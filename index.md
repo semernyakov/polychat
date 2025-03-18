@@ -119,4 +119,6 @@ Try out the plugin features in our [live demo](demo/)!
 
 ---
 
-[View on GitHub](https://github.com/semernyakov/groq-chat-plugin){: .button} 
+[View on GitHub](https://github.com/semernyakov/groq-chat-plugin){: .button}
+
+[Русская версия](index.ru.md){: .button} 
