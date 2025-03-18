@@ -1,0 +1,36 @@
+title: Groq Chat Plugin
+description: Groq Chat Plugin for Obsidian with support for latest models
+baseurl: "/groq-chat-plugin"
+url: "https://semernyakov.github.io"
+
+theme: jekyll-theme-cayman
+
+plugins:
+  - jekyll-seo-tag
+  - jekyll-sitemap
+  - jekyll-feed
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+  - .sass-cache/
+  - .jekyll-cache/
+  - gemfiles/
+  - demo/
+
+languages:
+  - en
+  - ru
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
+      lang: en
+  - scope:
+      path: "ru"
+    values:
+      lang: ru 
