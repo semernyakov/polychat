@@ -112,4 +112,22 @@ footer a:hover {
     .grid {
         grid-template-columns: 1fr;
     }
+}
+
+.badges {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    margin: 1rem 0;
+    flex-wrap: wrap;
+}
+
+.badges a {
+    text-decoration: none;
+    display: inline-block;
+}
+
+.badges img {
+    height: 20px;
+    vertical-align: middle;
 } 
