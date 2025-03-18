@@ -2,10 +2,9 @@ import { GroqPlugin } from './plugin';
 import { GroqModel } from '../constants/models';
 
 export interface Message {
-    role: 'user' | 'assistant' | 'system';
-    text: string;
-    timestamp: number;
-    status?: 'error';
+    role: 'user' | 'assistant';
+    content: string;
+    timestamp?: number;
 }
 
 export interface ChatProps {
@@ -35,4 +34,15 @@ export interface ChatPanelInternalProps {
     onSendMessage: () => Promise<void>;
     onModelChange: (model: GroqModel) => void;
     onClearHistory: () => void;
+}
+
+export interface ChatHistory {
+    messages: Message[];
+    timestamp: number;
+}
+
+export interface HistoryOptions {
+    method: 'memory' | 'file';
+    maxHistoryLength: number;
+    notePath: string;
 }

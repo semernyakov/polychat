@@ -1,4 +1,4 @@
-import { App, PluginSettingTab } from 'obsidian';
+import { App, PluginSettingTab, Setting } from 'obsidian';
 import { GroqModel } from '../constants';
 import { authService } from '../services/authService';
 import { Notice } from 'obsidian';

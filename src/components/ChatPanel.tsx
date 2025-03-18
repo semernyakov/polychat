@@ -42,23 +42,39 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ plugin }) => {
     const handleSend = useCallback(async () => {
         if (!state.input.trim() || state.isLoading) return;
 
+        const userMessage: Message = {
+            role: 'user',
+            content: state.input,
+            timestamp: Date.now()
+        };
+
         setState(prev => ({
             ...prev,
-            messages: [...prev.messages, { role: 'user', content: state.input }],
+            messages: [...prev.messages, userMessage],
             input: '',
             isLoading: true
         }));
 
         try {
-            const response = await groqService.sendMessage(state.input, {
-                method: plugin.settings.historyStorageMethod,
-                notePath: plugin.settings.notePath,
-                maxHistoryLength: plugin.settings.maxHistoryLength
-            });
+            const response = await groqService.sendMessage(
+                state.input,
+                state.selectedModel,
+                plugin.settings.apiKey,
+                {
+                    temperature: plugin.settings.temperature,
+                    max_tokens: plugin.settings.maxTokens
+                }
+            );
+
+            const assistantMessage: Message = {
+                role: 'assistant',
+                content: response,
+                timestamp: Date.now()
+            };
 
             setState(prev => ({
                 ...prev,
-                messages: [...prev.messages, { role: 'assistant', content: response }],
+                messages: [...prev.messages, assistantMessage],
                 isLoading: false
             }));
         } catch (error) {
@@ -67,7 +83,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ plugin }) => {
         }
     }, [state.input, state.isLoading, plugin.settings]);
 
-    const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
+    const handleKeyPress = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             handleSend();

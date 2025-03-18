@@ -1,8 +1,13 @@
-import { GroqModel } from '../constants/models';
+import { API_ENDPOINT, GroqModel } from '../constants';
 import { GroqApiResponse, GroqApiError, GroqApiOptions } from '../types/api';
 import { DEFAULT_MODEL_OPTIONS } from '../constants/models';
 
-export class GroqService {
+interface GroqRequestOptions {
+    temperature?: number;
+    max_tokens?: number;
+}
+
+class GroqService {
     private static instance: GroqService;
     
     private constructor() {}
@@ -15,53 +20,38 @@ export class GroqService {
     }
 
     async sendMessage(
-        message: string, 
-        model: GroqModel, 
+        message: string,
+        model: GroqModel,
         apiKey: string,
-        options: GroqApiOptions = {}
+        options: GroqRequestOptions = {}
     ): Promise<string> {
-        if (!apiKey) {
-            throw new Error('API ключ не указан');
+        const response = await fetch(API_ENDPOINT, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                messages: [{ role: 'user', content: message }],
+                model,
+                temperature: options.temperature ?? 0.7,
+                max_tokens: options.max_tokens ?? 2048
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`API error: ${response.statusText}`);
         }
 
-        const requestOptions = {
-            temperature: options.temperature ?? DEFAULT_MODEL_OPTIONS.temperature,
-            max_tokens: options.max_tokens ?? DEFAULT_MODEL_OPTIONS.max_tokens,
-            stream: options.stream ?? false
-        };
-
-        try {
-            const response = await fetch('https://api.groq.com/v1/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${apiKey}`
-                },
-                body: JSON.stringify({
-                    model,
-                    messages: [{ role: 'user', content: message }],
-                    ...requestOptions
-                })
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json() as GroqApiError;
-                throw new Error(`Ошибка API (${response.status}): ${errorData.error?.message || 'Неизвестная ошибка'}`);
-            }
-
-            const data = await response.json() as GroqApiResponse;
-            return data.choices[0].message.content;
-        } catch (error) {
-            console.error('Ошибка при вызове Groq API:', error);
-            throw new Error(`Ошибка чата: ${error instanceof Error ? error.message : 'Неизвестная ошибка'}`);
-        }
+        const data = await response.json();
+        return data.choices[0].message.content;
     }
 
     async validateApiKey(apiKey: string): Promise<boolean> {
         try {
-            await this.sendMessage('test', GROQ_MODELS.LLAMA_3_8B, apiKey);
+            await this.sendMessage('test', GroqModel.LLAMA_3_8B, apiKey);
             return true;
-        } catch {
+        } catch (error) {
             return false;
         }
     }
