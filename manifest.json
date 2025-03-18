@@ -1,10 +1,10 @@
 {
-    "id": "groq-chat",
+    "id": "groq-chat-plugin",
     "name": "Groq Chat",
     "version": "1.2.0",
     "minAppVersion": "0.15.0",
-    "description": "Интеграция с Groq API для чата с использованием различных моделей",
-    "author": "Semernyakov",
+    "description": "Groq Chat Plugin for Obsidian with support for latest models",
+    "author": "Ivan Semernyakov",
     "authorUrl": "https://github.com/semernyakov",
     "fundingUrl": "https://github.com/sponsors/semernyakov",
     "isDesktopOnly": false,

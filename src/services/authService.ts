@@ -1,14 +1,11 @@
 import { App } from 'obsidian';
-import { GroqPlugin } from '../types/plugin';
+import GroqChatPlugin from '../main';
 
 export class AuthService {
-    private app: App;
-    private plugin: GroqPlugin;
-
-    constructor(app: App, plugin: GroqPlugin) {
-        this.app = app;
-        this.plugin = plugin;
-    }
+    constructor(
+        private app: App,
+        private plugin: GroqChatPlugin
+    ) {}
 
     /**
      * Проверяет, авторизован ли пользователь
@@ -21,17 +18,17 @@ export class AuthService {
      * Проверяет, является ли API ключ валидным
      */
     async validateApiKey(apiKey: string): Promise<boolean> {
+        if (!apiKey) return false;
+        
         try {
             const response = await fetch('https://api.groq.com/v1/models', {
-                method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${apiKey}`
                 }
             });
-            
             return response.ok;
         } catch (error) {
-            console.error('Ошибка проверки API ключа:', error);
+            console.error('Error validating API key:', error);
             return false;
         }
     }
@@ -39,9 +36,21 @@ export class AuthService {
     /**
      * Сохраняет API ключ в настройках
      */
-    async saveApiKey(apiKey: string): Promise<void> {
-        this.plugin.settings.apiKey = apiKey;
-        await this.plugin.saveSettings();
+    async saveApiKey(apiKey: string): Promise<boolean> {
+        if (!apiKey) return false;
+        
+        try {
+            const isValid = await this.validateApiKey(apiKey);
+            if (isValid) {
+                this.plugin.settings.apiKey = apiKey;
+                await this.plugin.saveSettings();
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error('Error saving API key:', error);
+            return false;
+        }
     }
 
     /**

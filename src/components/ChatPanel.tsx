@@ -3,7 +3,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { App } from 'obsidian';
 import { GroqPlugin } from '../types/plugin';
 import { Message } from '../types/message';
-import { GoogleAuthButton } from './GoogleAuthButton';
 import { HistoryService } from '../services/historyService';
 import { MessageItem } from './MessageItem';
 import { ModelSelector } from './ModelSelector';
@@ -94,24 +93,12 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ plugin, app }) => {
         }
     }, [inputValue, plugin, isLoading, selectedModel]);
 
-    const handleAuthError = (error: string) => {
-        console.error('Ошибка аутентификации:', error);
-        const errorMessage: Message = {
-            id: Date.now().toString(),
-            role: 'error',
-            content: error,
-            timestamp: Date.now()
-        };
-        setMessages(prev => [...prev, errorMessage]);
-    };
-
     if (!plugin.settings.apiKey) {
         return (
             <div className="groq-chat-container">
-                <GoogleAuthButton 
-                    plugin={plugin} 
-                    onAuthError={handleAuthError} 
-                />
+                <div className="groq-api-key-warning">
+                    Пожалуйста, введите API ключ в настройках плагина
+                </div>
             </div>
         );
     }

@@ -1,47 +1,75 @@
-# Публикация плагина в Obsidian
+# Publishing Groq Chat Plugin
 
-## Подготовка к публикации
+This guide describes the process of publishing the Groq Chat Plugin for Obsidian.
 
-### 1. Проверка структуры проекта
+## Preparation for Publishing
 
-Убедитесь, что в корне проекта присутствуют все необходимые файлы:
+### 1. Functionality Check
+
+Before publishing, ensure all core features are working correctly:
+
+#### Supported Models
+
+* **Production Models**:
+  - Llama 3 70B Versatile (128K context tokens)
+  - Llama 3 8B Instant (128K context tokens)
+  - Mixtral 8x7B (32K context tokens)
+  - Gemma 2 9B (8K context tokens)
+  - Llama Guard 3 8B (for security checks)
+  - Whisper Large V3 (for audio processing)
+
+* **Preview Models**:
+  - Llama 3 90B Vision (image support)
+  - Qwen 2.5 Coder 32B (for code processing)
+  - Mistral Saba 24B
+  - DeepSeek models
+
+#### Core Functionality
+
+- [ ] Google OAuth authentication
+- [ ] Chat creation and management
+- [ ] All supported models working
+- [ ] Audio processing via Whisper
+- [ ] Image handling via Vision models
+- [ ] Code analysis via Coder models
+- [ ] Chat history saving
+- [ ] Interface settings
+- [ ] Hotkeys
+
+### 2. Check the structure of the project
+
+Ensure that all necessary files are present in the root of the project:
 
 ```
 groq-chat-plugin/
-├── manifest.json         # Метаданные плагина
-├── package.json         # Конфигурация npm
-├── versions.json        # История версий
-├── main.js             # Скомпилированный плагин
-├── styles.css          # Стили плагина
-├── README.md           # Документация
-└── LICENSE             # Лицензия MIT
+├── manifest.json         # Plugin metadata
+├── package.json         # npm configuration
+├── versions.json        # Version history
+├── main.js             # Compiled plugin
+├── styles.css          # Plugin styles
+├── README.md           # Documentation
+└── LICENSE             # MIT License
 ```
 
-### 2. Проверка manifest.json
+### 3. Check manifest.json
 
-Убедитесь, что файл `manifest.json` содержит корректные данные:
+Ensure that the file `manifest.json` contains correct data:
 
 ```json
 {
     "id": "groq-chat",
     "name": "Groq Chat",
-    "version": "1.0.0",
-    "minAppVersion": "0.15.0",
-    "description": "Интеграция с Groq API для чата с использованием различных моделей",
-    "author": "Semernyakov",
+    "author": "Ivan Semernyakov",
     "authorUrl": "https://github.com/semernyakov",
-    "fundingUrl": "https://github.com/sponsors/semernyakov",
-    "isDesktopOnly": false,
+    "description": "Groq Chat Plugin for Obsidian with support for latest models",
     "repo": "semernyakov/groq-chat-plugin",
-    "mobile": {
-        "icon": "message-square"
-    }
+    "branch": "master"
 }
 ```
 
-### 3. Проверка package.json
+### 4. Check package.json
 
-Убедитесь, что в `package.json` настроены все необходимые скрипты:
+Ensure that all necessary scripts are configured in `package.json`:
 
 ```json
 {
@@ -56,121 +84,121 @@ groq-chat-plugin/
 }
 ```
 
-## Процесс публикации
+## Publishing Process
 
-### 1. Подготовка релиза
+### 1. Release Preparation
 
-1. Убедитесь, что все изменения закоммичены:
+1. Ensure all changes are committed:
    ```bash
    git status
    ```
 
-2. Проверьте, что все тесты проходят:
+2. Verify that all tests pass:
    ```bash
    npm run test
    ```
 
-3. Проверьте сборку проекта:
+3. Verify project build:
    ```bash
    npm run build
    ```
 
-4. Проверьте линтинг:
+4. Verify linting:
    ```bash
    npm run lint
    ```
 
-### 2. Создание релиза
+### 2. Create Release
 
-1. Обновите версию плагина:
+1. Update plugin version:
    ```bash
-   npm version patch # для патча (1.0.0 -> 1.0.1)
-   # или
-   npm version minor # для минорной версии (1.0.0 -> 1.1.0)
-   # или
-   npm version major # для мажорной версии (1.0.0 -> 2.0.0)
+   npm version patch # for patch (1.0.0 -> 1.0.1)
+   # or
+   npm version minor # for minor version (1.0.0 -> 1.1.0)
+   # or
+   npm version major # for major version (1.0.0 -> 2.0.0)
    ```
 
-2. Создайте релиз:
+2. Create release:
    ```bash
    npm run release
    ```
 
-3. Отправьте изменения в репозиторий:
+3. Push changes to repository:
    ```bash
    git push --follow-tags origin master
    ```
 
-### 3. Публикация в Community Plugins
+### 3. Publishing in Community Plugins
 
-1. Форкните репозиторий [obsidian-releases](https://github.com/obsidianmd/obsidian-releases)
+1. Fork the [obsidian-releases](https://github.com/obsidianmd/obsidian-releases) repository
 
-2. Добавьте информацию о плагине в `community-plugins.json`:
+2. Add plugin information to `community-plugins.json`:
    ```json
    {
        "id": "groq-chat",
        "name": "Groq Chat",
-       "author": "Semernyakov",
-       "description": "Интеграция с Groq API для чата с использованием различных моделей",
+       "author": "Ivan Semernyakov",
+       "description": "Groq Chat Plugin for Obsidian with support for latest models",
        "repo": "semernyakov/groq-chat-plugin",
        "branch": "master"
    }
    ```
 
-3. Создайте Pull Request в репозиторий obsidian-releases
+3. Create Pull Request in obsidian-releases repository
 
-### 4. Проверка перед отправкой PR
+### 4. Pre-PR Check
 
-1. Проверьте работу плагина в Obsidian:
-   - Установите плагин из локального файла
-   - Проверьте основной функционал
-   - Проверьте работу на мобильных устройствах
+1. Verify plugin functionality in Obsidian:
+   - Install plugin from local file
+   - Verify main functionality
+   - Verify operation on mobile devices
 
-2. Убедитесь, что документация актуальна:
-   - README.md содержит актуальную информацию
-   - Описаны все функции и настройки
-   - Есть инструкции по установке и использованию
+2. Ensure documentation is up-to-date:
+   - README.md contains up-to-date information
+   - All functions and settings are described
+   - Installation and usage instructions are provided
 
-3. Проверьте файлы релиза:
-   - manifest.json содержит правильную версию
-   - versions.json обновлен
-   - main.js успешно собран
-   - styles.css содержит все стили
+3. Verify release files:
+   - manifest.json contains correct version
+   - versions.json is updated
+   - main.js successfully built
+   - styles.css contains all styles
 
-## После публикации
+## Post-Publishing
 
-### 1. Мониторинг
+### 1. Monitoring
 
-1. Следите за issues в репозитории
-2. Отвечайте на вопросы пользователей
-3. Исправляйте найденные баги
+1. Follow issues in repository
+2. Respond to user questions
+3. Fix found bugs
 
-### 2. Обновления
+### 2. Updates
 
-1. Для выпуска обновления повторите процесс релиза
-2. Обновите versions.json для новой версии
-3. Создайте новый релиз на GitHub
+1. Repeat release process for update
+2. Update versions.json for new version
+3. Create new release on GitHub
 
-### 3. Поддержка
+### 3. Support
 
-1. Регулярно обновляйте зависимости
-2. Следите за обновлениями Obsidian API
-3. Поддерживайте совместимость с новыми версиями Obsidian
+1. Regularly update dependencies
+2. Follow Obsidian API updates
+3. Support compatibility with new Obsidian versions
 
-## Полезные ссылки
+## Useful Links
 
 - [Obsidian Plugin Guidelines](https://docs.obsidian.md/Plugins/Getting+started/Plugin+guidelines)
 - [Obsidian Releases Repository](https://github.com/obsidianmd/obsidian-releases)
 - [Sample Plugin Repository](https://github.com/obsidianmd/obsidian-sample-plugin)
 
-## Контрольный список
+## Control List
 
-- [ ] Все необходимые файлы присутствуют
-- [ ] manifest.json содержит корректные данные
-- [ ] versions.json обновлен
-- [ ] Тесты проходят успешно
-- [ ] Сборка работает без ошибок
-- [ ] Документация актуальна
-- [ ] Плагин работает на мобильных устройствах
-- [ ] Создан релиз на GitHub
-- [ ] Отправлен PR в obsidian-releases 
+- [ ] All necessary files are present
+- [ ] manifest.json contains correct data
+- [ ] versions.json is updated
+- [ ] Tests pass successfully
+- [ ] Build works without errors
+- [ ] Documentation is up-to-date
+- [ ] Plugin works on mobile devices
+- [ ] Release created on GitHub
+- [ ] Pull Request sent to obsidian-releases 

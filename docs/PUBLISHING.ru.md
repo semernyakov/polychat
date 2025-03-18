@@ -1,8 +1,42 @@
-# Публикация плагина в Obsidian
+# Публикация плагина Groq Chat
+
+Это руководство описывает процесс публикации плагина Groq Chat для Obsidian.
 
 ## Подготовка к публикации
 
-### 1. Проверка структуры проекта
+### 1. Проверка функциональности
+
+Перед публикацией убедитесь, что все основные функции работают корректно:
+
+#### Поддерживаемые модели
+
+* **Production Models**:
+  - Llama 3 70B Versatile (128K токенов контекста)
+  - Llama 3 8B Instant (128K токенов контекста)
+  - Mixtral 8x7B (32K токенов контекста)
+  - Gemma 2 9B (8K токенов контекста)
+  - Llama Guard 3 8B (для проверки безопасности)
+  - Whisper Large V3 (для обработки аудио)
+
+* **Preview Models**:
+  - Llama 3 90B Vision (поддержка изображений)
+  - Qwen 2.5 Coder 32B (для работы с кодом)
+  - Mistral Saba 24B
+  - DeepSeek модели
+
+#### Основной функционал
+
+- [ ] Авторизация через Google OAuth
+- [ ] Создание и управление чатами
+- [ ] Работа со всеми поддерживаемыми моделями
+- [ ] Обработка аудио через Whisper
+- [ ] Работа с изображениями через Vision модели
+- [ ] Анализ кода через Coder модели
+- [ ] Сохранение истории чатов
+- [ ] Настройки интерфейса
+- [ ] Горячие клавиши
+
+### 2. Проверка структуры проекта
 
 Убедитесь, что в корне проекта присутствуют все необходимые файлы:
 
@@ -17,29 +51,23 @@ groq-chat-plugin/
 └── LICENSE             # Лицензия MIT
 ```
 
-### 2. Проверка manifest.json
+### 3. Проверка manifest.json
 
 Убедитесь, что файл `manifest.json` содержит корректные данные:
 
 ```json
 {
-    "id": "groq-chat",                # Уникальный идентификатор плагина
-    "name": "Groq Chat",              # Отображаемое имя плагина
-    "version": "1.0.0",              # Текущая версия
-    "minAppVersion": "0.15.0",       # Минимальная версия Obsidian
-    "description": "...",            # Краткое описание
-    "author": "Semernyakov",         # Имя автора
-    "authorUrl": "...",              # Ссылка на профиль автора
-    "fundingUrl": "...",             # Ссылка для поддержки
-    "isDesktopOnly": false,          # Поддержка мобильных устройств
-    "repo": "...",                   # Репозиторий плагина
-    "mobile": {
-        "icon": "message-square"      # Иконка для мобильной версии
-    }
+    "id": "groq-chat",
+    "name": "Groq Chat",
+    "author": "Ivan Semernyakov",
+    "authorUrl": "https://github.com/semernyakov",
+    "description": "Плагин Groq Chat для Obsidian с поддержкой новейших моделей",
+    "repo": "semernyakov/groq-chat-plugin",
+    "branch": "master"
 }
 ```
 
-### 3. Проверка package.json
+### 4. Проверка package.json
 
 Проверьте настройку скриптов в `package.json`:
 
@@ -113,8 +141,8 @@ groq-chat-plugin/
    {
        "id": "groq-chat",
        "name": "Groq Chat",
-       "author": "Semernyakov",
-       "description": "Интеграция с Groq API для чата с использованием различных моделей",
+       "author": "Ivan Semernyakov",
+       "description": "Плагин Groq Chat для Obsidian с поддержкой новейших моделей",
        "repo": "semernyakov/groq-chat-plugin",
        "branch": "master"
    }

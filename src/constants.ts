@@ -94,3 +94,81 @@ export const DEFAULT_MODEL = GroqProductionModel.LLAMA_3_70B;
 export const API_ENDPOINT = 'https://api.groq.com/openai/v1/chat/completions';
 
 export const VIEW_TYPE_GROQ_CHAT = 'groq-chat-view';
+
+export const PLUGIN_NAME = 'groq-chat';
+export const PLUGIN_ID = 'groq-chat-plugin';
+
+export const DEFAULT_SETTINGS = {
+    apiKey: '',
+    defaultModel: 'llama-3-70b-v1',
+    maxTokens: 2048,
+    temperature: 0.7,
+    historySize: 100,
+    theme: 'system',
+    fontSize: 14,
+    showTimestamps: true,
+};
+
+export const SUPPORTED_MODELS = {
+    production: [
+        {
+            id: 'llama-3-70b-v1',
+            name: 'Llama 3 70B Versatile',
+            contextWindow: 128000,
+            maxResponseTokens: 32768,
+            description: 'Recommended for general tasks'
+        },
+        {
+            id: 'llama-3-8b-v1',
+            name: 'Llama 3 8B Instant',
+            contextWindow: 128000,
+            maxResponseTokens: 8192,
+            description: 'Recommended for quick responses'
+        },
+        {
+            id: 'mixtral-8x7b-v1',
+            name: 'Mixtral 8x7B',
+            contextWindow: 32000,
+            description: 'Recommended for complex computations'
+        },
+        {
+            id: 'gemma-2-9b-v1',
+            name: 'Gemma 2 9B',
+            contextWindow: 8000,
+            description: 'Recommended for efficient processing'
+        },
+        {
+            id: 'llama-guard-3-8b-v1',
+            name: 'Llama Guard 3 8B',
+            contextWindow: 4000,
+            description: 'For security checks'
+        },
+        {
+            id: 'whisper-large-v3',
+            name: 'Whisper Large V3',
+            maxFileSize: 25,
+            description: 'For audio transcription'
+        }
+    ],
+    preview: [
+        {
+            id: 'llama-3-90b-vision-v1',
+            name: 'Llama 3 90B Vision',
+            contextWindow: 128000,
+            maxResponseTokens: 8192,
+            description: 'With image support'
+        },
+        {
+            id: 'qwen-2-5-coder-32b-v1',
+            name: 'Qwen 2.5 Coder 32B',
+            contextWindow: 128000,
+            description: 'For code processing'
+        },
+        {
+            id: 'mistral-saba-24b-v1',
+            name: 'Mistral Saba 24B',
+            contextWindow: 32000,
+            description: 'General purpose model'
+        }
+    ]
+};

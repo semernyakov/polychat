@@ -1,0 +1,12 @@
+[
+  {
+    "id": "groq-chat-plugin",
+    "name": "Groq Chat",
+    "version": "1.2.0",
+    "author": "Ivan Semernyakov",
+    "description": "Groq Chat Plugin for Obsidian with support for latest models",
+    "repo": "semernyakov/groq-chat-plugin",
+    "fundingUrl": "https://github.com/sponsors/semernyakov",
+    "isDesktopOnly": false
+  }
+] 

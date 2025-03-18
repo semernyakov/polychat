@@ -1,5 +1,50 @@
 # Groq Chat Plugin Setup and Publishing Guide
 
+## Environment Setup
+
+### 1. Requirements
+
+- Node.js 16+
+- npm or yarn
+- Git
+- Obsidian 0.15.0+
+- Groq API key
+
+### 2. Supported Models
+
+#### Production Models
+* **Llama 3 70B Versatile**
+  - Context: 128K tokens
+  - Max response: 32,768 tokens
+  - Recommended for: general tasks
+
+* **Llama 3 8B Instant**
+  - Context: 128K tokens
+  - Max response: 8,192 tokens
+  - Recommended for: quick responses
+
+* **Mixtral 8x7B**
+  - Context: 32K tokens
+  - Recommended for: complex computations
+
+* **Gemma 2 9B**
+  - Context: 8K tokens
+  - Recommended for: efficient processing
+
+* **Whisper Large V3**
+  - Max file size: 25 MB
+  - Recommended for: audio transcription
+
+#### Preview Models
+* **Llama 3 90B Vision**
+  - Image support
+  - Context: 128K tokens
+  - Max response: 8,192 tokens
+
+* **Qwen 2.5 Coder 32B**
+  - Specialization: code processing
+  - Context: 128K tokens
+
 ## 1. Setting up Secret Keys
 
 ### 1.1. Getting GROQ_API_KEY
@@ -9,33 +54,13 @@
 4. Click "Create New Key"
 5. Copy the generated key
 
-### 1.2. Getting GOOGLE_CLIENT_ID
-1. Go to [Google Cloud Console](https://console.cloud.google.com)
-2. Create a new project or select an existing one
-3. Enable OAuth 2.0 API in "APIs & Services > Library"
-4. Go to "APIs & Services > Credentials"
-5. Click "Create Credentials > OAuth client ID"
-6. Select "Web application" as application type
-7. Add authorized redirect URIs:
-   - `obsidian://groq-chat/auth/callback`
-   - `http://localhost:3000/auth/callback` (for development)
-8. Copy the Client ID
-
-### 1.3. Getting NPM_TOKEN
-1. Sign up at [npmjs.com](https://www.npmjs.com)
-2. Go to profile settings
-3. Select "Access Tokens"
-4. Create a new token with publish rights
-5. Copy the token
-
-### 1.4. Adding Secrets to GitHub
+### 1.2. Adding Secrets to GitHub
 1. Go to your repository settings on GitHub
 2. Select "Settings > Secrets and variables > Actions"
 3. Click "New repository secret"
 4. Add the following secrets:
    ```
    GROQ_API_KEY=your_groq_key
-   GOOGLE_CLIENT_ID=your_client_id
    NPM_TOKEN=your_npm_token
    ```
 

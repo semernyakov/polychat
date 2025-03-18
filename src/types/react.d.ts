@@ -1,4 +1,6 @@
 import * as React from 'react';
+import { Plugin } from 'obsidian';
+import { ReactNode } from 'react';
 
 declare module 'react' {
     export interface FunctionComponent<P = {}> {
@@ -48,6 +50,7 @@ declare module 'react' {
         role?: string;
         tabIndex?: number;
         style?: CSSProperties;
+        css?: unknown;
     }
 
     export interface DOMAttributes<T> {
@@ -58,6 +61,7 @@ declare module 'react' {
         onClick?: (event: MouseEvent<T>) => void;
         onKeyPress?: (event: KeyboardEvent<T>) => void;
         onChange?: (event: ChangeEvent<T>) => void;
+        onResize?: (event: unknown) => void;
     }
 
     export interface AriaAttributes {
@@ -95,6 +99,7 @@ declare module 'react' {
             textarea: React.DetailedHTMLProps<React.TextareaHTMLAttributes<HTMLTextAreaElement>, HTMLTextAreaElement>;
             span: React.DetailedHTMLProps<React.HTMLAttributes<HTMLSpanElement>, HTMLSpanElement>;
             input: React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
+            'style-jsx'?: StyleHTMLAttributes<HTMLStyleElement>;
         }
     }
 
@@ -102,4 +107,26 @@ declare module 'react' {
     export function useState<T>(initialState: T | (() => T)): [T, (newState: T | ((prevState: T) => T)) => void];
     export function useEffect(effect: () => void | (() => void | undefined), deps?: ReadonlyArray<any>): void;
     export function useCallback<T extends (...args: any[]) => any>(callback: T, deps: ReadonlyArray<any>): T;
+}
+
+declare global {
+    interface Window {
+        ReactNativeWebView: {
+            postMessage: (message: string) => void;
+        };
+    }
+}
+
+export interface PluginProps {
+    plugin: Plugin;
+}
+
+export type ReactComponent = (props: Record<string, unknown>) => ReactNode;
+
+export interface ModalProps {
+    onClose: () => void;
+}
+
+export interface ViewProps extends PluginProps {
+    leaf: unknown;
 } 
