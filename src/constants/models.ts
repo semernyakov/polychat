@@ -1,5 +1,3 @@
-import { GroqChatSettings } from '../types/plugin';
-
 export type GroqModel = string;
 
 export const GROQ_MODELS: GroqModel[] = [

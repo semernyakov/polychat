@@ -129,4 +129,66 @@ export interface ModalProps {
 
 export interface ViewProps extends PluginProps {
     leaf: unknown;
+}
+
+declare global {
+    namespace JSX {
+        interface Element extends React.ReactElement<unknown, unknown> {}
+        interface ElementClass extends React.Component<unknown> {
+            render(): React.ReactNode;
+        }
+        interface ElementAttributesProperty {
+            props: unknown;
+        }
+        interface ElementChildrenAttribute {
+            children: unknown;
+        }
+        interface IntrinsicAttributes extends React.Attributes {}
+        interface IntrinsicClassAttributes<T> extends React.ClassAttributes<T> {}
+        interface IntrinsicElements {
+            [elemName: string]: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
+        }
+    }
+}
+
+export interface ReactProps {
+    children?: ReactNode;
+}
+
+export interface ReactState {
+    [key: string]: unknown;
+}
+
+export interface ReactComponent<P = Record<string, unknown>, S = Record<string, unknown>> {
+    new(props: P): ReactComponentInstance<P, S>;
+}
+
+export interface ReactComponentInstance<P, S> {
+    props: P;
+    state: S;
+    setState(state: Partial<S>, callback?: () => void): void;
+    forceUpdate(callback?: () => void): void;
+    render(): ReactNode;
+}
+
+export interface ReactElement<P = Record<string, unknown>> {
+    type: string | ReactComponent<P>;
+    props: P;
+    key: string | null;
+}
+
+export interface ReactFragment {
+    [key: string]: ReactNode;
+}
+
+export type ReactText = string | number;
+export type ReactChild = ReactElement | ReactText;
+
+export interface ReactNodeArray extends Array<ReactNode> {}
+
+export type ReactNode = ReactChild | ReactFragment | ReactNodeArray | boolean | null | undefined;
+
+export interface ReactPortal extends ReactElement {
+    key: string | null;
+    children: ReactNode;
 } 

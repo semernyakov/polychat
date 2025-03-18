@@ -1,4 +1,4 @@
-import { Plugin, WorkspaceLeaf } from 'obsidian';
+import { Plugin } from 'obsidian';
 import { GroqPlugin, DEFAULT_SETTINGS } from './types/plugin';
 import { AuthService } from './services/authService';
 import { GroqService } from './services/groqService';

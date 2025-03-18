@@ -1,6 +1,6 @@
 import { TFile } from 'obsidian';
 import { GroqPlugin } from '../types/plugin';
-import { Message, ChatHistory } from '../types/message';
+import { Message } from '../types/message';
 
 export class HistoryService {
     private plugin: GroqPlugin;

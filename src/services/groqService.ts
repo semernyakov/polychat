@@ -1,7 +1,7 @@
 import { App } from 'obsidian';
 import { GroqPlugin } from '../types/plugin';
 import { Message } from '../types/message';
-import { MODELS, ModelInfo, GroqProductionModel, GroqPreviewModel } from '../constants';
+import { MODELS, ModelInfo } from '../constants';
 
 export class GroqService {
     private app: App;

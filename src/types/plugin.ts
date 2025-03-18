@@ -1,4 +1,5 @@
-import { Plugin } from 'obsidian';
+import { App } from 'obsidian';
+import { GroqModel } from '../constants/models';
 
 export interface ModelSettings {
     temperature: number;
@@ -7,19 +8,21 @@ export interface ModelSettings {
 
 export interface GroqChatSettings {
     apiKey: string;
-    model: string;
+    model: GroqModel;
     temperature: number;
     maxTokens: number;
-    historyStorageMethod: 'file' | 'memory';
+    historyStorageMethod: 'memory' | 'file';
     maxHistoryLength: number;
     notePath: string;
 }
 
+export interface ModelConfig {
+    temperature: number;
+    maxTokens: number;
+}
+
 export interface ModelConfigMap {
-    [key: string]: {
-        temperature: number;
-        maxTokens: number;
-    };
+    [key: string]: ModelConfig;
 }
 
 export const DEFAULT_SETTINGS: GroqChatSettings = {
@@ -33,9 +36,10 @@ export const DEFAULT_SETTINGS: GroqChatSettings = {
 };
 
 export interface GroqPlugin {
-    app: any;
+    app: App;
     settings: GroqChatSettings;
-    saveSettings: () => Promise<void>;
-    loadData: () => Promise<any>;
-    saveData: (data: any) => Promise<void>;
+    saveSettings(): Promise<void>;
+    loadSettings(): Promise<void>;
+    onSettingsUpdate(callback: (settings: GroqChatSettings) => void): void;
+    onError(callback: (error: Error) => void): void;
 }

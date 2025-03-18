@@ -10,10 +10,9 @@ import { GROQ_MODELS } from '../constants/models';
 
 interface ChatPanelProps {
     plugin: GroqPlugin;
-    app: App;
 }
 
-export const ChatPanel: React.FC<ChatPanelProps> = ({ plugin, app }) => {
+export const ChatPanel: React.FC<ChatPanelProps> = ({ plugin }) => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [inputValue, setInputValue] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -27,7 +26,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ plugin, app }) => {
             setMessages(history);
         };
         loadHistory();
-    }, [plugin.settings.apiKey]);
+    }, [plugin, plugin.settings.apiKey]);
 
     const handleSendMessage = useCallback(async () => {
         if (!inputValue.trim() || isLoading) return;
