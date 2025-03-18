@@ -1,9 +1,9 @@
 # Groq Chat Plugin для Obsidian
 
-[![CI](https://github.com/semernyakov/groq-chat-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/semernyakov/groq-chat-plugin/actions/workflows/ci.yml)
-[![Coverage](https://codecov.io/gh/semernyakov/groq-chat-plugin/branch/main/graph/badge.svg)](https://codecov.io/gh/semernyakov/groq-chat-plugin)
-[![Version](https://img.shields.io/github/v/release/semernyakov/groq-chat-plugin)](https://github.com/semernyakov/groq-chat-plugin/releases)
-[![License](https://img.shields.io/github/license/semernyakov/groq-chat-plugin)](LICENSE)
+[![CI](https://github.com/semernyakov/grok-chat-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/semernyakov/grok-chat-plugin/actions/workflows/ci.yml)
+[![Coverage](https://codecov.io/gh/semernyakov/grok-chat-plugin/branch/main/graph/badge.svg)](https://codecov.io/gh/semernyakov/grok-chat-plugin)
+[![Version](https://img.shields.io/github/v/release/semernyakov/grok-chat-plugin)](https://github.com/semernyakov/grok-chat-plugin/releases)
+[![License](https://img.shields.io/github/license/semernyakov/grok-chat-plugin)](LICENSE)
 
 ![Groq Chat Plugin](./docs/images/plugin-banner.png)
 
@@ -147,7 +147,7 @@ MIT License. См. файл [LICENSE](./LICENSE) для подробностей
 
 ## 🎮 Демо
 
-Посмотреть демо можно [здесь](https://semernyakov.github.io/groq-chat-plugin/demo)
+Посмотреть демо можно [здесь](https://semernyakov.github.io/grok-chat-plugin/demo)
 
 ## Documentation
 
