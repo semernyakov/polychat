@@ -1,70 +1,89 @@
-# Groq Chat Plugin для Obsidian
+# Groq Chat Plugin for Obsidian
 
-[![CI](https://github.com/semernyakov/grok-chat-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/semernyakov/grok-chat-plugin/actions/workflows/ci.yml)
-[![Coverage](https://codecov.io/gh/semernyakov/grok-chat-plugin/branch/main/graph/badge.svg)](https://codecov.io/gh/semernyakov/grok-chat-plugin)
-[![Version](https://img.shields.io/github/v/release/semernyakov/grok-chat-plugin)](https://github.com/semernyakov/grok-chat-plugin/releases)
-[![License](https://img.shields.io/github/license/semernyakov/grok-chat-plugin)](LICENSE)
+[![Версия](https://img.shields.io/badge/Версия-v1.2.0-blue "Текущая версия плагина")](https://github.com/semernyakov/groq-chat-plugin/releases)
+[![Лицензия](https://img.shields.io/badge/Лицензия-MIT-green "Лицензия MIT")](https://github.com/semernyakov/groq-chat-plugin/blob/master/LICENSE)
+[![CI/CD](https://img.shields.io/github/actions/workflow/status/semernyakov/groq-chat-plugin/ci.yml?branch=master&label=CI%2FCD "Статус сборки")](https://github.com/semernyakov/groq-chat-plugin/actions)
+[![Покрытие тестами](https://img.shields.io/codecov/c/github/semernyakov/groq-chat-plugin "Покрытие кода тестами")](https://codecov.io/gh/semernyakov/groq-chat-plugin)
+[![Obsidian Downloads](https://img.shields.io/badge/dynamic/json?logo=obsidian&color=7963E6&label=downloads&query=downloads&url=https://raw.githubusercontent.com/obsidianmd/obsidian-releases/master/community-plugins.json "Количество загрузок в Obsidian")](https://obsidian.md/plugins?id=groq-chat-plugin)
 
 ![Groq Chat Plugin](./docs/images/plugin-banner.png)
 
-## 📝 Описание
+## 📝 Description
 
-Groq Chat Plugin - это мощный плагин для Obsidian, который интегрирует возможности Groq AI непосредственно в ваше рабочее пространство. Используйте передовые языковые модели для улучшения вашего рабочего процесса в Obsidian.
+Groq Chat Plugin is a powerful plugin for Obsidian that integrates Groq AI capabilities directly into your workspace. Use advanced language models to enhance your workflow in Obsidian.
 
-## ✨ Основные возможности
+## ✨ Key Features
 
-- 🤖 Прямой доступ к моделям Groq AI
-- 🔐 Простая авторизация через Google
-- 💬 Интерактивный чат-интерфейс
-- 📚 Сохранение истории диалогов
-- 🎨 Настраиваемый интерфейс
-- 🌓 Поддержка светлой и темной темы
-- ⚡ Быстрый доступ через боковую панель
+* 🤖 Support for a wide range of models:
+  * **Production Models** (recommended for main use):
+    - Llama 3 70B Versatile (128K context)
+    - Llama 3 8B Instant (128K context)
+    - Mixtral 8x7B (32K context)
+    - Gemma 2 9B (8K context)
+    - Llama Guard 3 8B (for security)
+    - Whisper Large V3 (for audio)
+  * **Preview Models** (for testing):
+    - Llama 3 90B Vision (image support)
+    - Qwen 2.5 Coder 32B (for code)
+    - Mistral Saba 24B
+    - DeepSeek models
+* 🔐 Secure API key storage
+* 💬 Interactive chat interface
+* 📚 Chat history saving
+* 🎨 Customizable interface
+* 🌓 Light and dark theme support
+* ⚡ Quick access via sidebar
 
-## 🚀 Установка
+## 🚀 Installation
 
-1. Откройте Obsidian
-2. Перейдите в Настройки → Сторонние плагины
-3. Нажмите "Просмотреть" и найдите "Groq Chat"
-4. Установите плагин
-5. Включите плагин в списке установленных
+1. Open Obsidian
+2. Go to Settings → Community Plugins
+3. Click "Browse" and search for "Groq Chat"
+4. Install the plugin
+5. Enable the plugin in installed plugins list
 
-## ⚙️ Настройка
+## ⚙️ Configuration
 
-### Авторизация через Google
+### API Key Setup
 
-1. Создайте проект в Google Cloud Console:
-   - Перейдите на [console.cloud.google.com](https://console.cloud.google.com)
-   - Создайте новый проект
-   - Настройте OAuth consent screen
-   - Создайте OAuth Client ID
+1. Get your API key from [console.groq.com](https://console.groq.com)
+2. Enter the key in plugin settings
+3. Save settings
 
-2. Настройте OAuth Credentials:
-   - Тип приложения: Web application
-   - Название: Groq Chat
-   - Authorized redirect URI: `obsidian://groq-chat/auth/callback`
-   - Скопируйте полученный Client ID
+### Model Configuration
 
-3. Настройте плагин:
-   - Вставьте Client ID в настройках плагина
-   - Нажмите "Войти через Google"
-   - Следуйте инструкциям для авторизации
+#### Production Models
+* **Llama 3 70B Versatile**
+  - Context: 128K tokens
+  - Max response tokens: 32,768
+  - Recommended for: general tasks
 
-### Настройка моделей
+* **Llama 3 8B Instant**
+  - Context: 128K tokens
+  - Max response tokens: 8,192
+  - Recommended for: quick responses
 
-Плагин поддерживает следующие модели Groq:
-- Llama 3 (70B)
-- Llama 3 (8B)
-- Mixtral (8x7B)
-- Gemma (7B)
-- Claude 3 Opus
-- Claude 3 Sonnet
-- Claude 3 Haiku
+* **Mixtral 8x7B**
+  - Context: 32K tokens
+  - Recommended for: complex computations
 
-Для каждой модели можно настроить:
-- Температуру генерации (0.1 - 1.0)
-- Максимальное количество токенов
-- Пользовательский промпт
+* **Gemma 2 9B**
+  - Context: 8K tokens
+  - Recommended for: efficient processing
+
+* **Whisper Large V3**
+  - Max file size: 25 MB
+  - Recommended for: audio transcription
+
+#### Preview Models
+* **Llama 3 90B Vision**
+  - Image support
+  - Context: 128K tokens
+  - Max response tokens: 8,192
+
+* **Qwen 2.5 Coder 32B**
+  - Specialization: code processing
+  - Context: 128K tokens
 
 ## 💡 Использование
 
@@ -81,6 +100,11 @@ Groq Chat Plugin - это мощный плагин для Obsidian, котор�
    - История сохраняется автоматически
    - Используйте кнопку "Очистить историю" для сброса
    - Выберите способ хранения в настройках (память/файл)
+
+4. **Специальные возможности:**
+   - Загрузка аудио для транскрибации (Whisper)
+   - Обработка изображений (Vision модели)
+   - Анализ кода и генерация (Coder модели)
 
 ## ⌨️ Горячие клавиши
 
@@ -117,6 +141,11 @@ Groq Chat Plugin - это мощный плагин для Obsidian, котор�
    - Проверьте статус сервиса Groq
    - Убедитесь в действительности токена
    - Проверьте лимиты использования
+
+3. **Проблемы с моделью:**
+   - Убедитесь в правильном выборе модели
+   - Проверьте ограничения контекста
+   - Превью модели могут иметь прерывания
 
 ## 🤝 Вклад в развитие
 
