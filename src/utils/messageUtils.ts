@@ -4,16 +4,15 @@ export const messageUtils = {
     createUserMessage(text: string): Message {
         return {
             text,
-            sender: 'user',
-            timestamp: Date.now(),
-            status: 'sending'
+            role: 'user',
+            timestamp: Date.now()
         };
     },
 
-    createGroqMessage(text: string, status: 'sent' | 'error' = 'sent'): Message {
+    createGroqMessage(text: string, status?: 'error'): Message {
         return {
             text,
-            sender: 'groq',
+            role: 'assistant',
             timestamp: Date.now(),
             status
         };

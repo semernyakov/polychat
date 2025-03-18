@@ -1,63 +1,45 @@
-import React from 'react';
-import { createRoot } from 'react-dom/client';
-import { WorkspaceLeaf, ItemView } from 'obsidian';
-import GroqChatPlugin from '../main';
-import { GroqChatPanel } from '../components/ChatPanel';
-import { VIEW_TYPE_GROQ_CHAT } from '../constants';
-import { GroqChatSettings } from '../types/plugin';
+import { ItemView, WorkspaceLeaf } from 'obsidian';
+import * as React from 'react';
+import { Root, createRoot } from 'react-dom/client';
+import ChatPanel from '../components/ChatPanel';
+import { GroqChatPlugin } from '../types/plugin';
+
+export const VIEW_TYPE_GROQ = 'groq-chat-view';
 
 export class GroqChatView extends ItemView {
-    plugin: GroqChatPlugin;
-    private reactRoot: ReturnType<typeof createRoot> | null = null;
+    private root: Root | null = null;
+    private plugin: GroqChatPlugin;
 
     constructor(leaf: WorkspaceLeaf, plugin: GroqChatPlugin) {
         super(leaf);
         this.plugin = plugin;
     }
 
-    getViewType() {
-        return VIEW_TYPE_GROQ_CHAT;
+    getViewType(): string {
+        return VIEW_TYPE_GROQ;
     }
 
-    getDisplayText() {
+    getDisplayText(): string {
         return 'Groq Chat';
     }
 
-    async onOpen() {
-        try {
-            this.reactRoot = createRoot(this.containerEl.children[1]);
-            this.renderReactComponent();
-        } catch (error) {
-            console.error('Error opening Groq Chat view:', error);
-        }
+    async onOpen(): Promise<void> {
+        const container = this.containerEl.children[1];
+        container.empty();
+        container.createEl('div', { attr: { id: 'groq-chat-root' } });
+
+        const root = createRoot(container.children[0] as HTMLElement);
+        this.root = root;
+
+        root.render(
+            <ChatPanel plugin={this.plugin} />
+        );
     }
 
-    async onClose() {
-        if (this.reactRoot) {
-            this.reactRoot.unmount();
-            this.reactRoot = null;
-        }
-    }
-
-    updateSettings() {
-        this.renderReactComponent();
-    }
-
-    clearConversation() {
-        if (this.reactRoot) {
-            this.renderReactComponent();
-        }
-    }
-
-    private renderReactComponent() {
-        if (this.reactRoot) {
-            try {
-                this.reactRoot.render(
-                    <GroqChatPanel plugin={this.plugin} />
-                );
-            } catch (error) {
-                console.error('Error rendering Groq Chat component:', error);
-            }
+    async onClose(): Promise<void> {
+        if (this.root) {
+            this.root.unmount();
+            this.root = null;
         }
     }
 }

@@ -2,10 +2,10 @@ import { GroqPlugin } from './plugin';
 import { GroqModel } from '../constants/models';
 
 export interface Message {
+    role: 'user' | 'assistant' | 'system';
     text: string;
-    sender: 'user' | 'groq' | 'system';
     timestamp: number;
-    status?: 'sending' | 'sent' | 'error';
+    status?: 'error';
 }
 
 export interface ChatProps {

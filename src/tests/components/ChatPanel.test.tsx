@@ -1,38 +1,52 @@
 import React from 'react';
-import { render, fireEvent, screen } from '@testing-library/react';
-import { GroqChatPanel } from '../../components/ChatPanel';
+import { render, screen, fireEvent } from '@testing-library/react';
+import ChatPanel from '../../components/ChatPanel';
 import { GroqPlugin } from '../../types/plugin';
 import '@testing-library/jest-dom';
 
-// Mock plugin
-const mockPlugin: GroqPlugin = {
-    settings: {
-        groqApiKey: 'test-key',
-        defaultModel: 'llama3-8b-8192',
-        historyStorageMethod: 'local',
-        maxHistoryLength: 100,
-        temperature: 0.7,
-        maxTokens: 1000
-    },
-    loadSettings: jest.fn(),
-    saveSettings: jest.fn(),
-    clearHistory: jest.fn()
-};
-
 describe('ChatPanel', () => {
-    it('renders correctly', () => {
-        render(<GroqChatPanel plugin={mockPlugin} />);
-        expect(screen.getByPlaceholder('Введите сообщение...')).toBeInTheDocument();
+    const mockPlugin = {
+        settings: {
+            apiKey: 'test-api-key',
+            defaultModel: 'mixtral-8x7b-32768',
+            temperature: 0.7,
+            maxTokens: 4096,
+            maxHistoryLength: 100,
+            historyStorageMethod: 'local' as const,
+            notePath: ''
+        },
+        app: {},
+        manifest: {},
+        addRibbonIcon: jest.fn(),
+        addStatusBarItem: jest.fn(),
+        addCommand: jest.fn(),
+        addSettingTab: jest.fn(),
+        saveData: jest.fn(),
+        loadData: jest.fn()
+    } as unknown as GroqPlugin;
+
+    beforeEach(() => {
+        render(<ChatPanel plugin={mockPlugin} />);
     });
 
-    it('handles input changes', () => {
-        render(<GroqChatPanel plugin={mockPlugin} />);
-        const input = screen.getByPlaceholder('Введите сообщение...') as HTMLTextAreaElement;
-        
-        fireEvent.change(input, { target: { value: 'test message' } });
-        expect(input).toHaveValue('test message');
+    it('renders input field and send button', () => {
+        expect(screen.getByPlaceholderText('Введите сообщение...')).toBeInTheDocument();
+        expect(screen.getByText('Отправить')).toBeInTheDocument();
+    });
 
-        fireEvent.change(input, { target: { value: '' } });
-        expect(input).toHaveValue('');
+    it('handles user input', () => {
+        const input = screen.getByPlaceholderText('Введите сообщение...') as HTMLTextAreaElement;
+        fireEvent.change(input, { target: { value: 'Test message' } });
+        expect(input.value).toBe('Test message');
+    });
+
+    it('clears input after sending message', () => {
+        const input = screen.getByPlaceholderText('Введите сообщение...') as HTMLTextAreaElement;
+        const sendButton = screen.getByText('Отправить');
+
+        fireEvent.change(input, { target: { value: 'Test message' } });
+        fireEvent.click(sendButton);
+
+        expect(input.value).toBe('');
     });
 }); 

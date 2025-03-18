@@ -8,7 +8,7 @@ import { MessageItem } from './MessageItem';
 import { messageUtils } from '../utils/messageUtils';
 import { apiUtils } from '../utils/apiUtils';
 
-export const GroqChatPanel: React.FC<ChatProps> = ({ plugin }) => {
+const ChatPanel: React.FC<ChatProps> = ({ plugin }) => {
     const [state, setState] = useState<ChatPanelState>({
         messages: [],
         inputText: '',
@@ -29,7 +29,7 @@ export const GroqChatPanel: React.FC<ChatProps> = ({ plugin }) => {
         };
 
         loadMessages();
-    }, [plugin.settings, plugin.settings.historyStorageMethod, plugin.settings.maxHistoryLength, plugin.settings.notePath]);
+    }, []);
 
     useEffect(() => {
         const saveHistory = async () => {
@@ -42,7 +42,7 @@ export const GroqChatPanel: React.FC<ChatProps> = ({ plugin }) => {
 
         saveHistory();
         scrollToBottom();
-    }, [state.messages]);
+    }, [state.messages, plugin.settings.historyStorageMethod, plugin.settings.maxHistoryLength, plugin.settings.notePath]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -79,7 +79,7 @@ export const GroqChatPanel: React.FC<ChatProps> = ({ plugin }) => {
             const response = await groqService.sendMessage(
                 state.inputText,
                 state.selectedModel,
-                plugin.settings.groqApiKey,
+                plugin.settings.apiKey,
                 {
                     temperature: plugin.settings.temperature,
                     max_tokens: plugin.settings.maxTokens
@@ -139,19 +139,11 @@ export const GroqChatPanel: React.FC<ChatProps> = ({ plugin }) => {
                     <MessageItem
                         key={`${message.timestamp}-${index}`}
                         message={message}
-                        sender={message.sender} // Добавлено для передачи отправителя
-                        timestamp={message.timestamp} // Добавлено для передачи времени
                     />
                 ))}
                 <div ref={messagesEndRef} />
             </div>
             <div className="input-group">
-                <ModelSelector
-                    selectedModel={state.selectedModel}
-                    onModelChange={(model) => setState(prev => ({ ...prev, selectedModel: model }))}
-                    models={plugin.settings.models}
-                    disabled={state.isLoading}
-                />
                 <div className="message-input">
                     <textarea
                         value={state.inputText}
@@ -160,7 +152,6 @@ export const GroqChatPanel: React.FC<ChatProps> = ({ plugin }) => {
                         placeholder="Введите сообщение..."
                         className="input-field"
                         rows={3}
-                        style={{ fontSize: `${plugin.settings.ui?.fontSize ?? 14}px` }}
                         disabled={state.isLoading}
                     />
                     <button 
@@ -175,3 +166,5 @@ export const GroqChatPanel: React.FC<ChatProps> = ({ plugin }) => {
         </div>
     );
 };
+
+export default ChatPanel;
