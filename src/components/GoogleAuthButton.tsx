@@ -3,12 +3,10 @@ import { authService } from '../services/authService';
 import { Notice } from 'obsidian';
 
 interface GoogleAuthButtonProps {
-    onAuthSuccess: (token: string) => void;
     onAuthError: (error: string) => void;
 }
 
 export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({
-    onAuthSuccess,
     onAuthError
 }) => {
     const handleAuth = async () => {

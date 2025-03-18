@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Message, ChatProps, ChatPanelState } from '../types/chat';
+import { ChatProps, ChatPanelState } from '../types/chat';
 import { groqService } from '../services/groqService';
 import { historyService } from '../services/historyService';
 import { ModelSelector } from './ModelSelector';
@@ -8,18 +8,27 @@ import { messageUtils } from '../utils/messageUtils';
 import { apiUtils } from '../utils/apiUtils';
 
 export const GroqChatPanel: React.FC<ChatProps> = ({ plugin }) => {
-    const [state, setState] = useState<ChatPanelState>(async () => ({
-        messages: await historyService.loadMessages({
-            method: plugin.settings.historyStorageMethod,
-            maxHistoryLength: plugin.settings.maxHistoryLength,
-            notePath: plugin.settings.notePath
-        }),
+    const [state, setState] = useState<ChatPanelState>({
+        messages: [],
         inputText: '',
         isLoading: false,
         selectedModel: plugin.settings.defaultModel
-    }));
-    
+    });
+
     const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const loadMessages = async () => {
+            const loadedMessages = await historyService.loadMessages({
+                method: plugin.settings.historyStorageMethod,
+                maxHistoryLength: plugin.settings.maxHistoryLength,
+                notePath: plugin.settings.notePath
+            });
+            setState(prev => ({ ...prev, messages: loadedMessages }));
+        };
+
+        loadMessages();
+    }, [plugin.settings, plugin.settings.historyStorageMethod, plugin.settings.maxHistoryLength, plugin.settings.notePath]);
 
     useEffect(() => {
         const saveHistory = async () => {
@@ -29,7 +38,7 @@ export const GroqChatPanel: React.FC<ChatProps> = ({ plugin }) => {
                 notePath: plugin.settings.notePath
             });
         };
-        
+
         saveHistory();
         scrollToBottom();
     }, [state.messages]);
@@ -118,8 +127,8 @@ export const GroqChatPanel: React.FC<ChatProps> = ({ plugin }) => {
                     <MessageItem
                         key={`${message.timestamp}-${index}`}
                         message={message}
-                        showTimestamp={plugin.settings.ui?.showTimestamps}
-                        fontSize={plugin.settings.ui?.fontSize}
+                        sender={message.sender} // Добавлено для передачи отправителя
+                        timestamp={message.timestamp} // Добавлено для передачи времени
                     />
                 ))}
                 <div ref={messagesEndRef} />
@@ -128,7 +137,7 @@ export const GroqChatPanel: React.FC<ChatProps> = ({ plugin }) => {
                 <ModelSelector
                     selectedModel={state.selectedModel}
                     onModelChange={(model) => setState(prev => ({ ...prev, selectedModel: model }))}
-                    modelSettings={plugin.settings.models}
+                    models={plugin.settings.models}
                     disabled={state.isLoading}
                 />
                 <div className="message-input">

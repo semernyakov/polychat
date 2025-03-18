@@ -1,12 +1,12 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { WorkspaceLeaf, View } from 'obsidian';
+import { WorkspaceLeaf, ItemView } from 'obsidian';
 import GroqChatPlugin from '../main';
 import { GroqChatPanel } from '../components/ChatPanel';
 import { VIEW_TYPE_GROQ_CHAT } from '../constants';
 import { GroqChatSettings } from '../types/plugin';
 
-export class GroqChatView extends View {
+export class GroqChatView extends ItemView {
     plugin: GroqChatPlugin;
     private reactRoot: ReturnType<typeof createRoot> | null = null;
 
@@ -25,8 +25,8 @@ export class GroqChatView extends View {
 
     async onOpen() {
         try {
-            this.reactRoot = createRoot(this.contentEl);
-            this.renderReactComponent(this.plugin.settings);
+            this.reactRoot = createRoot(this.containerEl.children[1]);
+            this.renderReactComponent();
         } catch (error) {
             console.error('Error opening Groq Chat view:', error);
         }
@@ -39,15 +39,21 @@ export class GroqChatView extends View {
         }
     }
 
-    updateSettings(newSettings: GroqChatSettings) {
-        this.renderReactComponent(newSettings);
+    updateSettings() {
+        this.renderReactComponent();
     }
 
-    private renderReactComponent(settings: GroqChatSettings) {
+    clearConversation() {
+        if (this.reactRoot) {
+            this.renderReactComponent();
+        }
+    }
+
+    private renderReactComponent() {
         if (this.reactRoot) {
             try {
                 this.reactRoot.render(
-                    <GroqChatPanel settings={settings} plugin={this.plugin} />
+                    <GroqChatPanel plugin={this.plugin} />
                 );
             } catch (error) {
                 console.error('Error rendering Groq Chat component:', error);

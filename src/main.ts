@@ -1,4 +1,3 @@
-// main.ts
 import { Plugin, Notice } from 'obsidian';
 import { GroqChatSettings } from './types/plugin';
 import './styles/chat.css';
@@ -7,12 +6,8 @@ import { AuthState, GoogleAuthConfig } from './types';
 import { GroqChatSettingsTab } from './settings';
 import { GroqChatView } from './views/GroqChatView';
 import { VIEW_TYPE_GROQ_CHAT } from './constants';
-import { createRoot } from 'react-dom/client';
-import App from '../ui/src/App';
-import React from 'react';
 import { settingsUtils } from './utils/settingsUtils';
 import { groqService } from './services/groqService';
-import { historyService } from './services/historyService';
 import { authService } from './services/authService';
 
 const DEFAULT_SETTINGS: GroqChatSettings = {
@@ -20,6 +15,9 @@ const DEFAULT_SETTINGS: GroqChatSettings = {
     defaultModel: 'llama3-8b-8192',
     historyStorageMethod: 'note',
     googleToken: '',
+    maxHistoryLength: 100,
+    temperature: 0.7,
+    maxTokens: 1000
 };
 
 export default class GroqChatPlugin extends Plugin {
@@ -29,7 +27,7 @@ export default class GroqChatPlugin extends Plugin {
 
     private googleAuthConfig: GoogleAuthConfig = {
         clientId: process.env.GOOGLE_CLIENT_ID || '',
-        clientSecret: '', // Removed client secret. User will input via settings
+        clientSecret: '', // Удален клиентский секрет. Пользователь введет через настройки
         redirectUri: 'obsidian://groq-chat/auth/callback'
     };
 
@@ -55,19 +53,19 @@ export default class GroqChatPlugin extends Plugin {
             }
         }
 
-        // Initialize authentication state
+        // Инициализация состояния аутентификации
         if (this.settings.googleToken) {
             try {
-                const authService = AuthService.getInstance();
-                const isValid = await authService.verifyToken(this.settings.googleToken);
+                const authServiceInstance = AuthService.getInstance();
+                const isValid = await authServiceInstance.verifyToken(this.settings.googleToken);
                 this.authState.isAuthenticated = isValid;
                 if (!isValid) {
                     this.settings.googleToken = '';
                     await this.saveSettings();
                 }
             } catch (error) {
-                console.error('Error verifying token:', error);
-                new Notice(`Error verifying Google token: ${error instanceof Error ? error.message : String(error)}.  Please re-authenticate.`, 5000); // Show a user-friendly notice
+                console.error('Ошибка проверки токена:', error);
+                new Notice(`Ошибка проверки Google токена: ${error instanceof Error ? error.message : String(error)}. Пожалуйста, повторно авторизуйтесь.`, 5000);
                 this.authState.isAuthenticated = false;
                 this.settings.googleToken = '';
                 await this.saveSettings();
@@ -109,8 +107,8 @@ export default class GroqChatPlugin extends Plugin {
 
         // Обработчик изменения настроек
         this.registerEvent(
-            this.app.workspace.on('groq-chat:settings-change', async () => {
-                await this.saveSettings();
+            this.app.workspace.on('layout-change', () => {
+                this.saveSettings();
                 this.updateView();
             })
         );
@@ -132,10 +130,28 @@ export default class GroqChatPlugin extends Plugin {
     async loadSettings() {
         this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
     }
+
     async saveSettings() {
         await this.saveData(this.settings);
-        // Notify the React view that settings have changed
+        // Уведомление React представления о том, что настройки изменились
         this.app.workspace.trigger('groq-chat:settings-change');
+    }
+
+    async clearHistory() {
+        // Реализация метода clearHistory, требуемого интерфейсом GroqPlugin
+        // Здесь должна быть логика очистки истории чата
+        try {
+            // Пример реализации
+            const view = this.app.workspace.getLeavesOfType(VIEW_TYPE_GROQ_CHAT)[0]?.view;
+            if (view instanceof GroqChatView) {
+                // Предположим, что в ChatPanel есть метод clearHistory
+                view.clearConversation?.();
+            }
+            new Notice('История чата очищена');
+        } catch (error) {
+            console.error('Ошибка при очистке истории:', error);
+            new Notice('Ошибка при очистке истории чата');
+        }
     }
 
     updateView() {
@@ -149,66 +165,7 @@ export default class GroqChatPlugin extends Plugin {
         // Сохранение истории перед выгрузкой плагина
         const view = this.app.workspace.getLeavesOfType(VIEW_TYPE_GROQ_CHAT)[0]?.view;
         if (view instanceof GroqChatView) {
-            await view.saveState();
+            await view.onClose(); // Используем существующий метод onClose вместо saveState
         }
-    }
-}
-
-// views/GroqChatView.ts
-import { WorkspaceLeaf, View } from 'obsidian';
-import ReactDOM from 'react-dom/client';
-
-export const VIEW_TYPE_GROQ_CHAT = 'groq-chat-view';
-
-import { GroqChatViewProps } from './types/views';
-
-interface AppProps {
-    settings: GroqChatSettings;
-}
-
-export class GroqChatView extends View {
-    plugin: GroqChatPlugin;
-    root: ReactDOM.Root | null = null;
-    reactComponent: React.ReactElement<AppProps>;
-
-    constructor(leaf: WorkspaceLeaf, plugin: GroqChatPlugin) {
-        super(leaf);
-        this.plugin = plugin;
-    }
-
-    getViewType() {
-        return VIEW_TYPE_GROQ_CHAT;
-    }
-
-    getDisplayText() {
-        return 'Groq Chat';
-    }
-
-    async onOpen() {
-       // Create a React root
-        this.root = createRoot(this.contentEl);
-
-        // Create React component with initial settings
-        this.reactComponent = React.createElement<AppProps>(App, { settings: this.plugin.settings });
-
-        // Render the React application
-        this.root.render(this.reactComponent);
-    }
-
-    async onClose() {
-       if (this.root) {
-            this.root.unmount();
-            this.root = null;
-       }
-    }
-
-    updateSettings(newSettings: GroqChatSettings) {
-        // Re-render the component with new settings
-        this.reactComponent = React.createElement<AppProps>(App, { settings: newSettings });
-        this.root.render(this.reactComponent);
-    }
-
-    async saveState() {
-        // Implementation of saveState method
     }
 }

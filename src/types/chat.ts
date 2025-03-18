@@ -1,7 +1,10 @@
+import { GroqPlugin } from './plugin';
+import { GroqModel } from '../constants/models';
+
 export interface Message {
     text: string;
-    sender: 'user' | 'groq';
-    timestamp?: number;
+    sender: 'user' | 'groq' | 'system';
+    timestamp: number;
     status?: 'sending' | 'sent' | 'error';
 }
 
