@@ -1,14 +1,14 @@
 import { ItemView, WorkspaceLeaf } from 'obsidian';
+import * as React from 'react';
 import { createRoot, Root } from 'react-dom/client';
-import React from 'react';
 import { ChatPanel } from '../components/ChatPanel';
 import { GroqPlugin } from '../types/plugin';
 
 export const VIEW_TYPE_GROQ_CHAT = 'groq-chat-view';
 
 export class GroqChatView extends ItemView {
-    private root: Root | null = null;
     private plugin: GroqPlugin;
+    private root: Root;
 
     constructor(leaf: WorkspaceLeaf, plugin: GroqPlugin) {
         super(leaf);
@@ -26,33 +26,31 @@ export class GroqChatView extends ItemView {
     async onOpen(): Promise<void> {
         const container = this.containerEl.children[1];
         container.empty();
-        container.createEl('div', { attr: { id: 'groq-chat-root' } });
         
-        this.root = createRoot(container.querySelector('#groq-chat-root')!);
-        this.root.render(<ChatPanel plugin={this.plugin} />);
+        const rootEl = container.createDiv({ cls: 'groq-chat-container' });
+        this.root = createRoot(rootEl);
+        
+        this.root.render(<ChatPanel plugin={this.plugin} app={this.app} />);
     }
 
     async onClose(): Promise<void> {
         if (this.root) {
             this.root.unmount();
-            this.root = null;
         }
     }
 
-    clearConversation() {
-        const container = this.containerEl.children[1];
-        if (container) {
-            this.root?.render(
-                <ChatPanel plugin={this.plugin} key={Date.now()} />
+    async rerender(): Promise<void> {
+        if (this.root) {
+            this.root.render(
+                <ChatPanel plugin={this.plugin} app={this.app} key={Date.now()} />
             );
         }
     }
 
-    updateSettings(settings: any) {
-        const container = this.containerEl.children[1];
-        if (container) {
-            this.root?.render(
-                <ChatPanel plugin={this.plugin} key={Date.now()} />
+    async refreshSettings(): Promise<void> {
+        if (this.root) {
+            this.root.render(
+                <ChatPanel plugin={this.plugin} app={this.app} key={Date.now()} />
             );
         }
     }

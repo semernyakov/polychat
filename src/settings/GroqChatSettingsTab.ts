@@ -1,120 +1,139 @@
-import { App, PluginSettingTab, Setting } from 'obsidian';
-import { GroqPlugin } from '../types/plugin';
-import { GroqModel, MODEL_DISPLAY_NAMES } from '../constants/models';
+import { App, PluginSettingTab, Setting, Notice } from 'obsidian';
+import GroqChatPlugin from '../main';
+import { AuthService } from '../services/authService';
+import { GROQ_MODELS } from '../constants/models';
 
 export class GroqChatSettingsTab extends PluginSettingTab {
-    plugin: GroqPlugin;
+    plugin: GroqChatPlugin;
+    private authService: AuthService;
 
-    constructor(app: App, plugin: GroqPlugin) {
+    constructor(app: App, plugin: GroqChatPlugin) {
         super(app, plugin);
         this.plugin = plugin;
+        this.authService = new AuthService(app, plugin);
     }
 
     display(): void {
         const { containerEl } = this;
         containerEl.empty();
 
-        containerEl.createEl('h2', { text: 'Groq Chat Settings' });
+        containerEl.createEl('h2', { text: 'Настройки Groq Chat' });
 
+        // API ключ
         new Setting(containerEl)
-            .setName('API Key')
-            .setDesc('Enter your Groq API key')
+            .setName('API ключ')
+            .setDesc('Введите API ключ для доступа к Groq API')
             .addText(text => text
-                .setPlaceholder('Enter API key')
+                .setPlaceholder('gsk_...')
                 .setValue(this.plugin.settings.apiKey)
                 .onChange(async (value) => {
                     this.plugin.settings.apiKey = value;
                     await this.plugin.saveSettings();
-                }));
+                })
+            )
+            .addButton(button => button
+                .setButtonText('Проверить')
+                .onClick(async () => {
+                    const isValid = await this.authService.validateApiKey(this.plugin.settings.apiKey);
+                    if (isValid) {
+                        new Notice('API ключ действителен');
+                    } else {
+                        new Notice('API ключ недействителен');
+                    }
+                })
+            );
 
+        // Модель
         new Setting(containerEl)
-            .setName('Google Client ID')
-            .setDesc('Enter your Google OAuth Client ID')
-            .addText(text => text
-                .setPlaceholder('Enter Client ID')
-                .setValue(this.plugin.settings.googleClientId)
-                .onChange(async (value) => {
-                    this.plugin.settings.googleClientId = value;
-                    await this.plugin.saveSettings();
-                }));
-
-        new Setting(containerEl)
-            .setName('Default Model')
-            .setDesc('Select the default model to use')
+            .setName('Модель')
+            .setDesc('Выберите модель Groq для использования')
             .addDropdown(dropdown => dropdown
-                .addOptions(Object.entries(MODEL_DISPLAY_NAMES).reduce((acc, [key, value]) => {
-                    acc[key] = value;
-                    return acc;
+                .addOptions(GROQ_MODELS.reduce((obj, model) => {
+                    obj[model] = model;
+                    return obj;
                 }, {} as Record<string, string>))
-                .setValue(this.plugin.settings.defaultModel)
+                .setValue(this.plugin.settings.model)
                 .onChange(async (value) => {
-                    this.plugin.settings.defaultModel = value as GroqModel;
+                    this.plugin.settings.model = value;
                     await this.plugin.saveSettings();
-                }));
+                })
+            );
 
+        // Температура
         new Setting(containerEl)
-            .setName('Temperature')
-            .setDesc('Set the temperature for responses (0.0 - 1.0)')
+            .setName('Температура')
+            .setDesc('Уровень случайности от 0.1 (детерминированный) до 1.0 (креативный)')
             .addSlider(slider => slider
-                .setLimits(0, 1, 0.1)
+                .setLimits(0.1, 1.0, 0.1)
                 .setValue(this.plugin.settings.temperature)
                 .setDynamicTooltip()
                 .onChange(async (value) => {
                     this.plugin.settings.temperature = value;
                     await this.plugin.saveSettings();
-                }));
+                })
+            );
 
+        // Максимальное количество токенов
         new Setting(containerEl)
-            .setName('Max Tokens')
-            .setDesc('Set the maximum number of tokens for responses')
+            .setName('Максимальное количество токенов')
+            .setDesc('Максимальная длина ответа в токенах')
             .addText(text => text
-                .setPlaceholder('Enter max tokens')
+                .setPlaceholder('4096')
                 .setValue(String(this.plugin.settings.maxTokens))
                 .onChange(async (value) => {
-                    const tokens = parseInt(value);
-                    if (!isNaN(tokens)) {
-                        this.plugin.settings.maxTokens = tokens;
+                    const parsedValue = parseInt(value);
+                    if (!isNaN(parsedValue) && parsedValue > 0) {
+                        this.plugin.settings.maxTokens = parsedValue;
                         await this.plugin.saveSettings();
                     }
-                }));
+                })
+            );
 
+        // Способ хранения истории
         new Setting(containerEl)
-            .setName('History Storage Method')
-            .setDesc('Choose how to store chat history')
+            .setName('Метод хранения истории')
+            .setDesc('Выберите, как хранить историю чата')
             .addDropdown(dropdown => dropdown
-                .addOption('memory', 'Memory')
-                .addOption('file', 'File')
+                .addOptions({
+                    'memory': 'В памяти',
+                    'file': 'В файле'
+                })
                 .setValue(this.plugin.settings.historyStorageMethod)
                 .onChange(async (value: 'memory' | 'file') => {
                     this.plugin.settings.historyStorageMethod = value;
                     await this.plugin.saveSettings();
-                }));
+                })
+            );
 
+        // Максимальная длина истории
         new Setting(containerEl)
-            .setName('Max History Length')
-            .setDesc('Set the maximum number of messages to keep in history')
+            .setName('Максимальная длина истории')
+            .setDesc('Максимальное количество сообщений в истории')
             .addText(text => text
-                .setPlaceholder('Enter max history length')
+                .setPlaceholder('20')
                 .setValue(String(this.plugin.settings.maxHistoryLength))
                 .onChange(async (value) => {
-                    const length = parseInt(value);
-                    if (!isNaN(length)) {
-                        this.plugin.settings.maxHistoryLength = length;
+                    const parsedValue = parseInt(value);
+                    if (!isNaN(parsedValue) && parsedValue > 0) {
+                        this.plugin.settings.maxHistoryLength = parsedValue;
                         await this.plugin.saveSettings();
                     }
-                }));
+                })
+            );
 
+        // Путь к файлу истории
         if (this.plugin.settings.historyStorageMethod === 'file') {
             new Setting(containerEl)
-                .setName('Note Path')
-                .setDesc('Set the path for the history note')
+                .setName('Путь к файлу истории')
+                .setDesc('Путь к файлу для хранения истории чата')
                 .addText(text => text
-                    .setPlaceholder('Enter note path')
+                    .setPlaceholder('groq-chat-history.md')
                     .setValue(this.plugin.settings.notePath)
                     .onChange(async (value) => {
                         this.plugin.settings.notePath = value;
                         await this.plugin.saveSettings();
-                    }));
+                    })
+                );
         }
     }
 } 

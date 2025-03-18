@@ -1,71 +1,52 @@
 {
   "name": "groq-chat-plugin",
   "version": "1.0.0",
-  "description": "Groq Chat Plugin for Obsidian",
-  "author": "Семерняков Иван Сергеевич <i.s.semernyakov@yandex.ru> (https://t.me/semernyakov)",
-  "license": "MIT",
+  "description": "Obsidian plugin for Groq AI Chat",
+  "main": "dist/main.js",
   "scripts": {
     "dev": "rollup -c -w",
-    "build": "rollup -c",
-    "build:demo": "rollup -c rollup.config.demo.mjs",
+    "build": "tsc -noEmit -skipLibCheck && node esbuild.js production",
+    "build-dev": "node esbuild.js",
     "test": "jest",
-    "test:ci": "jest --ci --coverage",
     "lint": "eslint . --ext .ts,.tsx",
-    "typecheck": "tsc --noEmit",
-    "format": "prettier --write .",
-    "prepare": "husky install",
-    "release": "standard-version",
-    "postrelease": "git push --follow-tags origin master"
+    "version": "node version-bump.mjs && git add manifest.json versions.json",
+    "publish": "npm run build && npm run test && npm run release"
+  },
+  "keywords": [
+    "obsidian",
+    "obsidian-plugin",
+    "groq",
+    "ai",
+    "chat"
+  ],
+  "author": "Semernyakov",
+  "license": "MIT",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^22.0.0",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^13.3.0",
+    "@rollup/plugin-typescript": "^8.3.2",
+    "@types/jest": "^28.1.3",
+    "@types/node": "^17.0.5",
+    "@types/react": "^18.0.12",
+    "@types/react-dom": "^18.0.5",
+    "@typescript-eslint/eslint-plugin": "^5.29.0",
+    "@typescript-eslint/parser": "^5.29.0",
+    "esbuild": "0.17.3",
+    "esbuild-plugin-copy": "^2.1.1",
+    "eslint": "^8.18.0",
+    "eslint-plugin-react": "^7.30.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "husky": "^8.0.0",
+    "jest": "^28.1.1",
+    "rollup": "^2.75.6",
+    "ts-jest": "^28.0.5",
+    "tslib": "^2.4.0",
+    "typescript": "^4.7.3"
   },
   "dependencies": {
-    "@testing-library/jest-dom": "^6.0.0",
-    "obsidian": "^1.4.11",
+    "obsidian": "^1.2.8",
     "react": "^18.0.0",
     "react-dom": "^18.0.0"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.24.0",
-    "@babel/preset-env": "^7.24.0",
-    "@babel/preset-react": "^7.23.3",
-    "@babel/preset-typescript": "^7.23.3",
-    "@rollup/plugin-commonjs": "^25.0.7",
-    "@rollup/plugin-node-resolve": "^15.2.3",
-    "@rollup/plugin-typescript": "^11.1.6",
-    "@testing-library/react": "^14.2.1",
-    "@types/jest": "^29.5.12",
-    "@types/node": "^20.11.24",
-    "@types/react": "^18.2.61",
-    "@types/react-dom": "^18.2.19",
-    "@typescript-eslint/eslint-plugin": "^7.1.0",
-    "@typescript-eslint/parser": "^7.1.0",
-    "babel-jest": "^29.7.0",
-    "eslint": "^8.57.0",
-    "eslint-config-prettier": "^10.1.1",
-    "eslint-plugin-react": "^7.37.4",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "husky": "^8.0.0",
-    "jest": "^29.0.0",
-    "jest-environment-jsdom": "^29.0.0",
-    "postcss": "^8.0.0",
-    "prettier": "^3.0.0",
-    "rollup": "^4.0.0",
-    "rollup-plugin-copy": "^3.5.0",
-    "rollup-plugin-postcss": "^4.0.0",
-    "standard-version": "^9.0.0",
-    "ts-jest": "^29.0.0",
-    "typescript": "^5.1.6"
-  },
-  "main": ".eslintrc.js",
-  "directories": {
-    "doc": "docs"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/semernyakov/grok-chat-plugin.git"
-  },
-  "keywords": [],
-  "bugs": {
-    "url": "https://github.com/semernyakov/grok-chat-plugin/issues"
-  },
-  "homepage": "https://github.com/semernyakov/grok-chat-plugin#readme"
+  }
 }

@@ -1,51 +1,136 @@
-import { Message, ChatHistory, HistoryOptions } from '../types/chat';
+import { TFile } from 'obsidian';
 import { GroqPlugin } from '../types/plugin';
+import { Message, ChatHistory } from '../types/message';
 
 export class HistoryService {
     private plugin: GroqPlugin;
-    private history: ChatHistory = {
-        messages: [],
-        lastUpdated: new Date().toISOString()
-    };
 
     constructor(plugin: GroqPlugin) {
         this.plugin = plugin;
     }
 
-    async loadMessages(): Promise<Message[]> {
+    /**
+     * Получение истории сообщений
+     */
+    async getHistory(): Promise<Message[]> {
         if (this.plugin.settings.historyStorageMethod === 'file') {
-            return this.loadFromFile();
-        }
-        return this.history.messages;
-    }
-
-    async saveMessages(messages: Message[]): Promise<void> {
-        this.history.messages = messages.slice(-this.plugin.settings.maxHistoryLength);
-        this.history.lastUpdated = new Date().toISOString();
-
-        if (this.plugin.settings.historyStorageMethod === 'file') {
-            await this.saveToFile();
+            return this.loadMessagesFromFile();
+        } else {
+            return this.loadMessagesFromMemory();
         }
     }
 
-    private async loadFromFile(): Promise<Message[]> {
-        try {
-            const data = await this.plugin.app.vault.adapter.read(this.plugin.settings.notePath);
-            const history: ChatHistory = JSON.parse(data);
-            return history.messages;
-        } catch {
+    /**
+     * Добавление сообщения в историю
+     */
+    async addMessage(message: Message): Promise<void> {
+        const history = await this.getHistory();
+        const updatedHistory = [...history, message];
+        
+        // Обрезаем историю до максимального размера
+        const limitedHistory = updatedHistory.slice(-this.plugin.settings.maxHistoryLength);
+        
+        if (this.plugin.settings.historyStorageMethod === 'file') {
+            await this.saveMessagesToFile(limitedHistory);
+        } else {
+            await this.saveMessagesToMemory(limitedHistory);
+        }
+    }
+
+    /**
+     * Очистка истории сообщений
+     */
+    async clearHistory(): Promise<void> {
+        if (this.plugin.settings.historyStorageMethod === 'file') {
+            await this.saveMessagesToFile([]);
+        } else {
+            await this.saveMessagesToMemory([]);
+        }
+    }
+
+    /**
+     * Загрузка сообщений из файла
+     */
+    private async loadMessagesFromFile(): Promise<Message[]> {
+        const { vault } = this.plugin.app;
+        const notePath = this.plugin.settings.notePath;
+        
+        if (!notePath) {
             return [];
         }
+
+        try {
+            let file = vault.getAbstractFileByPath(notePath);
+            
+            if (!file) {
+                // Если файл не существует, создаем его
+                await vault.create(notePath, '');
+                file = vault.getAbstractFileByPath(notePath);
+            }
+
+            if (file instanceof TFile) {
+                const content = await vault.read(file);
+                try {
+                    const historyData = JSON.parse(content);
+                    return Array.isArray(historyData) ? historyData : [];
+                } catch (error) {
+                    console.error('Ошибка при парсинге истории сообщений:', error);
+                    return [];
+                }
+            }
+        } catch (error) {
+            console.error('Ошибка при загрузке истории сообщений:', error);
+        }
+
+        return [];
     }
 
-    private async saveToFile(): Promise<void> {
-        try {
-            await this.plugin.app.vault.adapter.write(
-                this.plugin.settings.notePath,
-                JSON.stringify(this.history, null, 2)
-            );
-        } catch (error) {
-            console.error('Error saving history to file:', error);
+    /**
+     * Сохранение сообщений в файл
+     */
+    private async saveMessagesToFile(messages: Message[]): Promise<void> {
+        const { vault } = this.plugin.app;
+        const notePath = this.plugin.settings.notePath;
+        
+        if (!notePath) {
+            return;
         }
+
+        try {
+            let file = vault.getAbstractFileByPath(notePath);
+            
+            if (!file) {
+                // Если файл не существует, создаем его
+                await vault.create(notePath, '');
+                file = vault.getAbstractFileByPath(notePath);
+            }
+
+            if (file instanceof TFile) {
+                const content = JSON.stringify(messages, null, 2);
+                await vault.modify(file, content);
+            }
+        } catch (error) {
+            console.error('Ошибка при сохранении истории сообщений:', error);
+        }
+    }
+
+    /**
+     * Загрузка сообщений из памяти (локального хранилища)
+     */
+    private async loadMessagesFromMemory(): Promise<Message[]> {
+        const savedData = await this.plugin.loadData();
+        return savedData?.chatHistory || [];
+    }
+
+    /**
+     * Сохранение сообщений в память (локальное хранилище)
+     */
+    private async saveMessagesToMemory(messages: Message[]): Promise<void> {
+        const data = await this.plugin.loadData();
+        const updatedData = {
+            ...data,
+            chatHistory: messages
+        };
+        await this.plugin.saveData(updatedData);
     }
 }

@@ -4,9 +4,9 @@ import { GroqModel } from '../constants/models';
 export type MessageRole = 'user' | 'assistant' | 'error';
 
 export interface Message {
-    role: MessageRole;
+    role: 'user' | 'assistant';
     content: string;
-    timestamp: string;
+    timestamp: number;
 }
 
 export interface ChatProps {
@@ -40,7 +40,12 @@ export interface ChatPanelInternalProps {
 
 export interface ChatHistory {
     messages: Message[];
-    lastUpdated: string;
+}
+
+export interface ChatState {
+    isLoading: boolean;
+    error: string | null;
+    history: ChatHistory;
 }
 
 export interface HistoryOptions {

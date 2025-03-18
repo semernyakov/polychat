@@ -1,66 +1,85 @@
-import { API_ENDPOINT } from '../constants';
-import { GroqModel } from '../constants/models';
-import { GroqApiResponse, GroqApiError, GroqApiOptions } from '../types/api';
-import { DEFAULT_MODEL_OPTIONS } from '../constants/models';
-
-interface GroqRequestOptions {
-    temperature?: number;
-    max_tokens?: number;
-}
+import { App } from 'obsidian';
+import { GroqPlugin } from '../types/plugin';
+import { Message } from '../types/message';
 
 export class GroqService {
-    private static instance: GroqService;
-    
-    private constructor() {}
-    
-    static getInstance(): GroqService {
-        if (!GroqService.instance) {
-            GroqService.instance = new GroqService();
+    private app: App;
+    private plugin: GroqPlugin;
+
+    constructor(app: App, plugin: GroqPlugin) {
+        this.app = app;
+        this.plugin = plugin;
+    }
+
+    async validateApiKey(apiKey: string): Promise<boolean> {
+        try {
+            const response = await fetch('https://api.groq.com/v1/models', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`
+                }
+            });
+            
+            return response.ok;
+        } catch (error) {
+            console.error('Ошибка проверки API ключа:', error);
+            return false;
         }
-        return GroqService.instance;
     }
 
     async sendMessage(
         content: string,
-        model: GroqModel,
-        temperature: number,
-        maxTokens: number
-    ): Promise<string> {
+        model: string = this.plugin.settings.model,
+        temperature: number = this.plugin.settings.temperature,
+        maxTokens: number = this.plugin.settings.maxTokens
+    ): Promise<Message> {
+        if (!this.plugin.settings.apiKey) {
+            throw new Error('API ключ не задан. Пожалуйста, введите API ключ в настройках.');
+        }
+
         try {
-            const response = await fetch(API_ENDPOINT, {
+            const response = await fetch('https://api.groq.com/v1/chat/completions', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.plugin.settings.apiKey}`
                 },
                 body: JSON.stringify({
-                    messages: [{ role: 'user', content }],
                     model,
-                    temperature: temperature.toString(),
+                    messages: [{ role: 'user', content }],
+                    temperature: temperature,
                     max_tokens: maxTokens
                 })
             });
 
             if (!response.ok) {
-                const error: GroqApiError = await response.json();
-                throw new Error(error.error.message);
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(`API ошибка: ${response.status} ${response.statusText}. ${errorData.error?.message || ''}`);
             }
 
-            const data: GroqApiResponse = await response.json();
-            return data.choices[0].message.content;
+            const data = await response.json();
+            
+            return {
+                id: Date.now().toString(),
+                role: 'assistant',
+                content: data.choices[0].message.content,
+                timestamp: Date.now()
+            };
         } catch (error) {
-            console.error('Error sending message:', error);
+            console.error('Ошибка отправки сообщения:', error);
             throw error;
         }
     }
 
-    async validateApiKey(apiKey: string): Promise<boolean> {
-        try {
-            await this.sendMessage('test', GroqModel.LLAMA_3_8B, 0.7, 2048);
-            return true;
-        } catch (error) {
-            return false;
-        }
+    getAvailableModels() {
+        return [
+            'llama3-70b-8192',
+            'llama3-8b-8192',
+            'mixtral-8x7b-32768',
+            'gemma-7b-it',
+            'claude-3-opus-20240229',
+            'claude-3-sonnet-20240229',
+            'claude-3-haiku-20240307'
+        ];
     }
 }
-
-export const groqService = GroqService.getInstance();

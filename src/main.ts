@@ -1,36 +1,35 @@
 import { Plugin, WorkspaceLeaf } from 'obsidian';
-import { GroqChatView, VIEW_TYPE_GROQ_CHAT } from './views/GroqChatView';
-import { GroqChatSettingsTab } from './settings';
-import { DEFAULT_SETTINGS, GroqChatSettings, GroqPlugin } from './types/plugin';
+import { GroqPlugin, DEFAULT_SETTINGS } from './types/plugin';
 import { AuthService } from './services/authService';
+import { GroqService } from './services/groqService';
+import { GroqChatSettingsTab } from './settings/GroqChatSettingsTab';
+import { GroqChatView, VIEW_TYPE_GROQ_CHAT } from './views/GroqChatView';
 
 export default class GroqChatPlugin extends Plugin implements GroqPlugin {
-    settings: GroqChatSettings;
+    settings = DEFAULT_SETTINGS;
     private authService: AuthService;
+    private groqService: GroqService;
 
     async onload() {
         await this.loadSettings();
-        
-        this.authService = new AuthService(this);
+
+        this.authService = new AuthService(this.app, this);
+        this.groqService = new GroqService(this.app, this);
+
+        this.registerView(
+            VIEW_TYPE_GROQ_CHAT,
+            (leaf) => new GroqChatView(leaf, this)
+        );
 
         this.addRibbonIcon('message-square', 'Groq Chat', () => {
             this.activateView();
         });
 
         this.addSettingTab(new GroqChatSettingsTab(this.app, this));
+    }
 
-        this.registerView(
-            VIEW_TYPE_GROQ_CHAT,
-            (leaf: WorkspaceLeaf) => new GroqChatView(leaf, this)
-        );
-
-        this.addCommand({
-            id: 'open-groq-chat',
-            name: 'Open Groq Chat',
-            callback: () => {
-                this.activateView();
-            },
-        });
+    async onunload() {
+        this.app.workspace.detachLeavesOfType(VIEW_TYPE_GROQ_CHAT);
     }
 
     async loadSettings() {
@@ -41,25 +40,24 @@ export default class GroqChatPlugin extends Plugin implements GroqPlugin {
         await this.saveData(this.settings);
     }
 
-    async activateView() {
-        const workspace = this.app.workspace;
+    private async activateView() {
+        const { workspace } = this.app;
+
         let leaf = workspace.getLeavesOfType(VIEW_TYPE_GROQ_CHAT)[0];
 
         if (!leaf) {
             const rightLeaf = workspace.getRightLeaf(false);
-            const newLeaf = rightLeaf || workspace.getLeaf(true);
-            if (newLeaf) {
-                leaf = newLeaf;
+            if (rightLeaf) {
+                leaf = rightLeaf;
+                await leaf.setViewState({
+                    type: VIEW_TYPE_GROQ_CHAT,
+                    active: true,
+                });
             }
         }
 
         if (leaf) {
-            await leaf.setViewState({ type: VIEW_TYPE_GROQ_CHAT });
             workspace.revealLeaf(leaf);
         }
-    }
-
-    onunload() {
-        this.authService.stopServer();
     }
 }

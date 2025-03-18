@@ -1,14 +1,26 @@
+export interface GroqMessage {
+    role: 'user' | 'assistant' | 'system';
+    content: string;
+}
+
+export interface GroqApiRequest {
+    messages: GroqMessage[];
+    model: string;
+    temperature?: number;
+    max_tokens?: number;
+    stream?: boolean;
+}
+
 export interface GroqApiResponse {
+    id: string;
+    object: string;
+    created: number;
+    model: string;
     choices: {
-        message: {
-            content: string;
-            role: string;
-        };
+        index: number;
+        message: GroqMessage;
         finish_reason: string;
     }[];
-    created: number;
-    id: string;
-    model: string;
     usage: {
         prompt_tokens: number;
         completion_tokens: number;
@@ -20,12 +32,17 @@ export interface GroqApiError {
     error: {
         message: string;
         type: string;
-        code: string;
+        param?: string;
+        code?: string;
     };
 }
 
-export interface GroqApiOptions {
-    temperature?: number;
-    max_tokens?: number;
-    stream?: boolean;
+export interface GroqModel {
+    id: string;
+    object: string;
+    created: number;
+    owned_by: string;
+    permission: any[];
+    root: string;
+    parent: string | null;
 } 
