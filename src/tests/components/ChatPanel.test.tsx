@@ -3,10 +3,6 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ChatPanel } from '../../components/ChatPanel';
 import { GroqPlugin } from '../../types/plugin';
-import { App } from 'obsidian';
-
-// Мок для App
-const mockApp = {} as App;
 
 // Мок для плагина
 const mockPlugin = {

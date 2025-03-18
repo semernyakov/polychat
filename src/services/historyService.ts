@@ -1,4 +1,3 @@
-import { TFile } from 'obsidian';
 import { GroqPlugin } from '../types/plugin';
 import { Message } from '../types/message';
 
