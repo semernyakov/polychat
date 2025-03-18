@@ -1,0 +1,41 @@
+theme: jekyll-theme-cayman
+title: Groq Chat Plugin
+description: Integrate Groq's AI capabilities directly into your Obsidian notes
+show_downloads: true
+google_analytics:
+plugins:
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+# SEO settings
+author:
+  name: Ivan Semernyakov
+  url: https://github.com/semernyakov
+
+# Social links
+social:
+  github: semernyakov/groq-chat-plugin
+  npm: groq-chat-plugin
+
+# Additional settings
+markdown: kramdown
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+
+# Collections
+collections:
+  docs:
+    output: true
+    permalink: /:collection/:path/
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
+
+# Base URL
+baseurl: "/groq-chat-plugin"
+url: "https://semernyakov.github.io" 
