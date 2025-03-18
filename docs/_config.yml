@@ -42,4 +42,7 @@ defaults:
 
 github:
   is_project_page: true
-  repository_url: https://github.com/semernyakov/groq-chat-plugin 
+  repository_name: groq-chat-plugin
+  repository_url: https://github.com/semernyakov/groq-chat-plugin
+  owner_name: semernyakov
+  owner_url: https://github.com/semernyakov 

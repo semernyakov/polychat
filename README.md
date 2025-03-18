@@ -2,12 +2,12 @@
 
 [![Release](https://img.shields.io/github/v/release/semernyakov/groq-chat-plugin?style=flat-square)](https://github.com/semernyakov/groq-chat-plugin/releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/semernyakov/groq-chat-plugin/total?style=flat-square)](https://github.com/semernyakov/groq-chat-plugin/releases)
-[![License](https://img.shields.io/github/license/semernyakov/groq-chat-plugin?style=flat-square)](LICENSE)
+[![License](https://img.shields.io/github/license/semernyakov/groq-chat-plugin?style=flat-square)](https://github.com/semernyakov/groq-chat-plugin/blob/master/LICENSE)
 [![Tests](https://img.shields.io/github/actions/workflow/status/semernyakov/groq-chat-plugin/ci.yml?branch=master&style=flat-square)](https://github.com/semernyakov/groq-chat-plugin/actions/workflows/ci.yml)
 [![Coverage](https://img.shields.io/codecov/c/github/semernyakov/groq-chat-plugin?style=flat-square)](https://codecov.io/gh/semernyakov/groq-chat-plugin)
 [![NPM](https://img.shields.io/npm/v/groq-chat-plugin?style=flat-square)](https://www.npmjs.com/package/groq-chat-plugin)
 
-[Русская версия](README.ru.md)
+[Русская версия](ru/README.ru.md)
 
 A plugin for [Obsidian](https://obsidian.md) that integrates Groq's AI chat capabilities directly into your notes.
 
