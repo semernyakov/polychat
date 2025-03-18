@@ -13,6 +13,7 @@ export type ModelConfigMap = {
 export interface GroqChatSettings {
     apiKey: string;
     googleToken: string;
+    googleClientId: string;
     defaultModel: GroqModel;
     temperature: number;
     maxTokens: number;
@@ -40,6 +41,7 @@ export const DEFAULT_MODEL_OPTIONS: ModelConfigMap = {
 export const DEFAULT_SETTINGS: GroqChatSettings = {
     apiKey: '',
     googleToken: '',
+    googleClientId: '',
     defaultModel: GroqModel.LLAMA_3_8B,
     temperature: 0.7,
     maxTokens: 8192,
@@ -51,5 +53,6 @@ export const DEFAULT_SETTINGS: GroqChatSettings = {
 
 export interface GroqPlugin extends Plugin {
     settings: GroqChatSettings;
-    saveData: (settings: GroqChatSettings) => Promise<void>;
+    saveSettings(): Promise<void>;
+    loadSettings(): Promise<void>;
 }

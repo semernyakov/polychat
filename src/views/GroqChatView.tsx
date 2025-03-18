@@ -3,7 +3,8 @@ import { createRoot, Root } from 'react-dom/client';
 import React from 'react';
 import { ChatPanel } from '../components/ChatPanel';
 import { GroqPlugin } from '../types/plugin';
-import { VIEW_TYPE_GROQ_CHAT } from '../constants';
+
+export const VIEW_TYPE_GROQ_CHAT = 'groq-chat-view';
 
 export class GroqChatView extends ItemView {
     private root: Root | null = null;
@@ -22,16 +23,16 @@ export class GroqChatView extends ItemView {
         return 'Groq Chat';
     }
 
-    async onOpen() {
+    async onOpen(): Promise<void> {
         const container = this.containerEl.children[1];
         container.empty();
-        this.root = createRoot(container);
-        this.root.render(
-            <ChatPanel plugin={this.plugin} />
-        );
+        container.createEl('div', { attr: { id: 'groq-chat-root' } });
+        
+        this.root = createRoot(container.querySelector('#groq-chat-root')!);
+        this.root.render(<ChatPanel plugin={this.plugin} />);
     }
 
-    async onClose() {
+    async onClose(): Promise<void> {
         if (this.root) {
             this.root.unmount();
             this.root = null;

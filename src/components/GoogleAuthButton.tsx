@@ -1,37 +1,31 @@
 import React from 'react';
-import { authService } from '../services/authService';
-import { Notice } from 'obsidian';
+import { AuthService } from '../services/authService';
+import { GroqPlugin } from '../types/plugin';
 
-interface GoogleAuthButtonProps {
-    onAuthError: (error: string) => void;
+interface Props {
+    plugin: GroqPlugin;
+    onAuthError?: (error: Error) => void;
 }
 
-export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({
-    onAuthError
-}) => {
+export function GoogleAuthButton({ plugin, onAuthError }: Props) {
     const handleAuth = async () => {
         try {
-            await authService.initiateGoogleAuth();
+            const authService = new AuthService(plugin);
+            await authService.startAuthFlow();
         } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Неизвестная ошибка';
-            onAuthError(errorMessage);
-            new Notice(`Ошибка авторизации: ${errorMessage}`);
+            if (onAuthError) {
+                onAuthError(error instanceof Error ? error : new Error(String(error)));
+            }
         }
     };
 
     return (
         <button
+            type="button"
             className="google-auth-button"
             onClick={handleAuth}
         >
-            <div className="google-auth-button-content">
-                <img 
-                    src="data:image/svg+xml;base64,..." // Здесь будет base64 иконка Google
-                    alt="Google"
-                    className="google-icon"
-                />
-                <span>Войти через Google</span>
-            </div>
+            Войти через Google
         </button>
     );
-}; 
+}

@@ -1,6 +1,6 @@
 import { App, PluginSettingTab, Setting } from 'obsidian';
 import { GroqModel } from '../constants/models';
-import { authService } from '../services/authService';
+import { AuthService } from '../services/authService';
 import { Notice } from 'obsidian';
 import { GroqPlugin } from '../types/plugin';
 
@@ -34,7 +34,7 @@ export class GroqSettingTab extends PluginSettingTab {
             .addButton(button => button
                 .setButtonText(this.plugin.settings.apiKey ? 'Переавторизоваться' : 'Войти через Google')
                 .onClick(async () => {
-                    await authService.validateApiKey(this.plugin.settings.apiKey);
+                    await this.validateToken(this.plugin.settings.apiKey);
                     new Notice('Авторизация успешна!');
                 }));
 
@@ -60,4 +60,16 @@ export class GroqSettingTab extends PluginSettingTab {
                     await this.plugin.saveData(this.plugin.settings);
                 }));
     }
+
+    async validateToken(token: string): Promise<boolean> {
+        try {
+            const auth = new AuthService(this.plugin);
+            return await auth.validateToken(token);
+        } catch (error) {
+            console.error('Error validating token:', error);
+            return false;
+        }
+    }
 }
+
+export { GroqChatSettingsTab } from './GroqChatSettingsTab';

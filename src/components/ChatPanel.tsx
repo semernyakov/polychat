@@ -1,105 +1,104 @@
-import React, { useState, useEffect, useCallback } from 'react';
+/** @jsx React.createElement */
+import React from 'react';
 import { GroqPlugin } from '../types/plugin';
-import { groqService } from '../services/groqService';
-import { historyService } from '../services/historyService';
 import { Message } from '../types/chat';
+import { groqService } from '../services/groqService';
+import { HistoryService } from '../services/historyService';
 import { GroqModel } from '../constants/models';
+import { GoogleAuthButton } from './GoogleAuthButton';
 
-interface ChatPanelProps {
+interface Props {
     plugin: GroqPlugin;
 }
 
-export const ChatPanel: React.FC<ChatPanelProps> = ({ plugin }) => {
-    const [state, setState] = useState({
-        messages: [] as Message[],
-        input: '',
-        isLoading: false,
-        selectedModel: plugin.settings.defaultModel
-    });
+export function ChatPanel({ plugin }: Props) {
+    const [messages, setMessages] = React.useState<Message[]>([]);
+    const [input, setInput] = React.useState('');
+    const [isLoading, setIsLoading] = React.useState(false);
+    const [selectedModel] = React.useState<GroqModel>(plugin.settings.defaultModel);
+    const [historyService] = React.useState(() => new HistoryService(plugin));
 
-    useEffect(() => {
+    React.useEffect(() => {
         const loadHistory = async () => {
-            const history = await historyService.loadHistory({
-                method: plugin.settings.historyStorageMethod,
-                maxHistoryLength: plugin.settings.maxHistoryLength,
-                notePath: plugin.settings.notePath
-            });
-            setState(prev => ({ ...prev, messages: history }));
+            const history = await historyService.loadMessages();
+            setMessages(history);
         };
         loadHistory();
-    }, [plugin.settings.historyStorageMethod, plugin.settings.maxHistoryLength, plugin.settings.notePath]);
+    }, [historyService]);
 
-    useEffect(() => {
-        const saveHistory = async () => {
-            await historyService.saveHistory(state.messages, {
-                method: plugin.settings.historyStorageMethod,
-                maxHistoryLength: plugin.settings.maxHistoryLength,
-                notePath: plugin.settings.notePath
-            });
+    const handleAuthError = (error: Error) => {
+        const errorMessage: Message = {
+            role: 'error',
+            content: `Ошибка авторизации: ${error.message}`,
+            timestamp: new Date().toISOString()
         };
-        saveHistory();
-    }, [state.messages, plugin.settings.historyStorageMethod, plugin.settings.maxHistoryLength, plugin.settings.notePath]);
+        setMessages(prev => [...prev, errorMessage]);
+    };
 
-    const handleSend = useCallback(async () => {
-        if (!state.input.trim() || state.isLoading) return;
+    const handleSendMessage = async () => {
+        if (!input.trim() || isLoading) return;
 
         const userMessage: Message = {
             role: 'user',
-            content: state.input,
-            timestamp: Date.now()
+            content: input,
+            timestamp: new Date().toISOString()
         };
 
-        setState(prev => ({
-            ...prev,
-            messages: [...prev.messages, userMessage],
-            input: '',
-            isLoading: true
-        }));
+        setMessages(prev => [...prev, userMessage]);
+        setInput('');
+        setIsLoading(true);
 
         try {
             const response = await groqService.sendMessage(
-                state.input,
-                state.selectedModel,
-                plugin.settings.apiKey,
-                {
-                    temperature: plugin.settings.temperature,
-                    max_tokens: plugin.settings.maxTokens
-                }
+                userMessage.content,
+                selectedModel,
+                plugin.settings.temperature,
+                plugin.settings.maxTokens
             );
 
             const assistantMessage: Message = {
                 role: 'assistant',
                 content: response,
-                timestamp: Date.now()
+                timestamp: new Date().toISOString()
             };
 
-            setState(prev => ({
-                ...prev,
-                messages: [...prev.messages, assistantMessage],
-                isLoading: false
-            }));
+            setMessages(prev => [...prev, assistantMessage]);
+            await historyService.saveMessages([...messages, userMessage, assistantMessage]);
         } catch (error) {
             console.error('Error sending message:', error);
-            setState(prev => ({ ...prev, isLoading: false }));
+            const errorMessage: Message = {
+                role: 'error',
+                content: error instanceof Error ? error.message : 'Произошла ошибка при отправке сообщения',
+                timestamp: new Date().toISOString()
+            };
+            setMessages(prev => [...prev, errorMessage]);
+        } finally {
+            setIsLoading(false);
         }
-    }, [state.input, state.isLoading, plugin.settings]);
+    };
 
-    const handleKeyPress = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            handleSend();
+            handleSendMessage();
         }
-    }, [handleSend]);
+    };
 
     return (
         <div className="groq-chat-container">
+            {!plugin.settings.googleToken && (
+                <GoogleAuthButton plugin={plugin} onAuthError={handleAuthError} />
+            )}
             <div className="groq-chat-messages">
-                {state.messages.map((message, index) => (
+                {messages.map((message, index) => (
                     <div key={index} className={`message ${message.role}`}>
                         <div className="message-content">{message.content}</div>
+                        <div className="message-timestamp">
+                            {new Date(message.timestamp).toLocaleString()}
+                        </div>
                     </div>
                 ))}
-                {state.isLoading && (
+                {isLoading && (
                     <div className="message assistant">
                         <div className="message-content">Думаю...</div>
                     </div>
@@ -107,19 +106,19 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ plugin }) => {
             </div>
             <div className="groq-chat-input">
                 <textarea
-                    value={state.input}
-                    onChange={e => setState(prev => ({ ...prev, input: e.target.value }))}
+                    value={input}
+                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setInput(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder="Введите сообщение..."
-                    rows={3}
+                    disabled={isLoading || !plugin.settings.googleToken}
                 />
                 <button
-                    onClick={handleSend}
-                    disabled={state.isLoading || !state.input.trim()}
+                    onClick={handleSendMessage}
+                    disabled={isLoading || !input.trim() || !plugin.settings.googleToken}
                 >
                     Отправить
                 </button>
             </div>
         </div>
     );
-};
+}

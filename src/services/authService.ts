@@ -1,110 +1,148 @@
-import { GoogleAuthConfig } from '../types/auth';
 import { Notice } from 'obsidian';
-import { API_ENDPOINT } from '../constants';
+import { GroqPlugin } from '../types/plugin';
+
+const AUTH_PORT = 53324;
+const REDIRECT_URI = `http://localhost:${AUTH_PORT}/auth/callback`;
 
 export class AuthService {
-    private static instance: AuthService;
-    private readonly googleAuthConfig: GoogleAuthConfig = {
-        clientId: process.env.GOOGLE_CLIENT_ID || '',
-        redirectUri: 'obsidian://groq-chat/auth/callback',
-        scope: 'email profile'
-    };
+    private plugin: GroqPlugin;
+    private server: any;
 
-    private constructor() {}
+    constructor(plugin: GroqPlugin) {
+        this.plugin = plugin;
+    }
 
-    static getInstance(): AuthService {
-        if (!AuthService.instance) {
-            AuthService.instance = new AuthService();
+    async startAuthFlow() {
+        await this.startLocalServer();
+        
+        const clientId = this.plugin.settings.googleClientId;
+        const scope = 'email profile';
+        
+        const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+        authUrl.searchParams.append('client_id', clientId);
+        authUrl.searchParams.append('redirect_uri', REDIRECT_URI);
+        authUrl.searchParams.append('response_type', 'token');
+        authUrl.searchParams.append('scope', scope);
+        
+        window.open(authUrl.toString(), '_blank');
+    }
+
+    private async startLocalServer() {
+        if (this.server) {
+            return;
         }
-        return AuthService.instance;
-    }
 
-    async initiateGoogleAuth(): Promise<void> {
-        const params = new URLSearchParams({
-            client_id: this.googleAuthConfig.clientId,
-            redirect_uri: this.googleAuthConfig.redirectUri,
-            response_type: 'code',
-            scope: this.googleAuthConfig.scope,
-            access_type: 'offline',
-            prompt: 'consent'
-        });
-
-        window.open(
-            `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`,
-            '_blank'
-        );
-    }
-
-    async handleAuthCallback(code: string): Promise<string> {
         try {
-            const response = await fetch('https://api.groq.com/v1/oauth/google/token', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    code,
-                    client_id: this.googleAuthConfig.clientId,
-                    redirect_uri: this.googleAuthConfig.redirectUri,
-                    grant_type: 'authorization_code'
-                })
+            const http = require('http');
+            
+            this.server = http.createServer((req: any, res: any) => {
+                if (req.url?.startsWith('/auth/callback')) {
+                    const html = `
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <title>Авторизация Groq Chat</title>
+                            <script>
+                                window.onload = function() {
+                                    const hash = window.location.hash.substring(1);
+                                    const params = new URLSearchParams(hash);
+                                    const accessToken = params.get('access_token');
+                                    
+                                    if (accessToken) {
+                                        fetch('http://localhost:${AUTH_PORT}/token', {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json'
+                                            },
+                                            body: JSON.stringify({ token: accessToken })
+                                        }).then(() => {
+                                            document.body.innerHTML = '<h1>Авторизация успешна!</h1><p>Можете закрыть это окно.</p>';
+                                        });
+                                    } else {
+                                        document.body.innerHTML = '<h1>Ошибка авторизации</h1><p>Попробуйте еще раз.</p>';
+                                    }
+                                }
+                            </script>
+                        </head>
+                        <body>
+                            <h1>Обработка авторизации...</h1>
+                        </body>
+                        </html>
+                    `;
+                    
+                    res.writeHead(200, { 'Content-Type': 'text/html' });
+                    res.end(html);
+                } else if (req.url === '/token' && req.method === 'POST') {
+                    let body = '';
+                    req.on('data', (chunk: any) => {
+                        body += chunk.toString();
+                    });
+                    
+                    req.on('end', async () => {
+                        try {
+                            const { token } = JSON.parse(body);
+                            await this.handleToken(token);
+                            res.writeHead(200);
+                            res.end();
+                        } catch (error) {
+                            console.error('Error handling token:', error);
+                            res.writeHead(500);
+                            res.end();
+                        }
+                    });
+                }
             });
 
-            if (!response.ok) {
-                throw new Error('Ошибка получения токена');
+            this.server.listen(AUTH_PORT, 'localhost');
+        } catch (error) {
+            console.error('Error starting local server:', error);
+            new Notice('Ошибка запуска локального сервера авторизации');
+        }
+    }
+
+    private async handleToken(token: string) {
+        try {
+            // Проверяем токен
+            const isValid = await this.verifyToken(token);
+            if (!isValid) {
+                throw new Error('Invalid token');
             }
 
-            const data = await response.json();
-            return data.access_token;
+            // Сохраняем токен
+            this.plugin.settings.googleToken = token;
+            await this.plugin.saveSettings();
+            
+            new Notice('Авторизация успешна!');
         } catch (error) {
-            console.error('Ошибка авторизации:', error);
-            throw new Error('Ошибка при обработке авторизации');
+            console.error('Error handling token:', error);
+            new Notice('Ошибка авторизации');
         }
     }
 
     async verifyToken(token: string): Promise<boolean> {
         try {
-            const response = await fetch('https://api.groq.com/v1/auth/verify', {
+            const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            return response.ok;
-        } catch {
-            return false;
-        }
-    }
-
-    async validateApiKey(apiKey: string): Promise<boolean> {
-        if (!apiKey) {
-            new Notice('API ключ не указан');
-            return false;
-        }
-
-        try {
-            const response = await fetch(API_ENDPOINT, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${apiKey}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    messages: [{ role: 'user', content: 'test' }],
-                    model: 'llama2-70b-4096'
-                })
-            });
 
             if (!response.ok) {
-                new Notice('Неверный API ключ');
                 return false;
             }
 
-            return true;
+            const data = await response.json();
+            return !!data.email;
         } catch (error) {
-            new Notice(`Ошибка проверки API ключа: ${error instanceof Error ? error.message : 'Неизвестная ошибка'}`);
+            console.error('Error verifying token:', error);
             return false;
         }
     }
-}
 
-export const authService = AuthService.getInstance(); 
+    stopServer() {
+        if (this.server) {
+            this.server.close();
+            this.server = null;
+        }
+    }
+} 

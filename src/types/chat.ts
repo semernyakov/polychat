@@ -1,10 +1,12 @@
 import { GroqPlugin } from './plugin';
 import { GroqModel } from '../constants/models';
 
+export type MessageRole = 'user' | 'assistant' | 'error';
+
 export interface Message {
-    role: 'user' | 'assistant';
+    role: MessageRole;
     content: string;
-    timestamp?: number;
+    timestamp: string;
 }
 
 export interface ChatProps {
@@ -38,7 +40,7 @@ export interface ChatPanelInternalProps {
 
 export interface ChatHistory {
     messages: Message[];
-    timestamp: number;
+    lastUpdated: string;
 }
 
 export interface HistoryOptions {

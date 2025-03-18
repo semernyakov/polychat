@@ -5,7 +5,7 @@ export const messageUtils = {
         return {
             role: 'user',
             content,
-            timestamp: Date.now()
+            timestamp: new Date().toISOString()
         };
     },
 
@@ -13,7 +13,7 @@ export const messageUtils = {
         return {
             role: 'assistant',
             content,
-            timestamp: Date.now()
+            timestamp: new Date().toISOString()
         };
     },
 

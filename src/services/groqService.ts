@@ -8,7 +8,7 @@ interface GroqRequestOptions {
     max_tokens?: number;
 }
 
-class GroqService {
+export class GroqService {
     private static instance: GroqService;
     
     private constructor() {}
@@ -21,36 +21,41 @@ class GroqService {
     }
 
     async sendMessage(
-        message: string,
+        content: string,
         model: GroqModel,
-        apiKey: string,
-        options: GroqRequestOptions = {}
+        temperature: number,
+        maxTokens: number
     ): Promise<string> {
-        const response = await fetch(API_ENDPOINT, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${apiKey}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                messages: [{ role: 'user', content: message }],
-                model,
-                temperature: options.temperature ?? 0.7,
-                max_tokens: options.max_tokens ?? 2048
-            })
-        });
+        try {
+            const response = await fetch(API_ENDPOINT, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    messages: [{ role: 'user', content }],
+                    model,
+                    temperature: temperature.toString(),
+                    max_tokens: maxTokens
+                })
+            });
 
-        if (!response.ok) {
-            throw new Error(`API error: ${response.statusText}`);
+            if (!response.ok) {
+                const error: GroqApiError = await response.json();
+                throw new Error(error.error.message);
+            }
+
+            const data: GroqApiResponse = await response.json();
+            return data.choices[0].message.content;
+        } catch (error) {
+            console.error('Error sending message:', error);
+            throw error;
         }
-
-        const data = await response.json();
-        return data.choices[0].message.content;
     }
 
     async validateApiKey(apiKey: string): Promise<boolean> {
         try {
-            await this.sendMessage('test', GroqModel.LLAMA_3_8B, apiKey);
+            await this.sendMessage('test', GroqModel.LLAMA_3_8B, 0.7, 2048);
             return true;
         } catch (error) {
             return false;
