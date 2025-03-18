@@ -149,6 +149,37 @@ MIT License. См. файл [LICENSE](./LICENSE) для подробностей
 
 Посмотреть демо можно [здесь](https://semernyakov.github.io/groq-chat-plugin/demo)
 
+## Documentation
+
+- [Setup and Publishing Guide](docs/SETUP_AND_PUBLISH.md)
+- [Инструкция по настройке и публикации](docs/SETUP_AND_PUBLISH.ru.md)
+
+## Development
+
+```bash
+# Install dependencies
+npm install
+
+# Run development build
+npm run dev
+
+# Build for production
+npm run build
+
+# Run tests
+npm run test
+```
+
+## Contributing
+
+Please read our [Contributing Guide](CONTRIBUTING.md) before submitting a Pull Request.
+
+## Author
+
+Ivan Semernyakov
+- GitHub: [@semernyakov](https://github.com/semernyakov)
+- Website: [semernyakov.com](https://semernyakov.com)
+
 ---
 
 Создано с ❤️ для сообщества Obsidian

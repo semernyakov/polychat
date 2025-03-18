@@ -1,32 +1,55 @@
-# Плагин Groq Chat для Obsidian
+# Groq Chat Plugin для Obsidian
 
-## Необходимые плагины
-Перед установкой этого плагина убедитесь, что в вашем хранилище Obsidian установлены следующие плагины:
-- [Dataview](https://github.com/blacksmithgu/obsidian-dataview)
-- [Templater](https://github.com/SilentVoid13/Templater)
-- [QuickAdd](https://github.com/chhoumann/quickadd)
+Интеграция Groq Chat в Obsidian.
 
-## Инструкция по установке
-### Автоматическая установка
-1. Откройте Obsidian
-2. Перейдите в Настройки -> Сторонние плагины
-3. Нажмите "Поиск" и найдите "Groq Chat"
-4. Установите плагин и включите его
+## Документация
 
-### Ручная установка
-1. Загрузите последнюю версию с [страницы релизов GitHub](https://github.com/dvargas92495/obsidian-groq/releases)
-2. Распакуйте скачанный zip-архив
-3. Скопируйте распакованную папку в директорию плагинов вашего хранилища Obsidian:
-   - `{vault}/.obsidian/plugins/`
-4. Перезапустите Obsidian
-5. Перейдите в Настройки -> Сторонние плагины
-6. Найдите "Groq Chat" в списке плагинов и включите его
+- [Инструкция по настройке и публикации](docs/SETUP_AND_PUBLISH.ru.md)
+- [Setup and Publishing Guide](docs/SETUP_AND_PUBLISH.md)
 
-## Использование
-1. Получите API ключ от Groq
-2. Добавьте ваш API ключ в настройках плагина
-3. Используйте команду "Groq Chat: Start Chat" для начала нового чата
-4. Используйте команду "Groq Chat: Continue Chat" для продолжения существующего чата
+## Возможности
+
+- Интеграция с Groq API
+- Аутентификация через Google OAuth
+- Поддержка нескольких моделей
+- Управление историей чата
+- Поддержка Markdown
+- Подсветка кода
+- Поддержка мобильных устройств
+
+## Установка
+
+1. Откройте настройки Obsidian
+2. Перейдите в раздел Community Plugins
+3. Найдите "Groq Chat"
+4. Нажмите "Установить" и "Включить"
+
+## Разработка
+
+```bash
+# Установка зависимостей
+npm install
+
+# Запуск сборки для разработки
+npm run dev
+
+# Сборка для продакшена
+npm run build
+
+# Запуск тестов
+npm run test
+```
+
+## Участие в разработке
+
+Пожалуйста, прочтите наше [Руководство по участию](CONTRIBUTING.md) перед отправкой Pull Request.
 
 ## Лицензия
-Этот проект распространяется под лицензией MIT License - см. файл [LICENSE](LICENSE) для подробностей.
+
+[MIT](LICENSE)
+
+## Автор
+
+Иван Семерняков
+- GitHub: [@semernyakov](https://github.com/semernyakov)
+- Сайт: [semernyakov.com](https://semernyakov.com)

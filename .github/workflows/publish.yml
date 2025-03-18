@@ -1,25 +1,48 @@
-name: Publish to Obsidian
+name: Release
+
 on:
-  release:
-    types: [created]
+  push:
+    tags:
+      - 'v*'
 
 jobs:
-  publish:
+  release:
     runs-on: ubuntu-latest
+    
     steps:
     - uses: actions/checkout@v3
-    - uses: actions/setup-node@v3
+      with:
+        fetch-depth: 0
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
       with:
         node-version: '18'
-        registry-url: 'https://registry.npmjs.org'
-    - run: npm ci
-    - run: npm run build
-    - name: Submit to Obsidian
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build
+      run: npm run build
+
+    - name: Generate changelog
+      id: changelog
+      uses: conventional-changelog/conventional-changelog-action@v3
+      with:
+        config: conventional-changelog-conventionalcommits
+        preset: angular
+        tag-prefix: 'v'
+        output-file: 'CHANGELOG.md'
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        body_path: CHANGELOG.md
+        files: |
+          dist/*
+          manifest.json
+          README.md
+          LICENSE
       env:
-        OBSIDIAN_TOKEN: ${{ secrets.OBSIDIAN_TOKEN }}
-      run: |
-        curl -X POST \
-          -H "Authorization: Bearer $OBSIDIAN_TOKEN" \
-          -H "Content-Type: application/json" \
-          -d @manifest.json \
-          https://api.obsidian.md/plugins/submit 
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 

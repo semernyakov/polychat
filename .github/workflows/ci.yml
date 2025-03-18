@@ -2,25 +2,51 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master, gh-pages ]
   pull_request:
-    branches: [ main ]
+    branches: [ master ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x, 18.x]
+
     steps:
     - uses: actions/checkout@v3
-    - uses: actions/setup-node@v3
+    
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
       with:
-        node-version: '18'
+        node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: npm ci
-    - run: npm run lint
-    - run: npm run test
-    - run: npm run build
-    - name: Upload coverage
-      uses: codecov/codecov-action@v3
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Check types
+      run: npm run typecheck
+
+    - name: Run ESLint
+      run: npm run lint
+
+    - name: Run tests
+      run: npm run test
+
+    - name: Build
+      run: npm run build
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-files
+        path: dist/
+
+    - name: Check for vulnerabilities
+      run: npm audit
+      continue-on-error: true
 
   release:
     needs: test

@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { Notice } from 'obsidian';
 import { ChatProps, ChatPanelState } from '../types/chat';
 import { groqService } from '../services/groqService';
 import { historyService } from '../services/historyService';
@@ -45,6 +46,21 @@ export const GroqChatPanel: React.FC<ChatProps> = ({ plugin }) => {
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    const clearHistory = async () => {
+        try {
+            await historyService.clearHistory({
+                method: plugin.settings.historyStorageMethod,
+                notePath: plugin.settings.notePath,
+                maxHistoryLength: plugin.settings.maxHistoryLength
+            });
+            setState(prev => ({ ...prev, messages: [] }));
+            new Notice('История чата очищена');
+        } catch (error) {
+            console.error('Ошибка при очистке истории:', error);
+            new Notice('Ошибка при очистке истории чата');
+        }
     };
 
     const sendMessage = async () => {
@@ -101,23 +117,19 @@ export const GroqChatPanel: React.FC<ChatProps> = ({ plugin }) => {
         }
     };
 
-    const clearHistory = async () => {
-        await historyService.clearHistory({
-            method: plugin.settings.historyStorageMethod,
-            maxHistoryLength: plugin.settings.maxHistoryLength,
-            notePath: plugin.settings.notePath
-        });
-        setState(prev => ({ ...prev, messages: [] }));
-    };
-
     return (
-        <div className="groq-chat-panel">
-            <div className="chat-header">
-                <h2>Groq Chat</h2>
-                <button 
-                    onClick={clearHistory} 
-                    className="clear-history-button"
+        <div className="groq-chat-container">
+            <div className="groq-chat-header">
+                <ModelSelector
+                    selectedModel={state.selectedModel}
+                    onModelChange={(model) => setState(prev => ({ ...prev, selectedModel: model }))}
                     disabled={state.isLoading}
+                />
+                <button
+                    className="groq-chat-clear-button"
+                    onClick={clearHistory}
+                    title="Очистить историю чата"
+                    disabled={state.isLoading || state.messages.length === 0}
                 >
                     Очистить историю
                 </button>
