@@ -1,4 +1,4 @@
-import { GroqModel, DEFAULT_MODEL_OPTIONS } from '../constants/models';
+import { DEFAULT_MODEL_OPTIONS } from '../constants/models';
 import { GroqChatSettings, ModelConfigMap } from '../types/plugin';
 import { UISettings } from '../types/settings';
 

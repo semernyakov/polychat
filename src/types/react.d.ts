@@ -84,7 +84,7 @@ declare global {
 
 declare global {
     namespace JSX {
-        interface Element extends React.ReactElement<unknown, unknown> {}
+        interface Element extends React.ReactElement<unknown> {}
         interface ElementClass extends React.Component<unknown> {
             render(): React.ReactNode;
         }

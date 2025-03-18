@@ -1,6 +1,5 @@
 /** @jsx React.createElement */
 import React, { useState, useEffect, useCallback } from 'react';
-import { App } from 'obsidian';
 import { GroqPlugin } from '../types/plugin';
 import { Message } from '../types/message';
 import { HistoryService } from '../services/historyService';

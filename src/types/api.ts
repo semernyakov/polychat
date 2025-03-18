@@ -42,7 +42,20 @@ export interface GroqModel {
     object: string;
     created: number;
     owned_by: string;
-    permission: any[];
+    permission: Array<{
+        id: string;
+        object: string;
+        created: number;
+        allow_create_engine: boolean;
+        allow_sampling: boolean;
+        allow_logprobs: boolean;
+        allow_search_indices: boolean;
+        allow_view: boolean;
+        allow_fine_tuning: boolean;
+        organization: string;
+        group: string | null;
+        is_blocking: boolean;
+    }>;
     root: string;
     parent: string | null;
 }
