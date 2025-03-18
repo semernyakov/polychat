@@ -1,4 +1,5 @@
-import { API_ENDPOINT, GroqModel } from '../constants';
+import { API_ENDPOINT } from '../constants';
+import { GroqModel } from '../constants/models';
 import { GroqApiResponse, GroqApiError, GroqApiOptions } from '../types/api';
 import { DEFAULT_MODEL_OPTIONS } from '../constants/models';
 

@@ -3,12 +3,9 @@ import { GroqModel } from '../constants/models';
 export interface ModelSettings {
     temperature: number;
     maxTokens: number;
-    customPrompt?: string;
 }
 
-export interface ModelConfigMap {
-    [key in GroqModel]: ModelSettings;
-}
+export type ModelConfigMap = Record<GroqModel, ModelSettings>;
 
 export interface StorageSettings {
     method: 'local' | 'note';
@@ -17,7 +14,7 @@ export interface StorageSettings {
 }
 
 export interface UISettings {
-    theme: 'light' | 'dark' | 'system';
+    theme: string;
     fontSize: number;
     showTimestamps: boolean;
 }

@@ -4,20 +4,11 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ChatPanel } from '../../components/ChatPanel';
 import { GroqPlugin } from '../../types/plugin';
-import { GroqModel } from '../../constants';
+import { GroqModel } from '../../constants/models';
+import { DEFAULT_MODEL_OPTIONS } from '../../constants/models';
 
-jest.mock('../../services/historyService', () => ({
-    historyService: {
-        loadMessages: jest.fn().mockResolvedValue([]),
-        saveMessages: jest.fn().mockResolvedValue(undefined)
-    }
-}));
-
-jest.mock('../../services/groqService', () => ({
-    groqService: {
-        sendMessage: jest.fn().mockResolvedValue('Mock response')
-    }
-}));
+jest.mock('../../services/groqService');
+jest.mock('../../services/historyService');
 
 jest.mock('../../services/authService', () => ({
     authService: {
@@ -29,12 +20,14 @@ describe('ChatPanel', () => {
     const mockPlugin = {
         settings: {
             apiKey: 'test-api-key',
+            googleToken: '',
             defaultModel: GroqModel.LLAMA_3_8B,
             temperature: 0.7,
-            maxTokens: 2048,
+            maxTokens: 8192,
             historyStorageMethod: 'memory',
             maxHistoryLength: 100,
-            notePath: 'test.md'
+            notePath: 'test-path.md',
+            modelConfig: DEFAULT_MODEL_OPTIONS
         },
         app: {},
         manifest: {},
@@ -42,9 +35,10 @@ describe('ChatPanel', () => {
         addStatusBarItem: jest.fn(),
         addCommand: jest.fn(),
         addSettingTab: jest.fn(),
-        saveData: jest.fn(),
-        loadData: jest.fn()
-    } as GroqPlugin;
+        registerView: jest.fn(),
+        loadData: jest.fn(),
+        saveData: jest.fn()
+    } as unknown as GroqPlugin;
 
     beforeEach(() => {
         render(<ChatPanel plugin={mockPlugin} />);

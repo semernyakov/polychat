@@ -3,6 +3,7 @@ import { GroqPlugin } from '../types/plugin';
 import { groqService } from '../services/groqService';
 import { historyService } from '../services/historyService';
 import { Message } from '../types/chat';
+import { GroqModel } from '../constants/models';
 
 interface ChatPanelProps {
     plugin: GroqPlugin;

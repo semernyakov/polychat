@@ -127,20 +127,14 @@ export default class GroqPlugin extends Plugin {
     async activateView() {
         const workspace = this.app.workspace;
         let leaf = workspace.getLeavesOfType(VIEW_TYPE_GROQ_CHAT)[0];
-
+        
         if (!leaf) {
-            leaf = workspace.getRightLeaf(false);
-            if (leaf) {
-                await leaf.setViewState({
-                    type: VIEW_TYPE_GROQ_CHAT,
-                    active: true,
-                });
-            }
+            const rightLeaf = workspace.getRightLeaf(false);
+            leaf = rightLeaf || workspace.getLeaf(true);
+            await leaf.setViewState({ type: VIEW_TYPE_GROQ_CHAT });
         }
-
-        if (leaf) {
-            workspace.revealLeaf(leaf);
-        }
+        
+        workspace.revealLeaf(leaf);
     }
 
     clearConversation() {

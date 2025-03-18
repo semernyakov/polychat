@@ -1,5 +1,5 @@
 import { App, PluginSettingTab, Setting } from 'obsidian';
-import { GroqModel } from '../constants';
+import { GroqModel } from '../constants/models';
 import { authService } from '../services/authService';
 import { Notice } from 'obsidian';
 import { GroqPlugin } from '../types/plugin';
