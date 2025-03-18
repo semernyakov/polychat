@@ -1,6 +1,27 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
+    "module": "ESNext",
+    "target": "ES2017",
+    "allowJs": true,
+    "noImplicitAny": true,
+    "moduleResolution": "node",
+    "importHelpers": true,
+    "isolatedModules": true,
+    "strictNullChecks": true,
+    "lib": [
+      "DOM",
+      "ES2017",
+      "WebWorker"
+    ],
+    "types": [
+      "node",
+      "jest"
+    ],
     "allowSyntheticDefaultImports": true,
     "jsx": "react-jsx" // Изменено на "react-jsx" для поддержки новых возможностей React 17+
-  }
+  },
+  "include": [
+    "src/**/*"
+  ]
 }

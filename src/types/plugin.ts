@@ -1,5 +1,6 @@
 import { Plugin } from 'obsidian';
 import { GroqModel } from '../constants/models';
+import { GroqChatSettings } from '../settings';
 
 export interface GroqPluginSettings {
     apiKey: string;
@@ -12,5 +13,6 @@ export interface GroqPluginSettings {
 }
 
 export interface GroqPlugin extends Plugin {
-    settings: GroqPluginSettings;
+    settings: GroqChatSettings;
+    saveData: (settings: GroqChatSettings) => Promise<void>;
 }

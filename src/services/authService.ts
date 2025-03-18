@@ -1,4 +1,6 @@
 import { GoogleAuthConfig } from '../types/auth';
+import { Notice } from 'obsidian';
+import { API_ENDPOINT } from '../constants';
 
 export class AuthService {
     private static instance: AuthService;
@@ -69,6 +71,37 @@ export class AuthService {
             });
             return response.ok;
         } catch {
+            return false;
+        }
+    }
+
+    async validateApiKey(apiKey: string): Promise<boolean> {
+        if (!apiKey) {
+            new Notice('API ключ не указан');
+            return false;
+        }
+
+        try {
+            const response = await fetch(API_ENDPOINT, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    messages: [{ role: 'user', content: 'test' }],
+                    model: 'llama2-70b-4096'
+                })
+            });
+
+            if (!response.ok) {
+                new Notice('Неверный API ключ');
+                return false;
+            }
+
+            return true;
+        } catch (error) {
+            new Notice(`Ошибка проверки API ключа: ${error instanceof Error ? error.message : 'Неизвестная ошибка'}`);
             return false;
         }
     }

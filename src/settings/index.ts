@@ -1,20 +1,20 @@
 import { App, PluginSettingTab } from 'obsidian';
-import { GroqPlugin } from '../types/plugin';
-import { GROQ_MODELS } from '../constants';
+import { GroqModel } from '../constants';
 import { authService } from '../services/authService';
 import { Notice } from 'obsidian';
+import { GroqPlugin } from '../types/plugin';
 
 export interface GroqChatSettings {
-    groqApiKey: string;
-    defaultModel: typeof GROQ_MODELS.LLAMA_3_8B;
+    apiKey: string;
+    defaultModel: GroqModel;
 }
 
 export const DEFAULT_SETTINGS: GroqChatSettings = {
-    groqApiKey: '',
-    defaultModel: GROQ_MODELS.LLAMA_3_8B
+    apiKey: '',
+    defaultModel: GroqModel.LLAMA_3_8B
 };
 
-export class GroqChatSettingsTab extends PluginSettingTab {
+export class GroqSettingTab extends PluginSettingTab {
     plugin: GroqPlugin;
 
     constructor(app: App, plugin: GroqPlugin) {
@@ -28,42 +28,36 @@ export class GroqChatSettingsTab extends PluginSettingTab {
 
         containerEl.createEl('h2', { text: 'Настройки Groq Chat' });
 
-        // Секция авторизации
-        containerEl.createEl('h3', { text: 'Авторизация' });
-
         new Setting(containerEl)
-            .setName('Авторизация через Google')
-            .setDesc('Войдите в Groq через ваш аккаунт Google')
+            .setName('Авторизация')
+            .setDesc('Войдите в свой аккаунт Groq для использования API')
             .addButton(button => button
-                .setButtonText(this.plugin.settings.groqApiKey ? 'Переавторизоваться' : 'Войти через Google')
+                .setButtonText(this.plugin.settings.apiKey ? 'Переавторизоваться' : 'Войти через Google')
                 .onClick(async () => {
-                    try {
-                        await authService.initiateGoogleAuth();
-                    } catch (error) {
-                        new Notice(`Ошибка авторизации: ${error instanceof Error ? error.message : 'Неизвестная ошибка'}`);
-                    }
+                    await authService.validateApiKey(this.plugin.settings.apiKey);
+                    new Notice('Авторизация успешна!');
                 }));
 
         new Setting(containerEl)
-            .setName('Groq API Key')
-            .setDesc('Enter your Groq API key')
+            .setName('API ключ')
+            .setDesc('Введите ваш API ключ Groq')
             .addText(text => text
-                .setPlaceholder('Enter your api key')
-                .setValue(this.plugin.settings.groqApiKey)
+                .setPlaceholder('Введите API ключ')
+                .setValue(this.plugin.settings.apiKey)
                 .onChange(async (value) => {
-                    this.plugin.settings.groqApiKey = value;
-                    await this.plugin.saveSettings();
+                    this.plugin.settings.apiKey = value;
+                    await this.plugin.saveData(this.plugin.settings);
                 }));
 
         new Setting(containerEl)
-            .setName('Default Model')
-            .setDesc('Select the default Groq model to use')
+            .setName('Модель по умолчанию')
+            .setDesc('Выберите модель Groq для использования по умолчанию')
             .addDropdown(dropdown => dropdown
-                .addOption(GROQ_MODELS.LLAMA_3_8B, 'Llama 3 8B')
+                .addOptions(Object.values(GroqModel).reduce((acc, model) => ({ ...acc, [model]: model }), {}))
                 .setValue(this.plugin.settings.defaultModel)
                 .onChange(async (value) => {
-                    this.plugin.settings.defaultModel = value as typeof GROQ_MODELS.LLAMA_3_8B;
-                    await this.plugin.saveSettings();
+                    this.plugin.settings.defaultModel = value as GroqModel;
+                    await this.plugin.saveData(this.plugin.settings);
                 }));
     }
 }
