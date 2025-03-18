@@ -3,6 +3,24 @@
   "version": "1.2.2",
   "description": "Groq Chat Plugin for Obsidian",
   "main": "main.js",
+  "files": [
+    "main.js",
+    "manifest.json",
+    "styles.css",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/semernyakov/groq-chat-plugin.git"
+  },
+  "bugs": {
+    "url": "https://github.com/semernyakov/groq-chat-plugin/issues"
+  },
+  "homepage": "https://github.com/semernyakov/groq-chat-plugin#readme",
   "scripts": {
     "dev": "node esbuild.config.mjs",
     "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
