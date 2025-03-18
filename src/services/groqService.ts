@@ -1,10 +1,12 @@
 import { App } from 'obsidian';
 import { GroqPlugin } from '../types/plugin';
 import { Message } from '../types/message';
+import { MODELS, ModelInfo, GroqProductionModel, GroqPreviewModel } from '../constants';
 
 export class GroqService {
     private app: App;
     private plugin: GroqPlugin;
+    private readonly API_BASE = 'https://api.groq.com/openai/v1';
 
     constructor(app: App, plugin: GroqPlugin) {
         this.app = app;
@@ -13,14 +15,21 @@ export class GroqService {
 
     async validateApiKey(apiKey: string): Promise<boolean> {
         try {
-            const response = await fetch('https://api.groq.com/v1/models', {
+            const response = await fetch(`${this.API_BASE}/models`, {
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${apiKey}`
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json'
                 }
             });
             
-            return response.ok;
+            if (!response.ok) {
+                const error = await response.json();
+                console.error('API ключ недействителен:', error.error?.message);
+                return false;
+            }
+
+            return true;
         } catch (error) {
             console.error('Ошибка проверки API ключа:', error);
             return false;
@@ -37,8 +46,23 @@ export class GroqService {
             throw new Error('API ключ не задан. Пожалуйста, введите API ключ в настройках.');
         }
 
+        const modelInfo = MODELS[model];
+        if (!modelInfo) {
+            throw new Error('Неизвестная модель');
+        }
+
+        if (modelInfo.isPreview) {
+            console.warn('Внимание: используется preview модель, не рекомендуется для production.');
+        }
+
+        // Проверяем и корректируем maxTokens если превышает лимит модели
+        if (modelInfo.maxCompletionTokens && maxTokens > modelInfo.maxCompletionTokens) {
+            console.warn(`Превышен лимит токенов для модели ${modelInfo.name}. Установлено максимальное значение ${modelInfo.maxCompletionTokens}`);
+            maxTokens = modelInfo.maxCompletionTokens;
+        }
+
         try {
-            const response = await fetch('https://api.groq.com/v1/chat/completions', {
+            const response = await fetch(`${this.API_BASE}/chat/completions`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -47,23 +71,29 @@ export class GroqService {
                 body: JSON.stringify({
                     model,
                     messages: [{ role: 'user', content }],
-                    temperature: temperature,
-                    max_tokens: maxTokens
+                    temperature,
+                    max_tokens: maxTokens,
+                    stream: false
                 })
             });
 
             if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(`API ошибка: ${response.status} ${response.statusText}. ${errorData.error?.message || ''}`);
+                const errorData = await response.json();
+                throw new Error(`API ошибка: ${errorData.error?.message || 'Неизвестная ошибка'}`);
             }
 
             const data = await response.json();
             
+            if (!data.choices?.[0]?.message?.content) {
+                throw new Error('Некорректный ответ от API');
+            }
+
             return {
-                id: Date.now().toString(),
+                id: data.id || Date.now().toString(),
                 role: 'assistant',
                 content: data.choices[0].message.content,
-                timestamp: Date.now()
+                timestamp: Date.now(),
+                usage: data.usage
             };
         } catch (error) {
             console.error('Ошибка отправки сообщения:', error);
@@ -71,15 +101,27 @@ export class GroqService {
         }
     }
 
-    getAvailableModels() {
-        return [
-            'llama3-70b-8192',
-            'llama3-8b-8192',
-            'mixtral-8x7b-32768',
-            'gemma-7b-it',
-            'claude-3-opus-20240229',
-            'claude-3-sonnet-20240229',
-            'claude-3-haiku-20240307'
-        ];
+    getAvailableModels(): Array<ModelInfo> {
+        return Object.values(MODELS)
+            .sort((a, b) => {
+                // Сначала production модели, потом preview
+                if (a.isPreview !== b.isPreview) {
+                    return a.isPreview ? 1 : -1;
+                }
+                // В рамках каждой группы сортируем по имени
+                return a.name.localeCompare(b.name);
+            });
+    }
+
+    getModelInfo(modelId: string): ModelInfo | undefined {
+        return MODELS[modelId];
+    }
+
+    isPreviewModel(modelId: string): boolean {
+        return MODELS[modelId]?.isPreview ?? false;
+    }
+
+    getModelContextWindow(modelId: string): number | undefined {
+        return MODELS[modelId]?.contextWindow;
     }
 }

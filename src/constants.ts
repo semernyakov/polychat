@@ -1,11 +1,96 @@
-export enum GroqModel {
-    LLAMA_3_8B = 'llama2-70b-4096',
+// Production Models
+export enum GroqProductionModel {
+    // Text Models
+    LLAMA_3_70B = 'llama-3.3-70b-versatile',
+    LLAMA_3_8B = 'llama-3.1-8b-instant',
+    LLAMA_GUARD_8B = 'llama-guard-3-8b',
+    LLAMA_3_70B_8K = 'llama3-70b-8192',
+    LLAMA_3_8B_8K = 'llama3-8b-8192',
     MIXTRAL_8X7B = 'mixtral-8x7b-32768',
-    GEMMA_7B = 'gemma-7b-it'
+    GEMMA_9B = 'gemma2-9b-it',
+    
+    // Audio Models
+    WHISPER_LARGE = 'whisper-large-v3',
+    WHISPER_LARGE_TURBO = 'whisper-large-v3-turbo',
+    WHISPER_DISTIL = 'distil-whisper-large-v3-en'
 }
 
-export const DEFAULT_MODEL = GroqModel.LLAMA_3_8B;
+// Preview Models
+export enum GroqPreviewModel {
+    QWEN_32B = 'qwen-qwq-32b',
+    MISTRAL_SABA_24B = 'mistral-saba-24b',
+    QWEN_CODER_32B = 'qwen-2.5-coder-32b',
+    QWEN_2_5_32B = 'qwen-2.5-32b',
+    DEEPSEEK_QWEN_32B = 'deepseek-r1-distill-qwen-32b',
+    DEEPSEEK_LLAMA_70B_SPEC = 'deepseek-r1-distill-llama-70b-specdec',
+    DEEPSEEK_LLAMA_70B = 'deepseek-r1-distill-llama-70b',
+    LLAMA_3_70B_SPEC = 'llama-3.3-70b-specdec',
+    LLAMA_3_1B = 'llama-3.2-1b-preview',
+    LLAMA_3_3B = 'llama-3.2-3b-preview',
+    LLAMA_3_11B_VISION = 'llama-3.2-11b-vision-preview',
+    LLAMA_3_90B_VISION = 'llama-3.2-90b-vision-preview'
+}
 
-export const API_ENDPOINT = 'https://api.groq.com/v1/chat/completions';
+export interface ModelInfo {
+    id: string;
+    name: string;
+    developer: string;
+    contextWindow?: number;
+    maxCompletionTokens?: number;
+    maxFileSize?: string;
+    isPreview: boolean;
+    category: 'text' | 'audio' | 'vision';
+}
+
+export const MODELS: Record<string, ModelInfo> = {
+    [GroqProductionModel.LLAMA_3_70B]: {
+        id: GroqProductionModel.LLAMA_3_70B,
+        name: 'Llama 3 70B Versatile',
+        developer: 'Meta',
+        contextWindow: 128000,
+        maxCompletionTokens: 32768,
+        isPreview: false,
+        category: 'text'
+    },
+    [GroqProductionModel.LLAMA_3_8B]: {
+        id: GroqProductionModel.LLAMA_3_8B,
+        name: 'Llama 3 8B Instant',
+        developer: 'Meta',
+        contextWindow: 128000,
+        maxCompletionTokens: 8192,
+        isPreview: false,
+        category: 'text'
+    },
+    [GroqProductionModel.MIXTRAL_8X7B]: {
+        id: GroqProductionModel.MIXTRAL_8X7B,
+        name: 'Mixtral 8x7B',
+        developer: 'Mistral',
+        contextWindow: 32768,
+        isPreview: false,
+        category: 'text'
+    },
+    [GroqProductionModel.GEMMA_9B]: {
+        id: GroqProductionModel.GEMMA_9B,
+        name: 'Gemma 2 9B',
+        developer: 'Google',
+        contextWindow: 8192,
+        isPreview: false,
+        category: 'text'
+    },
+    [GroqPreviewModel.LLAMA_3_90B_VISION]: {
+        id: GroqPreviewModel.LLAMA_3_90B_VISION,
+        name: 'Llama 3 90B Vision',
+        developer: 'Meta',
+        contextWindow: 128000,
+        maxCompletionTokens: 8192,
+        isPreview: true,
+        category: 'vision'
+    }
+    // Добавьте остальные модели по аналогии
+};
+
+export const DEFAULT_MODEL = GroqProductionModel.LLAMA_3_70B;
+
+export const API_ENDPOINT = 'https://api.groq.com/openai/v1/chat/completions';
 
 export const VIEW_TYPE_GROQ_CHAT = 'groq-chat-view';
