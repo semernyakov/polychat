@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { Message } from '../types/chat';
 
 interface MessageItemProps {
@@ -8,13 +8,12 @@ interface MessageItemProps {
 export const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
     return (
         <div className={`message ${message.role}`}>
-            <div className="message-role">{message.role}</div>
             <div className="message-content">
-                {message.text.split('\n').map((line, i) => (
-                    <Fragment key={i}>
+                {message.content.split('\n').map((line: string, i: number) => (
+                    <span key={i}>
                         {line}
-                        {i < message.text.split('\n').length - 1 && <br />}
-                    </Fragment>
+                        {i < message.content.split('\n').length - 1 && <br />}
+                    </span>
                 ))}
             </div>
         </div>

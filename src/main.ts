@@ -1,4 +1,4 @@
-import { Plugin, Notice } from 'obsidian';
+import { Plugin } from 'obsidian';
 import { GroqChatSettings, DEFAULT_SETTINGS } from './types/plugin';
 import './styles/chat.css';
 import { AuthService } from './services/authService';
@@ -51,7 +51,7 @@ export default class GroqPlugin extends Plugin {
             },
         });
 
-        this.addSettingTab(new GroqSettingTab(this));
+        this.addSettingTab(new GroqSettingTab(this.app, this));
 
         // Проверка API ключа при загрузке
         if (this.settings.groqApiKey) {
@@ -130,13 +130,17 @@ export default class GroqPlugin extends Plugin {
 
         if (!leaf) {
             leaf = workspace.getRightLeaf(false);
-            await leaf?.setViewState({
-                type: VIEW_TYPE_GROQ_CHAT,
-                active: true,
-            });
+            if (leaf) {
+                await leaf.setViewState({
+                    type: VIEW_TYPE_GROQ_CHAT,
+                    active: true,
+                });
+            }
         }
 
-        workspace.revealLeaf(leaf);
+        if (leaf) {
+            workspace.revealLeaf(leaf);
+        }
     }
 
     clearConversation() {

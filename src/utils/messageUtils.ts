@@ -1,20 +1,19 @@
 import { Message } from '../types/chat';
 
 export const messageUtils = {
-    createUserMessage(text: string): Message {
+    createUserMessage(content: string): Message {
         return {
-            text,
             role: 'user',
+            content,
             timestamp: Date.now()
         };
     },
 
-    createGroqMessage(text: string, status?: 'error'): Message {
+    createAssistantMessage(content: string): Message {
         return {
-            text,
             role: 'assistant',
-            timestamp: Date.now(),
-            status
+            content,
+            timestamp: Date.now()
         };
     },
 

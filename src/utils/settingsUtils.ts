@@ -1,6 +1,7 @@
-import { GroqChatSettings } from '../types/plugin';
+import { GroqChatSettings, DEFAULT_SETTINGS } from '../types/plugin';
 import { ModelConfigMap, UISettings } from '../types/settings';
 import { GROQ_MODELS, DEFAULT_MODEL_OPTIONS } from '../constants/models';
+import { GroqModel } from '../constants';
 
 export const settingsUtils = {
     getDefaultSettings(): GroqChatSettings {
@@ -34,8 +35,15 @@ export const settingsUtils = {
 
     validateSettings(settings: Partial<GroqChatSettings>): GroqChatSettings {
         return {
-            ...this.getDefaultSettings(),
+            ...DEFAULT_SETTINGS,
             ...settings
+        };
+    },
+
+    getDefaultModelConfig(model: GroqModel) {
+        return {
+            temperature: 0.7,
+            maxTokens: 2048
         };
     }
 }; 
