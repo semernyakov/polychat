@@ -1,154 +1,91 @@
-# Groq Chat Plugin для Obsidian
+# Groq Chat Plugin for Obsidian
 
-[![CI](https://github.com/semernyakov/groq-chat-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/semernyakov/groq-chat-plugin/actions/workflows/ci.yml)
-[![Coverage](https://codecov.io/gh/semernyakov/groq-chat-plugin/branch/main/graph/badge.svg)](https://codecov.io/gh/semernyakov/groq-chat-plugin)
-[![Version](https://img.shields.io/github/v/release/semernyakov/groq-chat-plugin)](https://github.com/semernyakov/groq-chat-plugin/releases)
-[![License](https://img.shields.io/github/license/semernyakov/groq-chat-plugin)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/semernyakov/groq-chat-plugin?style=flat-square)](https://github.com/semernyakov/groq-chat-plugin/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/semernyakov/groq-chat-plugin/total?style=flat-square)](https://github.com/semernyakov/groq-chat-plugin/releases)
+[![License](https://img.shields.io/github/license/semernyakov/groq-chat-plugin?style=flat-square)](LICENSE)
+[![Tests](https://img.shields.io/github/actions/workflow/status/semernyakov/groq-chat-plugin/ci.yml?branch=master&style=flat-square)](https://github.com/semernyakov/groq-chat-plugin/actions/workflows/ci.yml)
+[![Coverage](https://img.shields.io/codecov/c/github/semernyakov/groq-chat-plugin?style=flat-square)](https://codecov.io/gh/semernyakov/groq-chat-plugin)
+[![NPM](https://img.shields.io/npm/v/groq-chat-plugin?style=flat-square)](https://www.npmjs.com/package/groq-chat-plugin)
 
-![Groq Chat Plugin](./docs/images/plugin-banner.png)
+[Русская версия](README.ru.md)
 
-## 📝 Описание
+A plugin for [Obsidian](https://obsidian.md) that integrates Groq's AI chat capabilities directly into your notes.
 
-Groq Chat Plugin - это мощный плагин для Obsidian, который интегрирует возможности Groq AI непосредственно в ваше рабочее пространство. Используйте передовые языковые модели для улучшения вашего рабочего процесса в Obsidian.
+## Features
 
-## ✨ Основные возможности
+- Direct integration with Groq AI models
+- Real-time chat interface
+- Support for latest Groq models
+- Markdown formatting support
+- Code highlighting
+- Mobile support
+- Custom model selection
+- Chat history
+- Context-aware responses
 
-- 🤖 Прямой доступ к моделям Groq AI
-- 🔐 Простая авторизация через Google
-- 💬 Интерактивный чат-интерфейс
-- 📚 Сохранение истории диалогов
-- 🎨 Настраиваемый интерфейс
-- 🌓 Поддержка светлой и темной темы
-- ⚡ Быстрый доступ через боковую панель
+## Installation
 
-## 🚀 Установка
+1. Open Obsidian Settings
+2. Go to Community Plugins and disable Safe Mode
+3. Click Browse and search for "Groq Chat"
+4. Install the plugin
+5. Enable the plugin in Community Plugins
 
-1. Откройте Obsidian
-2. Перейдите в Настройки → Сторонние плагины
-3. Нажмите "Просмотреть" и найдите "Groq Chat"
-4. Установите плагин
-5. Включите плагин в списке установленных
+## Configuration
 
-## ⚙️ Настройка
+1. Get your API key from [Groq Console](https://console.groq.com)
+2. Open plugin settings in Obsidian
+3. Enter your API key
+4. Configure additional settings as needed
 
-### Авторизация через Google
+## Usage
 
-1. Создайте проект в Google Cloud Console:
-   - Перейдите на [console.cloud.google.com](https://console.cloud.google.com)
-   - Создайте новый проект
-   - Настройте OAuth consent screen
-   - Создайте OAuth Client ID
+1. Open any note
+2. Click the Groq Chat icon in the sidebar
+3. Start chatting with AI
+4. Use `/` commands for additional features
 
-2. Настройте OAuth Credentials:
-   - Тип приложения: Web application
-   - Название: Groq Chat
-   - Authorized redirect URI: `obsidian://groq-chat/auth/callback`
-   - Скопируйте полученный Client ID
+## Development
 
-3. Настройте плагин:
-   - Вставьте Client ID в настройках плагина
-   - Нажмите "Войти через Google"
-   - Следуйте инструкциям для авторизации
+```bash
+# Clone the repository
+git clone https://github.com/semernyakov/groq-chat-plugin.git
 
-### Настройка моделей
+# Install dependencies
+npm install
 
-Плагин поддерживает следующие модели Groq:
-- Llama 3 (8B)
-- Mixtral (8x7B)
-- Gemma (7B)
+# Start development server
+npm run dev
 
-Для каждой модели можно настроить:
-- Температуру генерации (0.1 - 1.0)
-- Максимальное количество токенов
-- Пользовательский промпт
+# Build the plugin
+npm run build
 
-## 💡 Использование
+# Run tests
+npm run test
 
-1. **Открытие чата:**
-   - Нажмите на иконку чата в боковой панели
-   - Используйте горячую клавишу (по умолчанию: Ctrl/Cmd + Shift + G)
+# Check code style
+npm run lint
+```
 
-2. **Отправка сообщений:**
-   - Введите текст в поле ввода
-   - Нажмите Enter или кнопку "Отправить"
-   - Используйте Shift + Enter для переноса строки
+## Contributing
 
-3. **Работа с историей:**
-   - История сохраняется автоматически
-   - Используйте кнопку "Очистить историю" для сброса
-   - Выберите способ хранения в настройках
+Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
 
-## ⌨️ Горячие клавиши
+## Security
 
-| Действие | Windows/Linux | macOS |
-|----------|---------------|-------|
-| Открыть чат | Ctrl + Shift + G | Cmd + Shift + G |
-| Отправить сообщение | Enter | Enter |
-| Новая строка | Shift + Enter | Shift + Enter |
-| Очистить ввод | Esc | Esc |
+For security issues, please read our [Security Policy](SECURITY.md) and report any vulnerabilities responsibly.
 
-## 🎨 Настройка интерфейса
+## License
 
-- Размер шрифта
-- Отображение временных меток
-- Выбор темы (светлая/темная/системная)
-- Настройка максимальной длины истории
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🔒 Безопасность
+## Support
 
-- Все токены хранятся локально
-- Поддержка безопасной авторизации через OAuth 2.0
-- Шифрование данных при хранении
+If you find this plugin helpful, consider:
+- [Starring the repository](https://github.com/semernyakov/groq-chat-plugin)
+- [Sponsoring the development](https://github.com/sponsors/semernyakov)
+- [Reporting issues](https://github.com/semernyakov/groq-chat-plugin/issues)
 
-## 🐛 Устранение неполадок
+## Changelog
 
-### Распространенные проблемы:
-
-1. **Ошибка авторизации:**
-   - Проверьте правильность Client ID
-   - Убедитесь, что redirect URI настроен корректно
-   - Проверьте подключение к интернету
-
-2. **Ошибка API:**
-   - Проверьте статус сервиса Groq
-   - Убедитесь в действительности токена
-   - Проверьте лимиты использования
-
-## 🤝 Вклад в развитие
-
-Мы приветствуем вклад в развитие проекта! Для участия:
-
-1. Форкните репозиторий
-2. Создайте ветку для вашей функции
-3. Внесите изменения
-4. Отправьте Pull Request
-
-## 📄 Лицензия
-
-MIT License. См. файл [LICENSE](./LICENSE) для подробностей.
-
-## 🙏 Благодарности
-
-- Команде Obsidian за отличную платформу
-- Groq за предоставление API
-- Всем контрибьюторам за помощь в развитии
-
-## 📞 Поддержка
-
-- Создайте Issue в репозитории
-- Присоединяйтесь к нашему [Discord](ссылка)
-- Следите за обновлениями в [Twitter](ссылка)
-
-## 📸 Скриншоты
-
-![Chat Interface](docs/images/chat-interface.png)
-![Settings Panel](docs/images/settings-panel.png)
-![Google Auth](docs/images/google-auth.png)
-
-## 🎮 Демо
-
-Посмотреть демо можно [здесь](https://semernyakov.github.io/groq-chat-plugin/demo)
-
----
-
-Создано с ❤️ для сообщества Obsidian
+See [CHANGELOG.ru.md](CHANGELOG.ru.md) for all changes.
