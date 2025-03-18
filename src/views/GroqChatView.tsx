@@ -30,7 +30,7 @@ export class GroqChatView extends ItemView {
         const rootEl = container.createDiv({ cls: 'groq-chat-container' });
         this.root = createRoot(rootEl);
         
-        this.root.render(<ChatPanel plugin={this.plugin} app={this.app} />);
+        this.root.render(<ChatPanel plugin={this.plugin} />);
     }
 
     async onClose(): Promise<void> {
@@ -42,7 +42,7 @@ export class GroqChatView extends ItemView {
     async rerender(): Promise<void> {
         if (this.root) {
             this.root.render(
-                <ChatPanel plugin={this.plugin} app={this.app} key={Date.now()} />
+                <ChatPanel plugin={this.plugin} />
             );
         }
     }
@@ -50,8 +50,16 @@ export class GroqChatView extends ItemView {
     async refreshSettings(): Promise<void> {
         if (this.root) {
             this.root.render(
-                <ChatPanel plugin={this.plugin} app={this.app} key={Date.now()} />
+                <ChatPanel plugin={this.plugin} />
             );
         }
+    }
+
+    render() {
+        return (
+            <div className="groq-chat-view">
+                <ChatPanel plugin={this.plugin} />
+            </div>
+        );
     }
 }

@@ -4,11 +4,15 @@ import { AuthService } from './services/authService';
 import { GroqService } from './services/groqService';
 import { GroqChatSettingsTab } from './settings/GroqChatSettingsTab';
 import { GroqChatView, VIEW_TYPE_GROQ_CHAT } from './views/GroqChatView';
+import { GroqChatSettings } from './types/plugin';
+import { Notice } from 'obsidian';
 
 export default class GroqChatPlugin extends Plugin implements GroqPlugin {
     settings = DEFAULT_SETTINGS;
     private authService: AuthService;
     private groqService: GroqService;
+    private settingsUpdateCallbacks: Array<(settings: GroqChatSettings) => void> = [];
+    private errorCallbacks: Array<(error: Error) => void> = [];
 
     async onload() {
         await this.loadSettings();
@@ -38,6 +42,7 @@ export default class GroqChatPlugin extends Plugin implements GroqPlugin {
 
     async saveSettings() {
         await this.saveData(this.settings);
+        this.settingsUpdateCallbacks.forEach(callback => callback(this.settings));
     }
 
     private async activateView() {
@@ -59,5 +64,19 @@ export default class GroqChatPlugin extends Plugin implements GroqPlugin {
         if (leaf) {
             workspace.revealLeaf(leaf);
         }
+    }
+
+    onSettingsUpdate(callback: (settings: GroqChatSettings) => void): void {
+        this.settingsUpdateCallbacks.push(callback);
+    }
+
+    onError(callback: (error: Error) => void): void {
+        this.errorCallbacks.push(callback);
+    }
+
+    private handleError(error: Error): void {
+        console.error('GroqChat Error:', error);
+        new Notice('GroqChat Error: ' + error.message);
+        this.errorCallbacks.forEach(callback => callback(error));
     }
 }

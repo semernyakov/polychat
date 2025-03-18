@@ -1,5 +1,6 @@
 import { App } from 'obsidian';
 import { GroqModel } from '../constants/models';
+import { Message } from './message';
 
 export interface ModelSettings {
     temperature: number;
@@ -14,6 +15,7 @@ export interface GroqChatSettings {
     historyStorageMethod: 'memory' | 'file';
     maxHistoryLength: number;
     notePath: string;
+    history: Message[];
 }
 
 export interface ModelConfig {
@@ -32,7 +34,8 @@ export const DEFAULT_SETTINGS: GroqChatSettings = {
     maxTokens: 4096,
     historyStorageMethod: 'memory',
     maxHistoryLength: 20,
-    notePath: 'groq-chat-history.md'
+    notePath: 'groq-chat-history.md',
+    history: []
 };
 
 export interface GroqPlugin {

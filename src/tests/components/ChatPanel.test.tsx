@@ -28,7 +28,11 @@ global.fetch = jest.fn(() =>
 
 describe('ChatPanel', () => {
     beforeEach(() => {
-        render(<ChatPanel plugin={mockPlugin} app={mockApp} />);
+        render(
+            <ChatPanel
+                plugin={mockPlugin}
+            />
+        );
     });
 
     it('renders input field correctly', () => {

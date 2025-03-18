@@ -10,7 +10,8 @@ export function getDefaultSettings(): GroqChatSettings {
         maxTokens: 4096,
         historyStorageMethod: 'memory',
         maxHistoryLength: 20,
-        notePath: 'groq-chat-history.md'
+        notePath: 'groq-chat-history.md',
+        history: []
     };
 }
 
