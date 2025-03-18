@@ -1,7 +1,7 @@
 {
   "id": "groq-chat-plugin",
   "name": "Groq Chat",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "minAppVersion": "0.15.0",
   "description": "Groq Chat Plugin for Obsidian with support for latest models",
   "author": "Ivan Semernyakov",
