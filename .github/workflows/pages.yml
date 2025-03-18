@@ -27,24 +27,16 @@ jobs:
         with:
           ruby-version: '3.2'
           bundler-cache: true
+          working-directory: docs
       
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v4
       
-      - name: Install dependencies
-        run: |
-          cd docs
-          gem install bundler
-          bundle init
-          bundle add jekyll
-          bundle add jekyll-theme-cayman
-          bundle add jekyll-seo-tag
-          bundle add jekyll-sitemap
-      
       - name: Build site
         run: |
           cd docs
+          bundle install
           bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
         env:
           JEKYLL_ENV: production
