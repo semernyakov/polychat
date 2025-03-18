@@ -1,170 +1,108 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Notice } from 'obsidian';
-import { ChatProps, ChatPanelState } from '../types/chat';
+import React, { useState, useEffect, useCallback } from 'react';
+import { GroqPlugin } from '../types/plugin';
 import { groqService } from '../services/groqService';
 import { historyService } from '../services/historyService';
-import { ModelSelector } from './ModelSelector';
-import { MessageItem } from './MessageItem';
-import { messageUtils } from '../utils/messageUtils';
-import { apiUtils } from '../utils/apiUtils';
+import { Message } from '../types/chat';
 
-const ChatPanel: React.FC<ChatProps> = ({ plugin }) => {
-    const [state, setState] = useState<ChatPanelState>({
-        messages: [],
-        inputText: '',
+interface ChatPanelProps {
+    plugin: GroqPlugin;
+}
+
+export const ChatPanel: React.FC<ChatPanelProps> = ({ plugin }) => {
+    const [state, setState] = useState({
+        messages: [] as Message[],
+        input: '',
         isLoading: false,
         selectedModel: plugin.settings.defaultModel
     });
 
-    const messagesEndRef = useRef<HTMLDivElement>(null);
-
     useEffect(() => {
-        const loadMessages = async () => {
-            const loadedMessages = await historyService.loadMessages({
+        const loadHistory = async () => {
+            const history = await historyService.loadHistory({
                 method: plugin.settings.historyStorageMethod,
                 maxHistoryLength: plugin.settings.maxHistoryLength,
                 notePath: plugin.settings.notePath
             });
-            setState(prev => ({ ...prev, messages: loadedMessages }));
+            setState(prev => ({ ...prev, messages: history }));
         };
-
-        loadMessages();
+        loadHistory();
     }, [plugin.settings.historyStorageMethod, plugin.settings.maxHistoryLength, plugin.settings.notePath]);
 
     useEffect(() => {
         const saveHistory = async () => {
-            await historyService.saveMessages(state.messages, {
+            await historyService.saveHistory(state.messages, {
                 method: plugin.settings.historyStorageMethod,
                 maxHistoryLength: plugin.settings.maxHistoryLength,
                 notePath: plugin.settings.notePath
             });
         };
-
         saveHistory();
-        scrollToBottom();
     }, [state.messages, plugin.settings.historyStorageMethod, plugin.settings.maxHistoryLength, plugin.settings.notePath]);
 
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    };
-
-    const clearHistory = async () => {
-        try {
-            await historyService.clearHistory({
-                method: plugin.settings.historyStorageMethod,
-                notePath: plugin.settings.notePath,
-                maxHistoryLength: plugin.settings.maxHistoryLength
-            });
-            setState(prev => ({ ...prev, messages: [] }));
-            new Notice('История чата очищена');
-        } catch (error) {
-            console.error('Ошибка при очистке истории:', error);
-            new Notice('Ошибка при очистке истории чата');
-        }
-    };
-
-    const sendMessage = async () => {
-        if (state.inputText.trim() === '' || state.isLoading) return;
-
-        const userMessage = messageUtils.createUserMessage(state.inputText);
+    const handleSend = useCallback(async () => {
+        if (!state.input.trim() || state.isLoading) return;
 
         setState(prev => ({
             ...prev,
-            messages: [...prev.messages, userMessage],
-            inputText: '',
+            messages: [...prev.messages, { role: 'user', content: state.input }],
+            input: '',
             isLoading: true
         }));
 
         try {
-            const response = await groqService.sendMessage(
-                state.inputText,
-                state.selectedModel,
-                plugin.settings.apiKey,
-                {
-                    temperature: plugin.settings.temperature,
-                    max_tokens: plugin.settings.maxTokens
-                }
-            );
-
-            const groqMessage = messageUtils.createGroqMessage(response);
+            const response = await groqService.sendMessage(state.input, {
+                method: plugin.settings.historyStorageMethod,
+                notePath: plugin.settings.notePath,
+                maxHistoryLength: plugin.settings.maxHistoryLength
+            });
 
             setState(prev => ({
                 ...prev,
-                messages: messageUtils.truncateHistory(
-                    [...prev.messages, groqMessage],
-                    plugin.settings.maxHistoryLength
-                ),
+                messages: [...prev.messages, { role: 'assistant', content: response }],
                 isLoading: false
             }));
         } catch (error) {
-            const errorMessage = messageUtils.createGroqMessage(
-                apiUtils.formatApiError(error),
-                'error'
-            );
-
-            setState(prev => ({
-                ...prev,
-                messages: [...prev.messages, errorMessage],
-                isLoading: false
-            }));
+            console.error('Error sending message:', error);
+            setState(prev => ({ ...prev, isLoading: false }));
         }
-    };
+    }, [state.input, state.isLoading, plugin.settings]);
 
-    const handleKeyPress = (e: React.KeyboardEvent) => {
+    const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            sendMessage();
+            handleSend();
         }
-    };
+    }, [handleSend]);
 
     return (
         <div className="groq-chat-container">
-            <div className="groq-chat-header">
-                <ModelSelector
-                    selectedModel={state.selectedModel}
-                    onModelChange={(model) => setState(prev => ({ ...prev, selectedModel: model }))}
-                    disabled={state.isLoading}
+            <div className="groq-chat-messages">
+                {state.messages.map((message, index) => (
+                    <div key={index} className={`message ${message.role}`}>
+                        <div className="message-content">{message.content}</div>
+                    </div>
+                ))}
+                {state.isLoading && (
+                    <div className="message assistant">
+                        <div className="message-content">Думаю...</div>
+                    </div>
+                )}
+            </div>
+            <div className="groq-chat-input">
+                <textarea
+                    value={state.input}
+                    onChange={e => setState(prev => ({ ...prev, input: e.target.value }))}
+                    onKeyPress={handleKeyPress}
+                    placeholder="Введите сообщение..."
+                    rows={3}
                 />
                 <button
-                    className="groq-chat-clear-button"
-                    onClick={clearHistory}
-                    title="Очистить историю чата"
-                    disabled={state.isLoading || state.messages.length === 0}
+                    onClick={handleSend}
+                    disabled={state.isLoading || !state.input.trim()}
                 >
-                    Очистить историю
+                    Отправить
                 </button>
-            </div>
-            <div className="messages-container">
-                {state.messages.map((message, index) => (
-                    <MessageItem
-                        key={`${message.timestamp}-${index}`}
-                        message={message}
-                    />
-                ))}
-                <div ref={messagesEndRef} />
-            </div>
-            <div className="input-group">
-                <div className="message-input">
-                    <textarea
-                        value={state.inputText}
-                        onChange={(e) => setState(prev => ({ ...prev, inputText: e.target.value }))}
-                        onKeyPress={handleKeyPress}
-                        placeholder="Введите сообщение..."
-                        className="input-field"
-                        rows={3}
-                        disabled={state.isLoading}
-                    />
-                    <button 
-                        onClick={sendMessage}
-                        className="send-button"
-                        disabled={!state.inputText.trim() || state.isLoading}
-                    >
-                        {state.isLoading ? 'Отправка...' : 'Отправить'}
-                    </button>
-                </div>
             </div>
         </div>
     );
 };
-
-export default ChatPanel;

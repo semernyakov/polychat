@@ -1,26 +1,16 @@
 import { Plugin, Notice } from 'obsidian';
-import { GroqChatSettings } from './types/plugin';
+import { GroqChatSettings, DEFAULT_SETTINGS } from './types/plugin';
 import './styles/chat.css';
 import { AuthService } from './services/authService';
 import { AuthState, GoogleAuthConfig } from './types';
-import { GroqChatSettingsTab } from './settings';
+import { GroqSettingTab } from './settings';
 import { GroqChatView } from './views/GroqChatView';
 import { VIEW_TYPE_GROQ_CHAT } from './constants';
 import { settingsUtils } from './utils/settingsUtils';
 import { groqService } from './services/groqService';
 import { authService } from './services/authService';
 
-const DEFAULT_SETTINGS: GroqChatSettings = {
-    groqApiKey: '',
-    defaultModel: 'llama3-8b-8192',
-    historyStorageMethod: 'note',
-    googleToken: '',
-    maxHistoryLength: 100,
-    temperature: 0.7,
-    maxTokens: 1000
-};
-
-export default class GroqChatPlugin extends Plugin {
+export default class GroqPlugin extends Plugin {
     private authState: AuthState = {
         isAuthenticated: false
     };
@@ -34,9 +24,34 @@ export default class GroqChatPlugin extends Plugin {
     settings: GroqChatSettings;
 
     async onload() {
-        // Загрузка настроек с валидацией
-        const loadedSettings = await this.loadData();
-        this.settings = settingsUtils.validateSettings(loadedSettings);
+        await this.loadSettings();
+
+        this.registerView(
+            VIEW_TYPE_GROQ_CHAT,
+            (leaf) => new GroqChatView(leaf, this)
+        );
+
+        this.addRibbonIcon('message-square', 'Groq Chat', () => {
+            this.activateView();
+        });
+
+        this.addCommand({
+            id: 'open-groq-chat',
+            name: 'Открыть Groq Chat',
+            callback: () => {
+                this.activateView();
+            },
+        });
+
+        this.addCommand({
+            id: 'clear-conversation',
+            name: 'Очистить диалог',
+            callback: () => {
+                this.clearConversation();
+            },
+        });
+
+        this.addSettingTab(new GroqSettingTab(this));
 
         // Проверка API ключа при загрузке
         if (this.settings.groqApiKey) {
@@ -82,7 +97,7 @@ export default class GroqChatPlugin extends Plugin {
                     this.settings.groqApiKey = token;
                     await this.saveSettings();
                     new Notice('Успешная авторизация в Groq');
-                    this.updateView();
+                    this.updateViews();
                 } catch (error) {
                     console.error('Ошибка авторизации:', error);
                     new Notice(`Ошибка авторизации: ${error instanceof Error ? error.message : 'Неизвестная ошибка'}`);
@@ -91,39 +106,12 @@ export default class GroqChatPlugin extends Plugin {
             }
         });
 
-        // Регистрация представления
-        this.registerView(
-            VIEW_TYPE_GROQ_CHAT,
-            (leaf) => new GroqChatView(leaf, this)
-        );
-
-        // Добавление кнопки в боковую панель
-        this.addRibbonIcon('message-square', 'Открыть Groq Chat', () => {
-            this.activateView();
-        });
-
-        // Добавление вкладки настроек
-        this.addSettingTab(new GroqChatSettingsTab(this.app, this));
-
         // Обработчик изменения настроек
         this.registerEvent(
             this.app.workspace.on('layout-change', () => {
                 this.saveSettings();
-                this.updateView();
+                this.updateViews();
             })
-        );
-    }
-
-    async activateView() {
-        this.app.workspace.detachLeavesOfType(VIEW_TYPE_GROQ_CHAT);
-
-        await this.app.workspace.getRightLeaf(false).setViewState({
-            type: VIEW_TYPE_GROQ_CHAT,
-            active: true,
-        });
-
-        this.app.workspace.revealLeaf(
-            this.app.workspace.getLeavesOfType(VIEW_TYPE_GROQ_CHAT)[0]
         );
     }
 
@@ -133,30 +121,36 @@ export default class GroqChatPlugin extends Plugin {
 
     async saveSettings() {
         await this.saveData(this.settings);
-        // Уведомление React представления о том, что настройки изменились
-        this.app.workspace.trigger('groq-chat:settings-change');
+        this.updateViews();
     }
 
-    async clearHistory() {
-        // Реализация метода clearHistory, требуемого интерфейсом GroqPlugin
-        // Здесь должна быть логика очистки истории чата
-        try {
-            // Пример реализации
-            const view = this.app.workspace.getLeavesOfType(VIEW_TYPE_GROQ_CHAT)[0]?.view;
-            if (view instanceof GroqChatView) {
-                // Предположим, что в ChatPanel есть метод clearHistory
-                view.clearConversation?.();
-            }
-            new Notice('История чата очищена');
-        } catch (error) {
-            console.error('Ошибка при очистке истории:', error);
-            new Notice('Ошибка при очистке истории чата');
+    async activateView() {
+        const workspace = this.app.workspace;
+        let leaf = workspace.getLeavesOfType(VIEW_TYPE_GROQ_CHAT)[0];
+
+        if (!leaf) {
+            leaf = workspace.getRightLeaf(false);
+            await leaf?.setViewState({
+                type: VIEW_TYPE_GROQ_CHAT,
+                active: true,
+            });
+        }
+
+        workspace.revealLeaf(leaf);
+    }
+
+    clearConversation() {
+        const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_GROQ_CHAT);
+        for (const leaf of leaves) {
+            const view = leaf.view as GroqChatView;
+            view.clearConversation();
         }
     }
 
-    updateView() {
-        const view = this.app.workspace.getLeavesOfType(VIEW_TYPE_GROQ_CHAT)[0]?.view;
-        if (view instanceof GroqChatView) {
+    updateViews() {
+        const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_GROQ_CHAT);
+        for (const leaf of leaves) {
+            const view = leaf.view as GroqChatView;
             view.updateSettings(this.settings);
         }
     }

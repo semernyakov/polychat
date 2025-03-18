@@ -6,4 +6,6 @@ export enum GroqModel {
 
 export const DEFAULT_MODEL = GroqModel.LLAMA_3_8B;
 
-export const API_ENDPOINT = 'https://api.groq.com/v1/chat/completions'; 
+export const API_ENDPOINT = 'https://api.groq.com/v1/chat/completions';
+
+export const VIEW_TYPE_GROQ_CHAT = 'groq-chat-view';
