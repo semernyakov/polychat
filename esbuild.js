@@ -11,26 +11,28 @@ https://github.com/semernyakov/groq-chat-plugin
 
 const isProd = process.argv[2] === 'production';
 
-const ctx = esbuild.build({
-  banner: {
-    js: banner,
-  },
-  entryPoints: ['src/main.ts'],
-  bundle: true,
-  external: ['obsidian', 'electron'],
-  format: 'cjs',
-  target: 'es2018',
-  logLevel: 'info',
-  sourcemap: isProd ? false : 'inline',
-  minify: isProd,
-  treeShaking: true,
-  outfile: 'dist/main.js',
-  plugins: [
-    copy({
-      assets: [
-        { from: 'manifest.json', to: 'manifest.json' },
-        { from: 'styles.css', to: 'styles.css' }
-      ]
-    })
-  ]
-}).catch(() => process.exit(1)); 
+const ctx = esbuild
+  .build({
+    banner: {
+      js: banner,
+    },
+    entryPoints: ['src/main.ts'],
+    bundle: true,
+    external: ['obsidian', 'electron'],
+    format: 'cjs',
+    target: 'es2018',
+    logLevel: 'info',
+    sourcemap: isProd ? false : 'inline',
+    minify: isProd,
+    treeShaking: true,
+    outfile: 'dist/main.js',
+    plugins: [
+      copy({
+        assets: [
+          { from: 'manifest.json', to: 'manifest.json' },
+          { from: 'styles.css', to: 'styles.css' },
+        ],
+      }),
+    ],
+  })
+  .catch(() => process.exit(1));

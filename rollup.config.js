@@ -6,24 +6,24 @@ import json from '@rollup/plugin-json';
 const isProd = process.env.BUILD === 'production';
 
 export default {
-    input: 'src/main.ts',
-    output: {
-        dir: 'dist',
-        sourcemap: 'inline',
-        format: 'cjs',
-        exports: 'default'
-    },
-    external: ['obsidian'],
-    plugins: [
-        typescript(),
-        nodeResolve({ 
-            browser: true,
-            preferBuiltins: true
-        }),
-        commonjs({
-            include: 'node_modules/**',
-            extensions: ['.js', '.ts']
-        }),
-        json()
-    ]
-}; 
+  input: 'src/main.ts',
+  output: {
+    dir: 'dist',
+    sourcemap: 'inline',
+    format: 'cjs',
+    exports: 'default',
+  },
+  external: ['obsidian'],
+  plugins: [
+    typescript(),
+    nodeResolve({
+      browser: true,
+      preferBuiltins: true,
+    }),
+    commonjs({
+      include: 'node_modules/**',
+      extensions: ['.js', '.ts'],
+    }),
+    json(),
+  ],
+};

@@ -1,10 +1,10 @@
 # Groq Chat Plugin for Obsidian
 
-[![Версия](https://img.shields.io/badge/Версия-v1.2.0-blue "Текущая версия плагина")](https://github.com/semernyakov/groq-chat-plugin/releases)
-[![Лицензия](https://img.shields.io/badge/Лицензия-MIT-green "Лицензия MIT")](https://github.com/semernyakov/groq-chat-plugin/blob/master/LICENSE)
-[![CI/CD](https://img.shields.io/github/actions/workflow/status/semernyakov/groq-chat-plugin/ci.yml?branch=master&label=CI%2FCD "Статус сборки")](https://github.com/semernyakov/groq-chat-plugin/actions)
-[![Покрытие тестами](https://img.shields.io/codecov/c/github/semernyakov/groq-chat-plugin "Покрытие кода тестами")](https://codecov.io/gh/semernyakov/groq-chat-plugin)
-[![Obsidian Downloads](https://img.shields.io/badge/dynamic/json?logo=obsidian&color=7963E6&label=downloads&query=downloads&url=https://raw.githubusercontent.com/obsidianmd/obsidian-releases/master/community-plugins.json "Количество загрузок в Obsidian")](https://obsidian.md/plugins?id=groq-chat-plugin)
+[![Версия](https://img.shields.io/badge/Версия-v1.2.0-blue 'Текущая версия плагина')](https://github.com/semernyakov/groq-chat-plugin/releases)
+[![Лицензия](https://img.shields.io/badge/Лицензия-MIT-green 'Лицензия MIT')](https://github.com/semernyakov/groq-chat-plugin/blob/master/LICENSE)
+[![CI/CD](https://img.shields.io/github/actions/workflow/status/semernyakov/groq-chat-plugin/ci.yml?branch=master&label=CI%2FCD 'Статус сборки')](https://github.com/semernyakov/groq-chat-plugin/actions)
+[![Покрытие тестами](https://img.shields.io/codecov/c/github/semernyakov/groq-chat-plugin 'Покрытие кода тестами')](https://codecov.io/gh/semernyakov/groq-chat-plugin)
+[![Obsidian Downloads](https://img.shields.io/badge/dynamic/json?logo=obsidian&color=7963E6&label=downloads&query=downloads&url=https://raw.githubusercontent.com/obsidianmd/obsidian-releases/master/community-plugins.json 'Количество загрузок в Obsidian')](https://obsidian.md/plugins?id=groq-chat-plugin)
 
 ![Groq Chat Plugin](./docs/images/plugin-banner.png)
 
@@ -14,25 +14,25 @@ Groq Chat Plugin is a powerful plugin for Obsidian that integrates Groq AI capab
 
 ## ✨ Key Features
 
-* 🤖 Support for a wide range of models:
-  * **Production Models** (recommended for main use):
+- 🤖 Support for a wide range of models:
+  - **Production Models** (recommended for main use):
     - Llama 3 70B Versatile (128K context)
     - Llama 3 8B Instant (128K context)
     - Mixtral 8x7B (32K context)
     - Gemma 2 9B (8K context)
     - Llama Guard 3 8B (for security)
     - Whisper Large V3 (for audio)
-  * **Preview Models** (for testing):
+  - **Preview Models** (for testing):
     - Llama 3 90B Vision (image support)
     - Qwen 2.5 Coder 32B (for code)
     - Mistral Saba 24B
     - DeepSeek models
-* 🔐 Secure API key storage
-* 💬 Interactive chat interface
-* 📚 Chat history saving
-* 🎨 Customizable interface
-* 🌓 Light and dark theme support
-* ⚡ Quick access via sidebar
+- 🔐 Secure API key storage
+- 💬 Interactive chat interface
+- 📚 Chat history saving
+- 🎨 Customizable interface
+- 🌓 Light and dark theme support
+- ⚡ Quick access via sidebar
 
 ## 🚀 Installation
 
@@ -53,50 +53,60 @@ Groq Chat Plugin is a powerful plugin for Obsidian that integrates Groq AI capab
 ### Model Configuration
 
 #### Production Models
-* **Llama 3 70B Versatile**
+
+- **Llama 3 70B Versatile**
+
   - Context: 128K tokens
   - Max response tokens: 32,768
   - Recommended for: general tasks
 
-* **Llama 3 8B Instant**
+- **Llama 3 8B Instant**
+
   - Context: 128K tokens
   - Max response tokens: 8,192
   - Recommended for: quick responses
 
-* **Mixtral 8x7B**
+- **Mixtral 8x7B**
+
   - Context: 32K tokens
   - Recommended for: complex computations
 
-* **Gemma 2 9B**
+- **Gemma 2 9B**
+
   - Context: 8K tokens
   - Recommended for: efficient processing
 
-* **Whisper Large V3**
+- **Whisper Large V3**
   - Max file size: 25 MB
   - Recommended for: audio transcription
 
 #### Preview Models
-* **Llama 3 90B Vision**
+
+- **Llama 3 90B Vision**
+
   - Image support
   - Context: 128K tokens
   - Max response tokens: 8,192
 
-* **Qwen 2.5 Coder 32B**
+- **Qwen 2.5 Coder 32B**
   - Specialization: code processing
   - Context: 128K tokens
 
 ## 💡 Использование
 
 1. **Открытие чата:**
+
    - Нажмите на иконку чата в боковой панели
    - Используйте горячую клавишу (по умолчанию: Ctrl/Cmd + Shift + G)
 
 2. **Отправка сообщений:**
+
    - Введите текст в поле ввода
    - Нажмите Enter или кнопку "Отправить"
    - Используйте Shift + Enter для переноса строки
 
 3. **Работа с историей:**
+
    - История сохраняется автоматически
    - Используйте кнопку "Очистить историю" для сброса
    - Выберите способ хранения в настройках (память/файл)
@@ -108,12 +118,12 @@ Groq Chat Plugin is a powerful plugin for Obsidian that integrates Groq AI capab
 
 ## ⌨️ Горячие клавиши
 
-| Действие | Windows/Linux | macOS |
-|----------|---------------|-------|
-| Открыть чат | Ctrl + Shift + G | Cmd + Shift + G |
-| Отправить сообщение | Enter | Enter |
-| Новая строка | Shift + Enter | Shift + Enter |
-| Очистить ввод | Esc | Esc |
+| Действие            | Windows/Linux    | macOS           |
+| ------------------- | ---------------- | --------------- |
+| Открыть чат         | Ctrl + Shift + G | Cmd + Shift + G |
+| Отправить сообщение | Enter            | Enter           |
+| Новая строка        | Shift + Enter    | Shift + Enter   |
+| Очистить ввод       | Esc              | Esc             |
 
 ## 🎨 Настройка интерфейса
 
@@ -133,11 +143,13 @@ Groq Chat Plugin is a powerful plugin for Obsidian that integrates Groq AI capab
 ### Распространенные проблемы:
 
 1. **Ошибка авторизации:**
+
    - Проверьте правильность Client ID
    - Убедитесь, что redirect URI настроен корректно
    - Проверьте подключение к интернету
 
 2. **Ошибка API:**
+
    - Проверьте статус сервиса Groq
    - Убедитесь в действительности токена
    - Проверьте лимиты использования
@@ -210,6 +222,7 @@ Please read our [Contributing Guide](CONTRIBUTING.md) before submitting a Pull R
 ## Author
 
 Ivan Semernyakov
+
 - GitHub: [@semernyakov](https://github.com/semernyakov)
 - Website: [semernyakov.com](https://semernyakov.com)
 

@@ -2,34 +2,34 @@ name: CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-          
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Run linter
         run: npm run lint
-        
+
       - name: Run type check
         run: npm run type-check
-        
+
       - name: Run tests
         run: npm run test
-        
+
       - name: Upload coverage reports
         uses: codecov/codecov-action@v4
         with:
@@ -42,22 +42,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-          
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Build
         run: npm run build
-        
+
       - name: Build demo
         run: npm run build:demo
-        
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -81,12 +81,12 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-      
+
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
           name: build
-      
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
@@ -96,4 +96,4 @@ jobs:
             styles.css
           generate_release_notes: true
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

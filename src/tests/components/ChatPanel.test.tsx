@@ -6,53 +6,52 @@ import { GroqPlugin } from '../../types/plugin';
 
 // Мок для плагина
 const mockPlugin = {
-    settings: {
-        apiKey: 'test-key',
-        model: 'llama3-8b-8192'
-    },
-    loadData: async () => ({ chatHistory: [] }),
-    saveData: async () => {}
+  settings: {
+    apiKey: 'test-key',
+    model: 'llama3-8b-8192',
+  },
+  loadData: async () => ({ chatHistory: [] }),
+  saveData: async () => {},
 } as unknown as GroqPlugin;
 
 // Мок для fetch
 global.fetch = jest.fn(() =>
-    Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({ choices: [{ message: { content: 'Ответ от API' } }] })
-    })
+  Promise.resolve({
+    ok: true,
+    json: () => Promise.resolve({ choices: [{ message: { content: 'Ответ от API' } }] }),
+  }),
 ) as jest.Mock;
 
 describe('ChatPanel', () => {
-    beforeEach(() => {
-        render(
-            <ChatPanel
-                plugin={mockPlugin}
-            />
-        );
-    });
+  beforeEach(() => {
+    render(<ChatPanel plugin={mockPlugin} />);
+  });
 
-    it('renders input field correctly', () => {
-        const input = screen.getByPlaceholderText('Введите сообщение...');
-        expect(input).toBeInTheDocument();
-    });
+  it('renders input field correctly', () => {
+    const input = screen.getByPlaceholderText('Введите сообщение...');
+    expect(input).toBeInTheDocument();
+  });
 
-    it('handles input change', () => {
-        const input = screen.getByPlaceholderText('Введите сообщение...') as HTMLInputElement;
-        fireEvent.change(input, { target: { value: 'Тестовое сообщение' } });
-        expect(input.value).toBe('Тестовое сообщение');
-    });
+  it('handles input change', () => {
+    const input = screen.getByPlaceholderText('Введите сообщение...') as HTMLInputElement;
+    fireEvent.change(input, { target: { value: 'Тестовое сообщение' } });
+    expect(input.value).toBe('Тестовое сообщение');
+  });
 
-    it('sends message on button click', async () => {
-        const input = screen.getByPlaceholderText('Введите сообщение...') as HTMLInputElement;
-        const button = screen.getByRole('button');
+  it('sends message on button click', async () => {
+    const input = screen.getByPlaceholderText('Введите сообщение...') as HTMLInputElement;
+    const button = screen.getByRole('button');
 
-        fireEvent.change(input, { target: { value: 'Тестовое сообщение' } });
-        fireEvent.click(button);
+    fireEvent.change(input, { target: { value: 'Тестовое сообщение' } });
+    fireEvent.click(button);
 
-        await waitFor(() => {
-            expect(screen.getByText('Тестовое сообщение')).toBeInTheDocument();
-        }, { timeout: 2000 });
-    });
+    await waitFor(
+      () => {
+        expect(screen.getByText('Тестовое сообщение')).toBeInTheDocument();
+      },
+      { timeout: 2000 },
+    );
+  });
 });
 
 /*
@@ -122,4 +121,4 @@ describe('ChatPanel', () => {
         expect(screen.getByText('Тестовое сообщение')).toBeInTheDocument();
     });
 });
-*/ 
+*/

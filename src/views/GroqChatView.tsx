@@ -7,59 +7,55 @@ import { GroqPlugin } from '../types/plugin';
 export const VIEW_TYPE_GROQ_CHAT = 'groq-chat-view';
 
 export class GroqChatView extends ItemView {
-    private plugin: GroqPlugin;
-    private root: Root;
+  private plugin: GroqPlugin;
+  private root: Root;
 
-    constructor(leaf: WorkspaceLeaf, plugin: GroqPlugin) {
-        super(leaf);
-        this.plugin = plugin;
-    }
+  constructor(leaf: WorkspaceLeaf, plugin: GroqPlugin) {
+    super(leaf);
+    this.plugin = plugin;
+  }
 
-    getViewType(): string {
-        return VIEW_TYPE_GROQ_CHAT;
-    }
+  getViewType(): string {
+    return VIEW_TYPE_GROQ_CHAT;
+  }
 
-    getDisplayText(): string {
-        return 'Groq Chat';
-    }
+  getDisplayText(): string {
+    return 'Groq Chat';
+  }
 
-    async onOpen(): Promise<void> {
-        const container = this.containerEl.children[1];
-        container.empty();
-        
-        const rootEl = container.createDiv({ cls: 'groq-chat-container' });
-        this.root = createRoot(rootEl);
-        
-        this.root.render(<ChatPanel plugin={this.plugin} />);
-    }
+  async onOpen(): Promise<void> {
+    const container = this.containerEl.children[1];
+    container.empty();
 
-    async onClose(): Promise<void> {
-        if (this.root) {
-            this.root.unmount();
-        }
-    }
+    const rootEl = container.createDiv({ cls: 'groq-chat-container' });
+    this.root = createRoot(rootEl);
 
-    async rerender(): Promise<void> {
-        if (this.root) {
-            this.root.render(
-                <ChatPanel plugin={this.plugin} />
-            );
-        }
-    }
+    this.root.render(<ChatPanel plugin={this.plugin} />);
+  }
 
-    async refreshSettings(): Promise<void> {
-        if (this.root) {
-            this.root.render(
-                <ChatPanel plugin={this.plugin} />
-            );
-        }
+  async onClose(): Promise<void> {
+    if (this.root) {
+      this.root.unmount();
     }
+  }
 
-    render() {
-        return (
-            <div className="groq-chat-view">
-                <ChatPanel plugin={this.plugin} />
-            </div>
-        );
+  async rerender(): Promise<void> {
+    if (this.root) {
+      this.root.render(<ChatPanel plugin={this.plugin} />);
     }
+  }
+
+  async refreshSettings(): Promise<void> {
+    if (this.root) {
+      this.root.render(<ChatPanel plugin={this.plugin} />);
+    }
+  }
+
+  render() {
+    return (
+      <div className="groq-chat-view">
+        <ChatPanel plugin={this.plugin} />
+      </div>
+    );
+  }
 }

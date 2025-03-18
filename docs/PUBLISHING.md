@@ -10,7 +10,8 @@ Before publishing, ensure all core features are working correctly:
 
 #### Supported Models
 
-* **Production Models**:
+- **Production Models**:
+
   - Llama 3 70B Versatile (128K context tokens)
   - Llama 3 8B Instant (128K context tokens)
   - Mixtral 8x7B (32K context tokens)
@@ -18,7 +19,7 @@ Before publishing, ensure all core features are working correctly:
   - Llama Guard 3 8B (for security checks)
   - Whisper Large V3 (for audio processing)
 
-* **Preview Models**:
+- **Preview Models**:
   - Llama 3 90B Vision (image support)
   - Qwen 2.5 Coder 32B (for code processing)
   - Mistral Saba 24B
@@ -57,13 +58,13 @@ Ensure that the file `manifest.json` contains correct data:
 
 ```json
 {
-    "id": "groq-chat",
-    "name": "Groq Chat",
-    "author": "Ivan Semernyakov",
-    "authorUrl": "https://github.com/semernyakov",
-    "description": "Groq Chat Plugin for Obsidian with support for latest models",
-    "repo": "semernyakov/groq-chat-plugin",
-    "branch": "master"
+  "id": "groq-chat",
+  "name": "Groq Chat",
+  "author": "Ivan Semernyakov",
+  "authorUrl": "https://github.com/semernyakov",
+  "description": "Groq Chat Plugin for Obsidian with support for latest models",
+  "repo": "semernyakov/groq-chat-plugin",
+  "branch": "master"
 }
 ```
 
@@ -73,14 +74,14 @@ Ensure that all necessary scripts are configured in `package.json`:
 
 ```json
 {
-    "scripts": {
-        "dev": "rollup -c -w",
-        "build": "rollup -c",
-        "test": "jest",
-        "lint": "eslint . --ext .ts,.tsx",
-        "version": "node version-bump.mjs && git add manifest.json versions.json",
-        "publish": "npm run build && npm run test && npm run release"
-    }
+  "scripts": {
+    "dev": "rollup -c -w",
+    "build": "rollup -c",
+    "test": "jest",
+    "lint": "eslint . --ext .ts,.tsx",
+    "version": "node version-bump.mjs && git add manifest.json versions.json",
+    "publish": "npm run build && npm run test && npm run release"
+  }
 }
 ```
 
@@ -89,16 +90,19 @@ Ensure that all necessary scripts are configured in `package.json`:
 ### 1. Release Preparation
 
 1. Ensure all changes are committed:
+
    ```bash
    git status
    ```
 
 2. Verify that all tests pass:
+
    ```bash
    npm run test
    ```
 
 3. Verify project build:
+
    ```bash
    npm run build
    ```
@@ -111,6 +115,7 @@ Ensure that all necessary scripts are configured in `package.json`:
 ### 2. Create Release
 
 1. Update plugin version:
+
    ```bash
    npm version patch # for patch (1.0.0 -> 1.0.1)
    # or
@@ -120,6 +125,7 @@ Ensure that all necessary scripts are configured in `package.json`:
    ```
 
 2. Create release:
+
    ```bash
    npm run release
    ```
@@ -134,14 +140,15 @@ Ensure that all necessary scripts are configured in `package.json`:
 1. Fork the [obsidian-releases](https://github.com/obsidianmd/obsidian-releases) repository
 
 2. Add plugin information to `community-plugins.json`:
+
    ```json
    {
-       "id": "groq-chat",
-       "name": "Groq Chat",
-       "author": "Ivan Semernyakov",
-       "description": "Groq Chat Plugin for Obsidian with support for latest models",
-       "repo": "semernyakov/groq-chat-plugin",
-       "branch": "master"
+     "id": "groq-chat",
+     "name": "Groq Chat",
+     "author": "Ivan Semernyakov",
+     "description": "Groq Chat Plugin for Obsidian with support for latest models",
+     "repo": "semernyakov/groq-chat-plugin",
+     "branch": "master"
    }
    ```
 
@@ -150,11 +157,13 @@ Ensure that all necessary scripts are configured in `package.json`:
 ### 4. Pre-PR Check
 
 1. Verify plugin functionality in Obsidian:
+
    - Install plugin from local file
    - Verify main functionality
    - Verify operation on mobile devices
 
 2. Ensure documentation is up-to-date:
+
    - README.md contains up-to-date information
    - All functions and settings are described
    - Installation and usage instructions are provided
@@ -201,4 +210,4 @@ Ensure that all necessary scripts are configured in `package.json`:
 - [ ] Documentation is up-to-date
 - [ ] Plugin works on mobile devices
 - [ ] Release created on GitHub
-- [ ] Pull Request sent to obsidian-releases 
+- [ ] Pull Request sent to obsidian-releases

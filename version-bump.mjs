@@ -12,4 +12,4 @@ writeFileSync('manifest.json', JSON.stringify(manifest, null, 4));
 
 // Обновляем versions.json
 versions[targetVersion] = manifest.minAppVersion;
-writeFileSync('versions.json', JSON.stringify(versions, null, 4)); 
+writeFileSync('versions.json', JSON.stringify(versions, null, 4));

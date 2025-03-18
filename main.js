@@ -23567,7 +23567,7 @@ __export(main_exports, {
   default: () => GroqChatPlugin
 });
 module.exports = __toCommonJS(main_exports);
-var import_obsidian4 = require("obsidian");
+var import_obsidian3 = require("obsidian");
 
 // src/types/plugin.ts
 var DEFAULT_SETTINGS = {
@@ -23577,7 +23577,8 @@ var DEFAULT_SETTINGS = {
   maxTokens: 4096,
   historyStorageMethod: "memory",
   maxHistoryLength: 20,
-  notePath: "groq-chat-history.md"
+  notePath: "groq-chat-history.md",
+  history: []
 };
 
 // src/services/authService.ts
@@ -23601,7 +23602,7 @@ var AuthService = class {
     try {
       const response = await fetch("https://api.groq.com/v1/models", {
         headers: {
-          "Authorization": `Bearer ${apiKey}`
+          Authorization: `Bearer ${apiKey}`
         }
       });
       return response.ok;
@@ -23699,7 +23700,7 @@ var GroqService = class {
       const response = await fetch(`${this.API_BASE}/models`, {
         method: "GET",
         headers: {
-          "Authorization": `Bearer ${apiKey}`,
+          Authorization: `Bearer ${apiKey}`,
           "Content-Type": "application/json"
         }
       });
@@ -23727,7 +23728,9 @@ var GroqService = class {
       console.warn("\u0412\u043D\u0438\u043C\u0430\u043D\u0438\u0435: \u0438\u0441\u043F\u043E\u043B\u044C\u0437\u0443\u0435\u0442\u0441\u044F preview \u043C\u043E\u0434\u0435\u043B\u044C, \u043D\u0435 \u0440\u0435\u043A\u043E\u043C\u0435\u043D\u0434\u0443\u0435\u0442\u0441\u044F \u0434\u043B\u044F production.");
     }
     if (modelInfo.maxCompletionTokens && maxTokens > modelInfo.maxCompletionTokens) {
-      console.warn(`\u041F\u0440\u0435\u0432\u044B\u0448\u0435\u043D \u043B\u0438\u043C\u0438\u0442 \u0442\u043E\u043A\u0435\u043D\u043E\u0432 \u0434\u043B\u044F \u043C\u043E\u0434\u0435\u043B\u0438 ${modelInfo.name}. \u0423\u0441\u0442\u0430\u043D\u043E\u0432\u043B\u0435\u043D\u043E \u043C\u0430\u043A\u0441\u0438\u043C\u0430\u043B\u044C\u043D\u043E\u0435 \u0437\u043D\u0430\u0447\u0435\u043D\u0438\u0435 ${modelInfo.maxCompletionTokens}`);
+      console.warn(
+        `\u041F\u0440\u0435\u0432\u044B\u0448\u0435\u043D \u043B\u0438\u043C\u0438\u0442 \u0442\u043E\u043A\u0435\u043D\u043E\u0432 \u0434\u043B\u044F \u043C\u043E\u0434\u0435\u043B\u0438 ${modelInfo.name}. \u0423\u0441\u0442\u0430\u043D\u043E\u0432\u043B\u0435\u043D\u043E \u043C\u0430\u043A\u0441\u0438\u043C\u0430\u043B\u044C\u043D\u043E\u0435 \u0437\u043D\u0430\u0447\u0435\u043D\u0438\u0435 ${modelInfo.maxCompletionTokens}`
+      );
       maxTokens = modelInfo.maxCompletionTokens;
     }
     try {
@@ -23735,7 +23738,7 @@ var GroqService = class {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${this.plugin.settings.apiKey}`
+          Authorization: `Bearer ${this.plugin.settings.apiKey}`
         },
         body: JSON.stringify({
           model,
@@ -23827,10 +23830,15 @@ var GroqChatSettingsTab = class extends import_obsidian.PluginSettingTab {
       })
     );
     new import_obsidian.Setting(containerEl).setName("\u041C\u043E\u0434\u0435\u043B\u044C").setDesc("\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u043C\u043E\u0434\u0435\u043B\u044C Groq \u0434\u043B\u044F \u0438\u0441\u043F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u043D\u0438\u044F").addDropdown(
-      (dropdown) => dropdown.addOptions(GROQ_MODELS.reduce((obj, model) => {
-        obj[model] = model;
-        return obj;
-      }, {})).setValue(this.plugin.settings.model).onChange(async (value) => {
+      (dropdown) => dropdown.addOptions(
+        GROQ_MODELS.reduce(
+          (obj, model) => {
+            obj[model] = model;
+            return obj;
+          },
+          {}
+        )
+      ).setValue(this.plugin.settings.model).onChange(async (value) => {
         this.plugin.settings.model = value;
         await this.plugin.saveSettings();
       })
@@ -23852,8 +23860,8 @@ var GroqChatSettingsTab = class extends import_obsidian.PluginSettingTab {
     );
     new import_obsidian.Setting(containerEl).setName("\u041C\u0435\u0442\u043E\u0434 \u0445\u0440\u0430\u043D\u0435\u043D\u0438\u044F \u0438\u0441\u0442\u043E\u0440\u0438\u0438").setDesc("\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435, \u043A\u0430\u043A \u0445\u0440\u0430\u043D\u0438\u0442\u044C \u0438\u0441\u0442\u043E\u0440\u0438\u044E \u0447\u0430\u0442\u0430").addDropdown(
       (dropdown) => dropdown.addOptions({
-        "memory": "\u0412 \u043F\u0430\u043C\u044F\u0442\u0438",
-        "file": "\u0412 \u0444\u0430\u0439\u043B\u0435"
+        memory: "\u0412 \u043F\u0430\u043C\u044F\u0442\u0438",
+        file: "\u0412 \u0444\u0430\u0439\u043B\u0435"
       }).setValue(this.plugin.settings.historyStorageMethod).onChange(async (value) => {
         this.plugin.settings.historyStorageMethod = value;
         await this.plugin.saveSettings();
@@ -23880,7 +23888,7 @@ var GroqChatSettingsTab = class extends import_obsidian.PluginSettingTab {
 };
 
 // src/views/GroqChatView.tsx
-var import_obsidian3 = require("obsidian");
+var import_obsidian2 = require("obsidian");
 var React4 = __toESM(require_react());
 var import_client = __toESM(require_client());
 
@@ -23888,9 +23896,9 @@ var import_client = __toESM(require_client());
 var import_react3 = __toESM(require_react());
 
 // src/services/historyService.ts
-var import_obsidian2 = require("obsidian");
 var HistoryService = class {
   constructor(plugin) {
+    this.memoryHistory = [];
     this.plugin = plugin;
   }
   /**
@@ -23898,22 +23906,24 @@ var HistoryService = class {
    */
   async getHistory() {
     if (this.plugin.settings.historyStorageMethod === "file") {
-      return this.loadMessagesFromFile();
+      return this.plugin.settings.history || [];
     } else {
-      return this.loadMessagesFromMemory();
+      return this.memoryHistory;
     }
   }
   /**
    * Добавление сообщения в историю
    */
   async addMessage(message) {
-    const history = await this.getHistory();
-    const updatedHistory = [...history, message];
-    const limitedHistory = updatedHistory.slice(-this.plugin.settings.maxHistoryLength);
+    const currentHistory = await this.getHistory();
+    const limitedHistory = [...currentHistory, message].slice(
+      -this.plugin.settings.maxHistoryLength
+    );
     if (this.plugin.settings.historyStorageMethod === "file") {
-      await this.saveMessagesToFile(limitedHistory);
+      this.plugin.settings.history = limitedHistory;
+      await this.plugin.saveSettings();
     } else {
-      await this.saveMessagesToMemory(limitedHistory);
+      this.memoryHistory = limitedHistory;
     }
   }
   /**
@@ -23921,81 +23931,11 @@ var HistoryService = class {
    */
   async clearHistory() {
     if (this.plugin.settings.historyStorageMethod === "file") {
-      await this.saveMessagesToFile([]);
+      this.plugin.settings.history = [];
+      await this.plugin.saveSettings();
     } else {
-      await this.saveMessagesToMemory([]);
+      this.memoryHistory = [];
     }
-  }
-  /**
-   * Загрузка сообщений из файла
-   */
-  async loadMessagesFromFile() {
-    const { vault } = this.plugin.app;
-    const notePath = this.plugin.settings.notePath;
-    if (!notePath) {
-      return [];
-    }
-    try {
-      let file = vault.getAbstractFileByPath(notePath);
-      if (!file) {
-        await vault.create(notePath, "");
-        file = vault.getAbstractFileByPath(notePath);
-      }
-      if (file instanceof import_obsidian2.TFile) {
-        const content = await vault.read(file);
-        try {
-          const historyData = JSON.parse(content);
-          return Array.isArray(historyData) ? historyData : [];
-        } catch (error) {
-          console.error("\u041E\u0448\u0438\u0431\u043A\u0430 \u043F\u0440\u0438 \u043F\u0430\u0440\u0441\u0438\u043D\u0433\u0435 \u0438\u0441\u0442\u043E\u0440\u0438\u0438 \u0441\u043E\u043E\u0431\u0449\u0435\u043D\u0438\u0439:", error);
-          return [];
-        }
-      }
-    } catch (error) {
-      console.error("\u041E\u0448\u0438\u0431\u043A\u0430 \u043F\u0440\u0438 \u0437\u0430\u0433\u0440\u0443\u0437\u043A\u0435 \u0438\u0441\u0442\u043E\u0440\u0438\u0438 \u0441\u043E\u043E\u0431\u0449\u0435\u043D\u0438\u0439:", error);
-    }
-    return [];
-  }
-  /**
-   * Сохранение сообщений в файл
-   */
-  async saveMessagesToFile(messages) {
-    const { vault } = this.plugin.app;
-    const notePath = this.plugin.settings.notePath;
-    if (!notePath) {
-      return;
-    }
-    try {
-      let file = vault.getAbstractFileByPath(notePath);
-      if (!file) {
-        await vault.create(notePath, "");
-        file = vault.getAbstractFileByPath(notePath);
-      }
-      if (file instanceof import_obsidian2.TFile) {
-        const content = JSON.stringify(messages, null, 2);
-        await vault.modify(file, content);
-      }
-    } catch (error) {
-      console.error("\u041E\u0448\u0438\u0431\u043A\u0430 \u043F\u0440\u0438 \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D\u0438\u0438 \u0438\u0441\u0442\u043E\u0440\u0438\u0438 \u0441\u043E\u043E\u0431\u0449\u0435\u043D\u0438\u0439:", error);
-    }
-  }
-  /**
-   * Загрузка сообщений из памяти (локального хранилища)
-   */
-  async loadMessagesFromMemory() {
-    const savedData = await this.plugin.loadData();
-    return (savedData == null ? void 0 : savedData.chatHistory) || [];
-  }
-  /**
-   * Сохранение сообщений в память (локальное хранилище)
-   */
-  async saveMessagesToMemory(messages) {
-    const data = await this.plugin.loadData();
-    const updatedData = {
-      ...data,
-      chatHistory: messages
-    };
-    await this.plugin.saveData(updatedData);
   }
 };
 
@@ -24018,7 +23958,11 @@ var MessageItem = ({ message }) => {
 
 // src/components/ModelSelector.tsx
 var import_react2 = __toESM(require_react());
-var ModelSelector = ({ models, selectedModel, onSelectModel }) => {
+var ModelSelector = ({
+  models,
+  selectedModel,
+  onSelectModel
+}) => {
   return /* @__PURE__ */ import_react2.default.createElement("div", { className: "groq-model-selector" }, /* @__PURE__ */ import_react2.default.createElement("label", { htmlFor: "model-select" }, "\u041C\u043E\u0434\u0435\u043B\u044C:"), /* @__PURE__ */ import_react2.default.createElement(
     "select",
     {
@@ -24032,7 +23976,7 @@ var ModelSelector = ({ models, selectedModel, onSelectModel }) => {
 };
 
 // src/components/ChatPanel.tsx
-var ChatPanel = ({ plugin, app }) => {
+var ChatPanel = ({ plugin }) => {
   const [messages, setMessages] = (0, import_react3.useState)([]);
   const [inputValue, setInputValue] = (0, import_react3.useState)("");
   const [isLoading, setIsLoading] = (0, import_react3.useState)(false);
@@ -24044,7 +23988,7 @@ var ChatPanel = ({ plugin, app }) => {
       setMessages(history);
     };
     loadHistory();
-  }, [plugin.settings.apiKey]);
+  }, [plugin, plugin.settings.apiKey]);
   const handleSendMessage = (0, import_react3.useCallback)(async () => {
     if (!inputValue.trim() || isLoading)
       return;
@@ -24067,7 +24011,7 @@ var ChatPanel = ({ plugin, app }) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${plugin.settings.apiKey}`
+          Authorization: `Bearer ${plugin.settings.apiKey}`
         },
         body: JSON.stringify({
           model: selectedModel,
@@ -24138,7 +24082,7 @@ var ChatPanel = ({ plugin, app }) => {
 
 // src/views/GroqChatView.tsx
 var VIEW_TYPE_GROQ_CHAT = "groq-chat-view";
-var GroqChatView = class extends import_obsidian3.ItemView {
+var GroqChatView = class extends import_obsidian2.ItemView {
   constructor(leaf, plugin) {
     super(leaf);
     this.plugin = plugin;
@@ -24154,7 +24098,7 @@ var GroqChatView = class extends import_obsidian3.ItemView {
     container.empty();
     const rootEl = container.createDiv({ cls: "groq-chat-container" });
     this.root = (0, import_client.createRoot)(rootEl);
-    this.root.render(/* @__PURE__ */ React4.createElement(ChatPanel, { plugin: this.plugin, app: this.app }));
+    this.root.render(/* @__PURE__ */ React4.createElement(ChatPanel, { plugin: this.plugin }));
   }
   async onClose() {
     if (this.root) {
@@ -24163,34 +24107,33 @@ var GroqChatView = class extends import_obsidian3.ItemView {
   }
   async rerender() {
     if (this.root) {
-      this.root.render(
-        /* @__PURE__ */ React4.createElement(ChatPanel, { plugin: this.plugin, app: this.app, key: Date.now() })
-      );
+      this.root.render(/* @__PURE__ */ React4.createElement(ChatPanel, { plugin: this.plugin }));
     }
   }
   async refreshSettings() {
     if (this.root) {
-      this.root.render(
-        /* @__PURE__ */ React4.createElement(ChatPanel, { plugin: this.plugin, app: this.app, key: Date.now() })
-      );
+      this.root.render(/* @__PURE__ */ React4.createElement(ChatPanel, { plugin: this.plugin }));
     }
+  }
+  render() {
+    return /* @__PURE__ */ React4.createElement("div", { className: "groq-chat-view" }, /* @__PURE__ */ React4.createElement(ChatPanel, { plugin: this.plugin }));
   }
 };
 
 // src/main.ts
-var GroqChatPlugin = class extends import_obsidian4.Plugin {
+var import_obsidian4 = require("obsidian");
+var GroqChatPlugin = class extends import_obsidian3.Plugin {
   constructor() {
     super(...arguments);
     this.settings = DEFAULT_SETTINGS;
+    this.settingsUpdateCallbacks = [];
+    this.errorCallbacks = [];
   }
   async onload() {
     await this.loadSettings();
     this.authService = new AuthService(this.app, this);
     this.groqService = new GroqService(this.app, this);
-    this.registerView(
-      VIEW_TYPE_GROQ_CHAT,
-      (leaf) => new GroqChatView(leaf, this)
-    );
+    this.registerView(VIEW_TYPE_GROQ_CHAT, (leaf) => new GroqChatView(leaf, this));
     this.addRibbonIcon("message-square", "Groq Chat", () => {
       this.activateView();
     });
@@ -24204,6 +24147,7 @@ var GroqChatPlugin = class extends import_obsidian4.Plugin {
   }
   async saveSettings() {
     await this.saveData(this.settings);
+    this.settingsUpdateCallbacks.forEach((callback) => callback(this.settings));
   }
   async activateView() {
     const { workspace } = this.app;
@@ -24221,6 +24165,17 @@ var GroqChatPlugin = class extends import_obsidian4.Plugin {
     if (leaf) {
       workspace.revealLeaf(leaf);
     }
+  }
+  onSettingsUpdate(callback) {
+    this.settingsUpdateCallbacks.push(callback);
+  }
+  onError(callback) {
+    this.errorCallbacks.push(callback);
+  }
+  handleError(error) {
+    console.error("GroqChat Error:", error);
+    new import_obsidian4.Notice("GroqChat Error: " + error.message);
+    this.errorCallbacks.forEach((callback) => callback(error));
   }
 };
 /*! Bundled license information:

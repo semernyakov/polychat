@@ -10,7 +10,8 @@
 
 #### Поддерживаемые модели
 
-* **Production Models**:
+- **Production Models**:
+
   - Llama 3 70B Versatile (128K токенов контекста)
   - Llama 3 8B Instant (128K токенов контекста)
   - Mixtral 8x7B (32K токенов контекста)
@@ -18,7 +19,7 @@
   - Llama Guard 3 8B (для проверки безопасности)
   - Whisper Large V3 (для обработки аудио)
 
-* **Preview Models**:
+- **Preview Models**:
   - Llama 3 90B Vision (поддержка изображений)
   - Qwen 2.5 Coder 32B (для работы с кодом)
   - Mistral Saba 24B
@@ -57,13 +58,13 @@ groq-chat-plugin/
 
 ```json
 {
-    "id": "groq-chat",
-    "name": "Groq Chat",
-    "author": "Ivan Semernyakov",
-    "authorUrl": "https://github.com/semernyakov",
-    "description": "Плагин Groq Chat для Obsidian с поддержкой новейших моделей",
-    "repo": "semernyakov/groq-chat-plugin",
-    "branch": "master"
+  "id": "groq-chat",
+  "name": "Groq Chat",
+  "author": "Ivan Semernyakov",
+  "authorUrl": "https://github.com/semernyakov",
+  "description": "Плагин Groq Chat для Obsidian с поддержкой новейших моделей",
+  "repo": "semernyakov/groq-chat-plugin",
+  "branch": "master"
 }
 ```
 
@@ -89,21 +90,27 @@ groq-chat-plugin/
 ### 1. Подготовка релиза
 
 1. Проверьте статус репозитория:
+
    ```bash
    git status
    ```
+
    Убедитесь, что все изменения закоммичены.
 
 2. Запустите тесты:
+
    ```bash
    npm run test
    ```
+
    Все тесты должны проходить успешно.
 
 3. Соберите проект:
+
    ```bash
    npm run build
    ```
+
    Проверьте, что сборка прошла без ошибок.
 
 4. Проверьте код линтером:
@@ -115,6 +122,7 @@ groq-chat-plugin/
 ### 2. Создание релиза
 
 1. Обновите версию плагина одной из команд:
+
    ```bash
    npm version patch   # Для исправлений (1.0.0 -> 1.0.1)
    npm version minor   # Для новых функций (1.0.0 -> 1.1.0)
@@ -122,9 +130,11 @@ groq-chat-plugin/
    ```
 
 2. Создайте релиз:
+
    ```bash
    npm run release
    ```
+
    Это автоматически обновит `manifest.json` и `versions.json`.
 
 3. Отправьте изменения в репозиторий:
@@ -137,14 +147,15 @@ groq-chat-plugin/
 1. Создайте форк репозитория [obsidian-releases](https://github.com/obsidianmd/obsidian-releases)
 
 2. Добавьте информацию о плагине в `community-plugins.json`:
+
    ```json
    {
-       "id": "groq-chat",
-       "name": "Groq Chat",
-       "author": "Ivan Semernyakov",
-       "description": "Плагин Groq Chat для Obsidian с поддержкой новейших моделей",
-       "repo": "semernyakov/groq-chat-plugin",
-       "branch": "master"
+     "id": "groq-chat",
+     "name": "Groq Chat",
+     "author": "Ivan Semernyakov",
+     "description": "Плагин Groq Chat для Obsidian с поддержкой новейших моделей",
+     "repo": "semernyakov/groq-chat-plugin",
+     "branch": "master"
    }
    ```
 
@@ -153,17 +164,19 @@ groq-chat-plugin/
 ### 4. Финальная проверка
 
 1. Тестирование в Obsidian:
+
    - Установите плагин локально через режим разработчика
    - Проверьте все основные функции
    - Протестируйте на мобильном устройстве
    - Убедитесь, что нет ошибок в консоли
 
 2. Проверка документации:
+
    - README.md актуален и содержит:
-     * Описание всех функций
-     * Инструкции по установке
-     * Примеры использования
-     * Раздел с частыми вопросами
+     - Описание всех функций
+     - Инструкции по установке
+     - Примеры использования
+     - Раздел с частыми вопросами
    - Документация переведена на русский язык
 
 3. Проверка файлов релиза:
@@ -177,11 +190,13 @@ groq-chat-plugin/
 ### 1. Мониторинг и поддержка
 
 1. Отслеживайте issues:
+
    - Регулярно проверяйте новые обращения
    - Быстро реагируйте на критические баги
    - Помечайте issues соответствующими тегами
 
 2. Работа с сообществом:
+
    - Отвечайте на вопросы пользователей
    - Принимайте и рассматривайте предложения
    - Ведите changelog изменений
@@ -194,6 +209,7 @@ groq-chat-plugin/
 ### 2. Выпуск обновлений
 
 1. Процесс обновления:
+
    - Следуйте процедуре релиза
    - Обновляйте `versions.json`
    - Создавайте релизы на GitHub
@@ -206,6 +222,7 @@ groq-chat-plugin/
 ### 3. Техническая поддержка
 
 1. Обслуживание кода:
+
    - Регулярно обновляйте зависимости
    - Проводите рефакторинг при необходимости
    - Поддерживайте качество кода
@@ -232,4 +249,4 @@ groq-chat-plugin/
 - [ ] Работа на мобильных устройствах
 - [ ] Создан релиз на GitHub
 - [ ] Отправлен PR в obsidian-releases
-- [ ] Проверена работа в последней версии Obsidian 
+- [ ] Проверена работа в последней версии Obsidian

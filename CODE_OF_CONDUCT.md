@@ -3,6 +3,7 @@
 ## Contact Information
 
 For any questions or concerns regarding the code of conduct, please contact:
+
 - Email: ivan@semernyakov.com
 - Telegram: [@IvanSemernyakov](https://t.me/IvanSemernyakov)
 - GitHub: [@semernyakov](https://github.com/semernyakov)
@@ -10,6 +11,7 @@ For any questions or concerns regarding the code of conduct, please contact:
 ## Our Standards
 
 We are committed to providing a welcoming and inclusive environment for everyone, regardless of:
+
 - Gender, gender identity and expression
 - Age, race, ethnicity, nationality
 - Sexual orientation
@@ -31,6 +33,7 @@ We are committed to providing a welcoming and inclusive environment for everyone
 ## Unacceptable Behavior
 
 The following behaviors are considered harassment and are unacceptable:
+
 - Violence, threats of violence, or violent language
 - Discriminatory jokes and language
 - Posting or displaying sexually explicit or violent material
@@ -49,4 +52,4 @@ The following behaviors are considered harassment and are unacceptable:
 
 ## Attribution
 
-This Code of Conduct is adapted from the [Contributor Covenant](https://www.contributor-covenant.org/), version 2.1. 
+This Code of Conduct is adapted from the [Contributor Covenant](https://www.contributor-covenant.org/), version 2.1.

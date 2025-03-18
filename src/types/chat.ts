@@ -4,52 +4,52 @@ import { GroqModel } from '../constants/models';
 export type MessageRole = 'user' | 'assistant' | 'error';
 
 export interface Message {
-    role: 'user' | 'assistant';
-    content: string;
-    timestamp: number;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: number;
 }
 
 export interface ChatProps {
-    plugin: GroqPlugin;
+  plugin: GroqPlugin;
 }
 
 export interface ChatPanelState {
-    messages: Message[];
-    inputText: string;
-    isLoading: boolean;
-    selectedModel: GroqModel;
+  messages: Message[];
+  inputText: string;
+  isLoading: boolean;
+  selectedModel: GroqModel;
 }
 
 export interface ChatHistoryManager {
-    saveMessages(messages: Message[]): void;
-    loadMessages(): Message[];
-    clearHistory(): void;
+  saveMessages(messages: Message[]): void;
+  loadMessages(): Message[];
+  clearHistory(): void;
 }
 
 // Internal props for the chat panel component
 export interface ChatPanelInternalProps {
-    messages: Message[];
-    inputText: string;
-    isLoading: boolean;
-    selectedModel: GroqModel;
-    onInputChange: (text: string) => void;
-    onSendMessage: () => Promise<void>;
-    onModelChange: (model: GroqModel) => void;
-    onClearHistory: () => void;
+  messages: Message[];
+  inputText: string;
+  isLoading: boolean;
+  selectedModel: GroqModel;
+  onInputChange: (text: string) => void;
+  onSendMessage: () => Promise<void>;
+  onModelChange: (model: GroqModel) => void;
+  onClearHistory: () => void;
 }
 
 export interface ChatHistory {
-    messages: Message[];
+  messages: Message[];
 }
 
 export interface ChatState {
-    isLoading: boolean;
-    error: string | null;
-    history: ChatHistory;
+  isLoading: boolean;
+  error: string | null;
+  history: ChatHistory;
 }
 
 export interface HistoryOptions {
-    method: 'memory' | 'file';
-    maxHistoryLength: number;
-    notePath: string;
+  method: 'memory' | 'file';
+  maxHistoryLength: number;
+  notePath: string;
 }

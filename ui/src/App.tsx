@@ -18,4 +18,4 @@ const App: React.FC<AppProps> = ({ title = 'Groq Chat Plugin Demo' }) => {
   );
 };
 
-export default App; 
+export default App;

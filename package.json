@@ -1,6 +1,6 @@
 {
   "name": "groq-chat-plugin",
-  "version": "1.2.1-beta.2",
+  "version": "1.2.1",
   "description": "Groq Chat Plugin for Obsidian",
   "main": "main.js",
   "scripts": {

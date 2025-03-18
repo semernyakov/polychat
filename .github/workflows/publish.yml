@@ -8,41 +8,41 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
-        cache: 'npm'
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-    - name: Install dependencies
-      run: npm ci
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
 
-    - name: Build
-      run: npm run build
+      - name: Install dependencies
+        run: npm ci
 
-    - name: Generate changelog
-      id: changelog
-      uses: conventional-changelog/conventional-changelog-action@v3
-      with:
-        config: conventional-changelog-conventionalcommits
-        preset: angular
-        tag-prefix: 'v'
-        output-file: 'CHANGELOG.md'
+      - name: Build
+        run: npm run build
 
-    - name: Create Release
-      uses: softprops/action-gh-release@v1
-      with:
-        body_path: CHANGELOG.md
-        files: |
-          dist/*
-          manifest.json
-          README.md
-          LICENSE
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+      - name: Generate changelog
+        id: changelog
+        uses: conventional-changelog/conventional-changelog-action@v3
+        with:
+          config: conventional-changelog-conventionalcommits
+          preset: angular
+          tag-prefix: 'v'
+          output-file: 'CHANGELOG.md'
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: CHANGELOG.md
+          files: |
+            dist/*
+            manifest.json
+            README.md
+            LICENSE
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
