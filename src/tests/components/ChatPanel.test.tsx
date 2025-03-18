@@ -1,9 +1,10 @@
 /// <reference types="@testing-library/jest-dom" />
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import ChatPanel from '../../components/ChatPanel';
-import { GroqPlugin } from '../../types/plugin';
 import '@testing-library/jest-dom';
+import { ChatPanel } from '../../components/ChatPanel';
+import { GroqPlugin } from '../../types/plugin';
+import { GroqModel } from '../../constants';
 
 jest.mock('../../services/historyService', () => ({
     historyService: {
@@ -28,12 +29,12 @@ describe('ChatPanel', () => {
     const mockPlugin = {
         settings: {
             apiKey: 'test-api-key',
-            defaultModel: 'mixtral-8x7b-32768',
+            defaultModel: GroqModel.LLAMA_3_8B,
             temperature: 0.7,
-            maxTokens: 4096,
+            maxTokens: 2048,
+            historyStorageMethod: 'memory',
             maxHistoryLength: 100,
-            historyStorageMethod: 'local' as const,
-            notePath: ''
+            notePath: 'test.md'
         },
         app: {},
         manifest: {},
@@ -43,30 +44,30 @@ describe('ChatPanel', () => {
         addSettingTab: jest.fn(),
         saveData: jest.fn(),
         loadData: jest.fn()
-    } as unknown as GroqPlugin;
+    } as GroqPlugin;
 
     beforeEach(() => {
         render(<ChatPanel plugin={mockPlugin} />);
     });
 
-    it('renders input field and send button', () => {
-        const input = screen.getByPlaceholderText('Введите сообщение...');
-        const button = screen.getByText('Отправить');
-        expect(input).toBeTruthy();
-        expect(button).toBeTruthy();
+    it('renders input fields', () => {
+        const { getByPlaceholderText } = render(<ChatPanel plugin={mockPlugin} />);
+        expect(getByPlaceholderText('Введите сообщение...')).toBeInTheDocument();
     });
 
     it('handles user input', () => {
-        const input = screen.getByPlaceholderText('Введите сообщение...') as HTMLTextAreaElement;
-        fireEvent.change(input, { target: { value: 'Test message' } });
-        expect(input.value).toBe('Test message');
+        const { getByPlaceholderText } = render(<ChatPanel plugin={mockPlugin} />);
+        const input = getByPlaceholderText('Введите сообщение...') as HTMLTextAreaElement;
+        fireEvent.change(input, { target: { value: 'test message' } });
+        expect(input.value).toBe('test message');
     });
 
     it('clears input after sending message', () => {
-        const input = screen.getByPlaceholderText('Введите сообщение...') as HTMLTextAreaElement;
-        const sendButton = screen.getByText('Отправить');
+        const { getByPlaceholderText, getByText } = render(<ChatPanel plugin={mockPlugin} />);
+        const input = getByPlaceholderText('Введите сообщение...') as HTMLTextAreaElement;
+        const sendButton = getByText('Отправить');
 
-        fireEvent.change(input, { target: { value: 'Test message' } });
+        fireEvent.change(input, { target: { value: 'test message' } });
         fireEvent.click(sendButton);
 
         expect(input.value).toBe('');

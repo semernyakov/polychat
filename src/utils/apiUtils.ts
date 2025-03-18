@@ -1,5 +1,11 @@
 import { GroqApiError } from '../types/api';
 
+interface ApiError {
+    error: {
+        message: string;
+    };
+}
+
 export const apiUtils = {
     isApiError(error: unknown): error is GroqApiError {
         return (
@@ -11,10 +17,11 @@ export const apiUtils = {
     },
 
     formatApiError(error: unknown): string {
-        if (this.isApiError(error)) {
-            return `API ошибка: ${error.error.message}`;
+        if (error && typeof error === 'object' && 'error' in error && typeof error.error === 'object' && error.error && 'message' in error.error) {
+            const apiError = error as ApiError;
+            return `API ошибка: ${apiError.error.message}`;
         }
-        return error instanceof Error ? error.message : 'Неизвестная ошибка';
+        return `API ошибка: ${error instanceof Error ? error.message : 'Неизвестная ошибка'}`;
     },
 
     createApiHeaders(apiKey: string): Headers {

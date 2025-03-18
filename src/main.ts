@@ -1,4 +1,4 @@
-import { Plugin } from 'obsidian';
+import { Plugin, Notice } from 'obsidian';
 import { GroqChatSettings, DEFAULT_SETTINGS } from './types/plugin';
 import './styles/chat.css';
 import { AuthService } from './services/authService';
@@ -54,12 +54,12 @@ export default class GroqPlugin extends Plugin {
         this.addSettingTab(new GroqSettingTab(this.app, this));
 
         // Проверка API ключа при загрузке
-        if (this.settings.groqApiKey) {
+        if (this.settings.apiKey) {
             try {
-                const isValid = await groqService.validateApiKey(this.settings.groqApiKey);
+                const isValid = await groqService.validateApiKey(this.settings.apiKey);
                 if (!isValid) {
                     new Notice('Недействительный API ключ Groq. Пожалуйста, проверьте настройки.');
-                    this.settings.groqApiKey = '';
+                    this.settings.apiKey = '';
                     await this.saveSettings();
                 }
             } catch (error) {
@@ -94,7 +94,7 @@ export default class GroqPlugin extends Plugin {
                     const token = await authService.handleAuthCallback(params.code);
                     this.authState.isAuthenticated = true;
                     this.authState.token = token;
-                    this.settings.groqApiKey = token;
+                    this.settings.apiKey = token;
                     await this.saveSettings();
                     new Notice('Успешная авторизация в Groq');
                     this.updateViews();
