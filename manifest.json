@@ -1,0 +1,10 @@
+{
+    "id": "groq-chat",
+    "name": "Groq Chat",
+    "version": "1.0.0",
+    "minAppVersion": "0.15.0",
+    "description": "Интеграция Groq AI в Obsidian",
+    "author": "Семерняков Иван Сергеевич",
+    "authorUrl": "https://t.me/semernyakov",
+    "isDesktopOnly": false
+} 
