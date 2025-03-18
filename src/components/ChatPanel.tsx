@@ -29,7 +29,7 @@ const ChatPanel: React.FC<ChatProps> = ({ plugin }) => {
         };
 
         loadMessages();
-    }, []);
+    }, [plugin.settings.historyStorageMethod, plugin.settings.maxHistoryLength, plugin.settings.notePath]);
 
     useEffect(() => {
         const saveHistory = async () => {

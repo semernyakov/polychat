@@ -30,8 +30,8 @@
     "@types/node": "^20.0.0",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
-    "@typescript-eslint/eslint-plugin": "^6.0.0",
-    "@typescript-eslint/parser": "^6.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.4.0",
+    "@typescript-eslint/parser": "^5.4.0",
     "eslint": "^8.0.0",
     "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-react": "^7.37.4",
@@ -48,7 +48,7 @@
     "rollup-plugin-postcss": "^4.0.0",
     "standard-version": "^9.0.0",
     "ts-jest": "^29.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.1.6"
   },
   "main": ".eslintrc.js",
   "directories": {

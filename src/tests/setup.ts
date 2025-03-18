@@ -2,17 +2,22 @@ import '@testing-library/jest-dom';
 
 // Mock services
 jest.mock('../services/groqService', () => ({
-    groqService: {
-        sendMessage: jest.fn()
-    }
+    GroqService: jest.fn().mockImplementation(() => ({
+        sendMessage: jest.fn().mockResolvedValue('Mock response')
+    }))
 }));
 
 jest.mock('../services/historyService', () => ({
-    historyService: {
+    HistoryService: jest.fn().mockImplementation(() => ({
         loadMessages: jest.fn().mockResolvedValue([]),
-        saveMessages: jest.fn().mockResolvedValue(undefined),
-        clearHistory: jest.fn().mockResolvedValue(undefined)
-    }
+        saveMessages: jest.fn().mockResolvedValue(undefined)
+    }))
+}));
+
+jest.mock('../services/authService', () => ({
+    AuthService: jest.fn().mockImplementation(() => ({
+        validateApiKey: jest.fn().mockResolvedValue(true)
+    }))
 }));
 
 // Mock utils

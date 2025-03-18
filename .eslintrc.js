@@ -1,4 +1,5 @@
 module.exports = {
+    root: true,
     parser: '@typescript-eslint/parser',
     extends: [
         'eslint:recommended',
@@ -19,7 +20,19 @@ module.exports = {
         }
     },
     rules: {
+        '@typescript-eslint/no-empty-function': ['error', {
+            allow: ['arrowFunctions', 'methods']
+        }],
+        '@typescript-eslint/triple-slash-reference': 'off',
         'react/react-in-jsx-scope': 'off',
         '@typescript-eslint/explicit-module-boundary-types': 'off'
-    }
+    },
+    overrides: [
+        {
+            files: ['src/tests/**/*', 'src/services/**/*'],
+            rules: {
+                '@typescript-eslint/no-empty-function': 'off'
+            }
+        }
+    ]
 }; 

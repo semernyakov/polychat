@@ -1,8 +1,28 @@
+/// <reference types="@testing-library/jest-dom" />
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import ChatPanel from '../../components/ChatPanel';
 import { GroqPlugin } from '../../types/plugin';
 import '@testing-library/jest-dom';
+
+jest.mock('../../services/historyService', () => ({
+    historyService: {
+        loadMessages: jest.fn().mockResolvedValue([]),
+        saveMessages: jest.fn().mockResolvedValue(undefined)
+    }
+}));
+
+jest.mock('../../services/groqService', () => ({
+    groqService: {
+        sendMessage: jest.fn().mockResolvedValue('Mock response')
+    }
+}));
+
+jest.mock('../../services/authService', () => ({
+    authService: {
+        validateApiKey: jest.fn().mockResolvedValue(true)
+    }
+}));
 
 describe('ChatPanel', () => {
     const mockPlugin = {
@@ -30,8 +50,10 @@ describe('ChatPanel', () => {
     });
 
     it('renders input field and send button', () => {
-        expect(screen.getByPlaceholderText('Введите сообщение...')).toBeInTheDocument();
-        expect(screen.getByText('Отправить')).toBeInTheDocument();
+        const input = screen.getByPlaceholderText('Введите сообщение...');
+        const button = screen.getByText('Отправить');
+        expect(input).toBeTruthy();
+        expect(button).toBeTruthy();
     });
 
     it('handles user input', () => {
