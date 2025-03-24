@@ -1,0 +1,52 @@
+{
+  "name": "groq-chat-plugin",
+  "version": "1.2.4",
+  "description": "Groq Chat Plugin for Obsidian",
+  "main": "main.js",
+  "scripts": {
+    "start": "obsidian dev",
+    "dev": "node esbuild.config.mjs && obsidian dev",
+    "build": "tsc --noEmit --skipLibCheck && node esbuild.config.mjs production",
+    "lint": "eslint . --ext .ts,.tsx --fix",
+    "format": "prettier --write .",
+    "format-check": "prettier --check .",
+    "version": "node version-bump.js && git add manifest.json versions.json",
+    "version-patch": "npm version patch"
+  },
+  "keywords": [
+    "obsidian",
+    "plugin",
+    "groq",
+    "chat",
+    "ai"
+  ],
+  "author": "Ivan Semernyakov",
+  "license": "MIT",
+  "devDependencies": {
+    "@eslint/js": "^9.23.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@types/node": "^22.13.12",
+    "@types/react": "^19.0.12",
+    "@types/react-dom": "^19.0.4",
+    "@typescript-eslint/eslint-plugin": "^8.27.0",
+    "@typescript-eslint/parser": "^8.27.0",
+    "builtin-modules": "5.0.0",
+    "esbuild": "^0.25.1",
+    "esbuild-copy-static-files": "^0.1.0",
+    "eslint": "^9.23.0",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "globals": "^16.0.0",
+    "identity-obj-proxy": "^3.0.0",
+    "obsidian": "^1.8.7",
+    "prettier": "^3.5.3",
+    "tslib": "2.8.1",
+    "typescript": "5.8.2"
+  },
+  "dependencies": {
+    "groq": "^3.80.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "type": "module"
+}
