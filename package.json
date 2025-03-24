@@ -10,7 +10,7 @@
     "lint": "eslint . --ext .ts,.tsx --fix",
     "format": "prettier --write .",
     "format-check": "prettier --check .",
-    "version": "node version-bump.js && git add manifest.json versions.json",
+    "version": "node version-bump.js && git add . && git commit -m \"chore: bump version\" && git push",
     "version-patch": "npm version patch"
   },
   "keywords": [
