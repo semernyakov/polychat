@@ -5,40 +5,46 @@ import globals from 'globals';
 
 export default [
   {
-    ignores: ['**/node_modules/**', '**/dist/**'],
+    ignores: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/*.d.ts',
+      'esbuild.config.mjs',
+      'version-bump.js',
+      'src/hot-reload.js'
+    ],
   },
-  js.configs.recommended, // Фикс ошибки с `configs`
+  js.configs.recommended,
   {
     files: ['**/*.ts', '**/*.tsx'],
     languageOptions: {
       parser: tsParser,
+      parserOptions: {
+        project: './tsconfig.json',
+      },
       globals: {
         ...globals.browser,
         ...globals.node,
+        console: 'readonly',
+        process: 'readonly',
+        window: 'readonly'
       },
     },
     plugins: {
-      '@typescript-eslint': ts, // Исправлено на корректный формат
+      '@typescript-eslint': ts,
     },
     rules: {
-      'no-console': 'off', // ⚠️ Изменено с "off" на "warn", лучше оставить предупреждение вместо полного отключения
-      // '@typescript-eslint/no-unused-vars': 'warn', // Используем правильное правило TypeScript
       '@typescript-eslint/no-unused-vars': [
         'warn',
-        { argsIgnorePattern: '^_' }, // ✅ Игнорируем переменные, начинающиеся с "_"
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+          ignoreRestSiblings: true
+        }
       ],
-    },
-  },
-  {
-    files: ['**/*.js', '**/*.mjs'],
-    languageOptions: {
-      globals: {
-        ...globals.browser,
-        ...globals.node,
-      },
-    },
-    rules: {
-      'no-console': 'off', // ❌ Отключаем для JS (например, `esbuild.config.mjs`)
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      'no-undef': 'off' // Отключаем, так как TypeScript сам проверяет необъявленные переменные
     },
   },
 ];
