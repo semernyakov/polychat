@@ -5,6 +5,7 @@ import { GroqModel, getModelInfo } from '../types/models';
 import { HistoryService } from '../services/historyService';
 import { MessageItem } from './MessageItem';
 import { Notice } from './Notice';
+import { SupportDialog } from './SupportDialog';
 
 interface ChatPanelProps {
   plugin: GroqPlugin;
@@ -16,13 +17,23 @@ const ApiKeyWarning = () => (
   </div>
 );
 
+/**
+ * Компонент для отображения панели чата. * @param {Object} props - Свойства компонента.
+ * @param {GroqPlugin} props.plugin - Экземпляр плагина.
+ * @returns {JSX.Element} - React-компонент панели чата.
+ */
 export const ChatPanel: React.FC<ChatPanelProps> = ({ plugin }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [selectedModel, setSelectedModel] = useState<GroqModel>(plugin.settings.model as GroqModel);
+  const [isSupportDialogOpen, setIsSupportDialogOpen] = useState(false);
 
   useEffect(() => {
+    /**
+     * Загружает историю сообщений из сервиса истории.
+     * @returns {Promise<void>} - Промис, который разрешается после загрузки истории.
+     */
     const historyService = new HistoryService(plugin);
     const loadHistory = async () => {
       const history = await historyService.getHistory();
@@ -107,6 +118,13 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ plugin }) => {
         <button onClick={handleCheckModels} className="groq-check-models-button">
           Проверить модели
         </button>
+        <button
+          onClick={() => setIsSupportDialogOpen(true)}
+          className="groq-support-heart"
+          title="Поддержать разработку"
+        >
+          ❤️
+        </button>
       </div>
 
       <div className="groq-messages-container">
@@ -137,6 +155,11 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ plugin }) => {
           Отправить
         </button>
       </div>
+
+      <SupportDialog
+        isOpen={isSupportDialogOpen}
+        onClose={() => setIsSupportDialogOpen(false)}
+      />
     </div>
   );
 };

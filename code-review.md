@@ -21,7 +21,7 @@ The codebase follows a clean React-based architecture with the following key com
    - Manages the React component lifecycle and rendering
    - Bridges between Obsidian's API and React components
 
-3. **GroqChatPanel** (ChatPanel.tsx)
+3. **GroqChatPanel** (ChatPanel.ts)
 
    - Main React component for the chat interface
    - Manages chat state, message history, and user input
@@ -70,7 +70,7 @@ The codebase follows a clean React-based architecture with the following key com
 
 3. **Code Organization**
 
-   - Consider breaking down ChatPanel.tsx into smaller components
+   - Consider breaking down ChatPanel.ts into smaller components
    - Add more comprehensive JSDoc documentation
    - Could benefit from unit tests
 

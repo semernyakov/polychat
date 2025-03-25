@@ -14,17 +14,29 @@ export class AuthService {
   }
 
   async validateApiKey(apiKey: string): Promise<boolean> {
-    if (!apiKey) return false;
+    if (!apiKey) {
+      new Notice('API ключ не может быть пустым');
+      return false;
+    }
+
+    if (!/^(gsk_|sk-)[a-zA-Z0-9_]{32,}$/.test(apiKey)) {
+      new Notice('Неверный формат API ключа');
+      return false;
+    }
 
     try {
       const isValid = await this.groqService.validateApiKey(apiKey);
-      if (!isValid) {
-        new Notice('Invalid API key');
+      
+      if (isValid) {
+        new Notice('✅ API ключ действителен');
+        return true;
+      } else {
+        new Notice('❌ API ключ недействителен');
+        return false;
       }
-      return isValid;
     } catch (error) {
-      console.error('API key validation error:', error);
-      new Notice('API key validation failed');
+      console.error('Ошибка проверки API ключа:', error);
+      new Notice('⚠️ Ошибка проверки API ключа');
       return false;
     }
   }

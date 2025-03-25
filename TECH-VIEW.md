@@ -54,9 +54,9 @@ src/
 
 React-компоненты находятся в `src/components/`. Основные компоненты:
 
-- `ChatPanel.tsx` — основная панель чата.
-- `MessageItem.tsx` — элемент сообщения.
-- `ModelSelector.tsx` — выбор модели.
+- `ChatPanel.ts` — основная панель чата.
+- `MessageItem.ts` — элемент сообщения.
+- `ModelSelector.ts` — выбор модели.
 
 **Проверка:**
 

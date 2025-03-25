@@ -8,6 +8,7 @@ export interface GroqChatSettings {
   historyStorageMethod: 'memory' | 'localStorage' | 'indexedDB' | 'file';
   maxHistoryLength: number;
   notePath: string;
+  storeHistory: boolean;
 }
 
 export const DEFAULT_SETTINGS: GroqChatSettings = {
@@ -18,4 +19,5 @@ export const DEFAULT_SETTINGS: GroqChatSettings = {
   historyStorageMethod: 'memory',
   maxHistoryLength: 20,
   notePath: 'groq-chat-history.md',
+  storeHistory: true,
 };

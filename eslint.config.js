@@ -43,7 +43,7 @@ export default [
           ignoreRestSiblings: true
         }
       ],
-      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      'no-console': 'off', // ['warn', { allow: ['warn', 'error'] }],
       'no-undef': 'off' // Отключаем, так как TypeScript сам проверяет необъявленные переменные
     },
   },

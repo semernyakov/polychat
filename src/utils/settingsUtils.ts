@@ -1,5 +1,5 @@
-import { GroqChatSettings } from '../types/types';
-import { DEFAULT_SETTINGS } from '../settings';
+import { GroqChatSettings } from '../types/types'; // Shortened import
+import { DEFAULT_SETTINGS } from '../settings/GroqChatSettings'; // Shortened import
 
 export function getDefaultSettings(): GroqChatSettings {
   return {
@@ -9,6 +9,7 @@ export function getDefaultSettings(): GroqChatSettings {
   };
 }
 
+// Consider removing this function if it's not used anywhere
 export function normalizeSettings(settings: GroqChatSettings): GroqChatSettings {
   return {
     ...settings,

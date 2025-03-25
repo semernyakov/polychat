@@ -5,6 +5,8 @@ import { getDefaultSettings } from './utils/settingsUtils';
 import { AuthService } from './services/authService';
 import { GroqService } from './services/groqService';
 import { GroqChatSettingsTab } from './settings/GroqChatSettingsTab';
+import './static/styles/chat.css'; // Основные стили для чата
+import './static/styles/notice.css'; // Стили для уведомлений
 
 export default class GroqChatPlugin extends Plugin {
   settings!: GroqChatSettings;

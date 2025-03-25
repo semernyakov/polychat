@@ -27,7 +27,7 @@ const baseConfig = {
   plugins: [
     esbuildCopyStaticFiles({
       src: './src/static',
-      dest: './dist',
+      dest: './dist/static',
       recursive: true,
     }),
   ],

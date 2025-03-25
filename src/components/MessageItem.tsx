@@ -18,6 +18,13 @@ export const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
         <span className="groq-message-time">{formatTimestamp(timestamp)}</span>
       </div>
       <div className="groq-message-content">{content}</div>
+      {/* <div className="groq-message-content">
+        {content.split('\n').map((line, index) => (
+          <React.Fragment key={index}>
+            {line}
+            {index < content.split('\n').length - 1 && <br />}
+          </React.Fragment>
+        ))} */}
     </div>
   );
 };
