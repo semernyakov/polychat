@@ -1,30 +1,34 @@
 import React from 'react';
-import { Message } from '../types/types';
-import { formatTimestamp } from '../utils/messageUtils';
+import { Message } from '../types/message';
+import { MessageUtils } from '../utils/messageUtils';
 
-interface MessageItemProps {
-  message: Message;
-}
+const getRoleLabel = (role: Message['role']): string => {
+  switch (role) {
+    case 'user':
+      return 'Вы';
+    case 'assistant':
+      return 'Ассистент';
+    case 'system':
+      return 'Система';
+    default:
+      return role;
+  }
+};
 
-export const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
-  const { role, content, timestamp } = message;
-
-  const roleLabel = role === 'user' ? 'Вы' : role === 'assistant' ? 'Ассистент' : 'Система';
-
+export const MessageItem: React.FC<{ message: Message }> = ({ message }) => {
   return (
-    <div className={`groq-message groq-message-${role}`}>
+    <div className={`groq-message groq-message--${message.role}`}>
       <div className="groq-message-header">
-        <span className="groq-message-role">{roleLabel}</span>
-        <span className="groq-message-time">{formatTimestamp(timestamp)}</span>
+        <span className="groq-message-role">{getRoleLabel(message.role)}</span>
+        <time className="groq-message-time" dateTime={new Date(message.timestamp).toISOString()}>
+          {MessageUtils.formatTime(message.timestamp)}
+        </time>
       </div>
-      <div className="groq-message-content">{content}</div>
-      {/* <div className="groq-message-content">
-        {content.split('\n').map((line, index) => (
-          <React.Fragment key={index}>
-            {line}
-            {index < content.split('\n').length - 1 && <br />}
-          </React.Fragment>
-        ))} */}
+      <div className="groq-message-content">
+        {message.content.split('\n').map((paragraph, i) => (
+          <p key={i}>{paragraph}</p>
+        ))}
+      </div>
     </div>
   );
 };

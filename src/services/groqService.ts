@@ -1,49 +1,42 @@
-import { App } from 'obsidian';
 import { Groq } from 'groq-sdk';
-import { GroqPlugin } from '../types/plugin';
+import { GroqPluginInterface } from '../types/plugin';
 import { GroqModel } from '../types/models';
-import { Message } from '../types/types';
+import { Message } from '../types/message';
 
 export class GroqService {
-  private readonly client: Groq;
+  private client: Groq;
 
-  constructor(
-    private readonly app: App,
-    private readonly plugin: GroqPlugin
-  ) {
+  constructor(private readonly plugin: GroqPluginInterface) {
     this.client = new Groq({
       apiKey: this.plugin.settings.apiKey,
-      dangerouslyAllowBrowser: true
+      dangerouslyAllowBrowser: true,
     });
   }
 
-  /**
-   * Validates the provided API key
-   * @param apiKey - The API key to validate
-   * @returns Promise<boolean> - True if the key is valid
-   */
+  private initializeClient(): void {
+    this.client = new Groq({
+      apiKey: this.plugin.settings.apiKey,
+      dangerouslyAllowBrowser: true,
+    });
+  }
+
   async validateApiKey(apiKey: string): Promise<boolean> {
+    if (!apiKey) return false;
+
     try {
       const tempClient = new Groq({ apiKey, dangerouslyAllowBrowser: true });
       await tempClient.chat.completions.create({
-        model: 'llama3-70b-8192',
+        model: GroqModel.LLAMA3_8B, // Используем более легкую модель для проверки
         messages: [{ role: 'user', content: 'test' }],
         max_tokens: 1,
       });
       return true;
     } catch (error) {
-      console.error('Ошибка проверки API ключа:', error);
+      console.error('API key validation failed:', error);
       return false;
     }
   }
 
-  /**
-   * Sends a message to the Groq API
-   * @param content - The message content
-   * @param model - The model to use
-   * @returns Promise<Message> - The assistant's response
-   * @throws Error if content is empty or API request fails
-   */
   async sendMessage(content: string, model: GroqModel): Promise<Message> {
     if (!content.trim()) {
       throw new Error('Message content cannot be empty');
@@ -54,20 +47,49 @@ export class GroqService {
         model,
         messages: [{ role: 'user', content }],
         temperature: this.plugin.settings.temperature,
-        max_tokens: this.plugin.settings.maxTokens
+        max_tokens: this.plugin.settings.maxTokens,
       });
+
+      if (!response.choices[0]?.message?.content) {
+        throw new Error('Empty response from API');
+      }
 
       return {
         id: response.id,
         role: 'assistant',
-        content: response.choices[0].message.content || '',
-        timestamp: Date.now()
+        content: response.choices[0].message.content,
+        timestamp: Date.now(),
+        usage: response.usage
+          ? {
+              prompt_tokens: response.usage.prompt_tokens,
+              completion_tokens: response.usage.completion_tokens,
+              total_tokens: response.usage.total_tokens,
+            }
+          : undefined,
       };
     } catch (error) {
-      if (error instanceof Error && error.message.includes('401')) {
-        throw new Error('Неверный API ключ. Пожалуйста, проверьте ключ в настройках.');
-      }
-      throw new Error(`API Error: ${error instanceof Error ? error.message : String(error)}`);
+      throw this.handleApiError(error);
     }
   }
+
+  async getAvailableModels(): Promise<GroqModel[]> {
+    try {
+      const response = await this.client.models.list();
+      return response.data.map(model => model.id as GroqModel);
+    } catch (error) {
+      console.error('Error fetching available models:', error);
+      return [];
+    }
+  }
+
+  private handleApiError(error: unknown): Error {
+    if (error instanceof Error) {
+      if (error.message.includes('401')) {
+        return new Error('Invalid API key. Please check your settings.');
+      }
+      return error;
+    }
+    return new Error('Unknown API error');
+  }
 }
+

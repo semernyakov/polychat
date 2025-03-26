@@ -1,29 +1,27 @@
 import React from 'react';
-import { GroqModel } from '../types/models';
+import { GroqModel, getModelInfo } from '../types/models';
 
 interface ModelSelectorProps {
-  models: GroqModel[];
-  selectedModel: string;
-  onSelectModel: (model: string) => void;
+  selectedModel: GroqModel;
+  onSelectModel: (model: GroqModel) => void;
 }
 
-export const ModelSelector: React.FC<ModelSelectorProps> = ({
-  models,
-  selectedModel,
-  onSelectModel,
-}) => {
+export const ModelSelector: React.FC<ModelSelectorProps> = ({ selectedModel, onSelectModel }) => {
   return (
     <div className="groq-model-selector">
-      <label htmlFor="model-select">Модель:</label>
+      <label htmlFor="model-select" className="groq-label">
+        Модель:
+      </label>
       <select
         id="model-select"
         value={selectedModel}
-        onChange={e => onSelectModel(e.target.value)}
+        onChange={e => onSelectModel(e.target.value as GroqModel)}
         className="groq-select"
+        aria-label="Выберите модель"
       >
-        {models.map(model => (
+        {Object.values(GroqModel).map(model => (
           <option key={model} value={model}>
-            {model}
+            {getModelInfo(model).name}
           </option>
         ))}
       </select>

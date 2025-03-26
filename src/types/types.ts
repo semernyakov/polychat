@@ -1,6 +1,11 @@
+import { GroqModel } from './models';
+import { GroqChatSettings } from './settings';
+
+export type MessageRole = 'user' | 'assistant' | 'system';
+
 export interface Message {
   id: string;
-  role: 'user' | 'assistant' | 'system';
+  role: MessageRole;
   content: string;
   timestamp: number;
   usage?: {
@@ -12,31 +17,6 @@ export interface Message {
     completion_time?: number;
     total_time?: number;
   };
-}
-
-export interface ModelInfo {
-  id: string;
-  name: string;
-  description: string;
-  maxTokens: number;
-  category: 'text' | 'audio' | 'vision';
-  developer?: string;
-  contextWindow?: number;
-  maxCompletionTokens?: number;
-  isPreview?: boolean;
-  maxFileSize?: number;
-}
-
-export interface GroqChatSettings {
-  storeHistory: boolean;
-  apiKey: string;
-  model: string;
-  temperature: number;
-  maxTokens: number;
-  maxHistoryLength: number;
-  historyStorageMethod: 'memory' | 'localStorage' | 'indexedDB' | 'file';
-  history: Message[];
-  notePath: string;
 }
 
 export interface ModelSettings {

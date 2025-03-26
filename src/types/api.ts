@@ -1,4 +1,14 @@
-import { Message } from './types';
+import { Message } from './message';
+
+export interface GroqApiError {
+  error: {
+    message: string;
+    type: string;
+    code?: string;
+    param?: string | null;
+  };
+  status?: number;
+}
 
 export interface GroqApiRequest {
   messages: Message[];
@@ -10,49 +20,17 @@ export interface GroqApiRequest {
 
 export interface GroqApiResponse {
   id: string;
+  model: string;
   object: string;
   created: number;
-  model: string;
-  choices: {
+  choices: Array<{
     index: number;
-    message: Message & { function_call?: unknown };
+    message: Message;
     finish_reason: string;
-  }[];
+  }>;
   usage: {
     prompt_tokens: number;
     completion_tokens: number;
     total_tokens: number;
   };
-}
-
-export interface GroqApiError {
-  error: {
-    message: string;
-    type: string;
-    param?: string;
-    code?: string;
-  };
-}
-
-export interface GroqModel {
-  id: string;
-  object: string;
-  created: number;
-  owned_by: string;
-  permission: Array<{
-    id: string;
-    object: string;
-    created: number;
-    allow_create_engine: boolean;
-    allow_sampling: boolean;
-    allow_logprobs: boolean;
-    allow_search_indices: boolean;
-    allow_view: boolean;
-    allow_fine_tuning: boolean;
-    organization: string;
-    group: string | null;
-    is_blocking: boolean;
-  }>;
-  root: string;
-  parent: string | null;
 }

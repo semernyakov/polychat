@@ -1,15 +1,13 @@
-import { GroqChatSettings } from '../types/types'; // Shortened import
-import { DEFAULT_SETTINGS } from '../settings/GroqChatSettings'; // Shortened import
+import { GroqChatSettings } from '../types/settings';
+import { DEFAULT_SETTINGS } from '../settings/GroqChatSettings';
 
 export function getDefaultSettings(): GroqChatSettings {
   return {
     ...DEFAULT_SETTINGS,
-    history: [],
     storeHistory: DEFAULT_SETTINGS.storeHistory,
   };
 }
 
-// Consider removing this function if it's not used anywhere
 export function normalizeSettings(settings: GroqChatSettings): GroqChatSettings {
   return {
     ...settings,
@@ -17,5 +15,6 @@ export function normalizeSettings(settings: GroqChatSettings): GroqChatSettings 
     maxTokens: Math.max(1, settings.maxTokens),
     maxHistoryLength: Math.max(1, settings.maxHistoryLength),
     historyStorageMethod: settings.historyStorageMethod || 'memory',
+    notePath: settings.notePath || 'groq-chat-history.md',
   };
 }

@@ -3,14 +3,15 @@
   "version": "1.2.5",
   "description": "Groq Chat Plugin for Obsidian",
   "main": "main.js",
+  "type": "module",
   "scripts": {
     "start": "obsidian dev",
     "dev": "node esbuild.config.mjs && obsidian dev",
     "build": "tsc --noEmit --skipLibCheck && node esbuild.config.mjs production",
     "lint": "eslint . --ext .ts,.tsx --fix",
-    "format": "prettier --write .",
-    "format-check": "prettier --check .",
-    "version": "node version-bump.js && git add . && git commit -m \"chore: bump version\" && git push",
+    "format": "npx prettier --write .",
+    "format-check": "npx prettier --check .",
+    "version": "node version-bump.js && git add manifest.json version.json community-plugins.json && git commit -m \"chore: bump version\" && git push",
     "version-patch": "npm version patch",
     "version-minor": "npm version minor"
   },
@@ -49,6 +50,5 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "winston": "^3.17.0"
-  },
-  "type": "module"
+  }
 }

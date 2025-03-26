@@ -18,12 +18,14 @@ const baseConfig = {
   platform: 'node',
   external: ['obsidian', 'electron', '@codemirror/*', '@lezer/*', ...builtins],
   format: 'cjs',
-  target: 'es2020',
+  target: 'es2022',
   logLevel: 'info',
   sourcemap: !isProduction ? 'inline' : false,
   minify: isProduction,
   outdir: 'dist',
+  // outfile: 'main.js',
   treeShaking: true,
+  platform: 'neutral',
   plugins: [
     esbuildCopyStaticFiles({
       src: './src/static',
@@ -70,3 +72,12 @@ const baseConfig = {
     process.exit(0);
   });
 })();
+
+// if (isProduction) {
+//   esbuild.build(baseConfig).catch(() => process.exit(1));
+// } else {
+//   esbuild.context(baseConfig).then(context => {
+//     context.watch();
+//     console.log('👀 Watching for changes...');
+//   }).catch(() => process.exit(1));
+// }

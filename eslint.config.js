@@ -11,7 +11,7 @@ export default [
       '**/*.d.ts',
       'esbuild.config.mjs',
       'version-bump.js',
-      'src/hot-reload.js'
+      'src/hot-reload.js',
     ],
   },
   js.configs.recommended,
@@ -21,13 +21,16 @@ export default [
       parser: tsParser,
       parserOptions: {
         project: './tsconfig.json',
+        ecmaFeatures: {
+          jsx: true,
+        },
       },
       globals: {
         ...globals.browser,
         ...globals.node,
         console: 'readonly',
         process: 'readonly',
-        window: 'readonly'
+        window: 'readonly',
       },
     },
     plugins: {
@@ -40,11 +43,20 @@ export default [
           argsIgnorePattern: '^_',
           varsIgnorePattern: '^_',
           caughtErrorsIgnorePattern: '^_',
-          ignoreRestSiblings: true
-        }
+          ignoreRestSiblings: true,
+        },
       ],
       'no-console': 'off', // ['warn', { allow: ['warn', 'error'] }],
-      'no-undef': 'off' // Отключаем, так как TypeScript сам проверяет необъявленные переменные
+      'no-undef': 'off', // Отключаем, так как TypeScript сам проверяет необъявленные переменные
+      'no-unused-vars': [
+        'warn',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+          ignoreRestSiblings: true,
+        },
+      ],
     },
   },
 ];

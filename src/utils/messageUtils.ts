@@ -1,41 +1,25 @@
-import { Message } from '../types/types';
+import { Message } from '../types/message';
 
-export function createUserMessage(content: string): Message {
-  return {
-    id: Date.now().toString(),
-    role: 'user',
+export const MessageUtils = {
+  create: (role: Message['role'], content: string): Message => ({
+    id: crypto.randomUUID(),
+    role,
     content,
     timestamp: Date.now(),
-  };
-}
+  }),
 
-export function createAssistantMessage(content: string): Message {
-  return {
-    id: Date.now().toString(),
-    role: 'assistant',
-    content,
-    timestamp: Date.now(),
-  };
-}
+  formatTime: (timestamp: number) =>
+    new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
 
-export function formatTimestamp(timestamp: number): string {
-  return new Date(timestamp).toLocaleTimeString();
-}
+  truncate: (messages: Message[], max: number) => messages.slice(-Math.max(1, max)),
 
-export function truncateHistory(messages: Message[], maxLength: number): Message[] {
-  return messages.slice(-maxLength);
-}
-
-export function validateMessage(message: unknown): message is Message {
-  return (
-    typeof message === 'object' &&
-    message !== null &&
-    'id' in message &&
-    'role' in message &&
-    ['user', 'assistant'].includes((message as Message).role) &&
-    'content' in message &&
-    typeof (message as Message).content === 'string' &&
-    'timestamp' in message &&
-    typeof (message as Message).timestamp === 'number'
-  );
-}
+  validate: (message: unknown): message is Message => {
+    const m = message as Message;
+    return (
+      !!m?.id &&
+      ['user', 'assistant', 'system'].includes(m?.role) &&
+      typeof m?.content === 'string' &&
+      !!m?.timestamp
+    );
+  },
+};

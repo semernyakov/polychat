@@ -1,5 +1,5 @@
-if (import.meta.hot) {
-  import.meta.hot.accept(() => {
+if (module.hot) {
+  module.hot.accept(() => {
     console.log('Hot reloading...');
     window.location.reload();
   });

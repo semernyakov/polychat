@@ -1,44 +1,17 @@
-import { GroqPlugin } from './plugin';
-import { Message } from './types';
+import { GroqPluginInterface } from './plugin';
+import { Message } from './message';
 
-export type MessageRole = 'user' | 'assistant' | 'system' | 'error';
-
-export interface ChatProps {
-  plugin: GroqPlugin;
-}
-
-export interface ChatPanelState {
+export interface ChatState {
   messages: Message[];
   inputText: string;
   isLoading: boolean;
-  selectedModel: string;
+  error: string | null;
 }
 
 export interface ChatHistoryManager {
-  saveMessages(messages: Message[]): void;
-  loadMessages(): Message[];
-  clearHistory(): void;
-}
-
-export interface ChatPanelInternalProps {
-  messages: Message[];
-  inputText: string;
-  isLoading: boolean;
-  selectedModel: string;
-  onInputChange: (text: string) => void;
-  onSendMessage: () => Promise<void>;
-  onModelChange: (model: string) => void;
-  onClearHistory: () => void;
-}
-
-export interface ChatHistory {
-  messages: Message[];
-}
-
-export interface ChatState {
-  isLoading: boolean;
-  error: string | null;
-  history: ChatHistory;
+  saveMessages(messages: Message[]): Promise<void>;
+  loadMessages(): Promise<Message[]>;
+  clearHistory(): Promise<void>;
 }
 
 export interface HistoryOptions {

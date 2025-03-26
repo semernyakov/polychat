@@ -1,43 +1,53 @@
 import { Plugin } from 'obsidian';
 import { GroqChatView, VIEW_TYPE_GROQ_CHAT } from './views/GroqChatView';
-import { GroqChatSettings } from './types/types';
-import { getDefaultSettings } from './utils/settingsUtils';
+import { DEFAULT_SETTINGS, GroqChatSettings } from './settings/GroqChatSettings';
 import { AuthService } from './services/authService';
 import { GroqService } from './services/groqService';
+import { HistoryService } from './services/historyService';
 import { GroqChatSettingsTab } from './settings/GroqChatSettingsTab';
-import './static/styles/chat.css'; // Основные стили для чата
-import './static/styles/notice.css'; // Стили для уведомлений
+import { GroqPluginInterface } from './types/plugin';
+import './static/сss/styles.css';
 
-export default class GroqChatPlugin extends Plugin {
-  settings!: GroqChatSettings;
+
+export default class GroqChatPlugin extends Plugin implements GroqPluginInterface {
+  settings = { ...DEFAULT_SETTINGS };
+  defaultSettings = { ...DEFAULT_SETTINGS };
   authService!: AuthService;
   groqService!: GroqService;
+  historyService!: HistoryService;
 
   async onload() {
     await this.loadSettings();
     this.initializeServices();
-
     this.registerView(VIEW_TYPE_GROQ_CHAT, leaf => new GroqChatView(leaf, this));
-    this.addRibbonIcon('message-square', 'Open Groq Chat', () => this.activateView());
+    this.addRibbonIcon('message-square', 'Groq Chat', () => this.activateView());
     this.addSettingTab(new GroqChatSettingsTab(this.app, this));
   }
 
   private initializeServices(): void {
-    this.groqService = new GroqService(this.app, this);
-    this.authService = new AuthService(this.app, this, this.groqService);
+    this.groqService = new GroqService(this);
+    this.authService = new AuthService(this, this.groqService);
+    this.historyService = new HistoryService(this);
   }
 
-  async loadSettings(): Promise<void> {
-    this.settings = { ...getDefaultSettings(), ...(await this.loadData()) };
+  async loadSettings() {
+    this.settings = { ...this.settings, ...(await this.loadData()) };
   }
 
-  async saveSettings(): Promise<void> {
+  async saveSettings() {
     await this.saveData(this.settings);
   }
 
+  // Добавлен новый метод resetSettings
+  async resetSettings() {
+    this.settings = { ...this.defaultSettings };
+    await this.saveSettings();
+  }
+
   private async activateView(): Promise<void> {
-    const leaf = this.app.workspace.getLeaf('tab');
-    await leaf.setViewState({ type: VIEW_TYPE_GROQ_CHAT, active: true });
-    await this.app.workspace.revealLeaf(leaf);
+    await this.app.workspace.getLeaf(true).setViewState({
+      type: VIEW_TYPE_GROQ_CHAT,
+      active: true,
+    });
   }
 }
