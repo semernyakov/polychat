@@ -1,3 +1,4 @@
+import './hot-reload';
 import { Plugin } from 'obsidian';
 import { GroqChatView, VIEW_TYPE_GROQ_CHAT } from './views/GroqChatView';
 import { DEFAULT_SETTINGS, GroqChatSettings } from './settings/GroqChatSettings';
@@ -6,8 +7,7 @@ import { GroqService } from './services/groqService';
 import { HistoryService } from './services/historyService';
 import { GroqChatSettingsTab } from './settings/GroqChatSettingsTab';
 import { GroqPluginInterface } from './types/plugin';
-import './static/сss/styles.css';
-
+import './styles/main.css'; // Добавлен импорт стилей
 
 export default class GroqChatPlugin extends Plugin implements GroqPluginInterface {
   settings = { ...DEFAULT_SETTINGS };

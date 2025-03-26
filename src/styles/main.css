@@ -210,3 +210,14 @@
 .groq-support-heart:hover {
   transform: scale(1.1);
 }
+/* General notice style */
+.notice {
+  padding: 10px;
+  background-color: var(--background-modifier-warning); /* More neutral */
+  color: var(--text-warning); /* More neutral */
+  border: 1px solid var(--background-modifier-border); /* Use border variable */
+  border-radius: 4px;
+  margin: 10px 0;
+  font-size: 0.9rem; /* Optional: Adjust font size */
+  text-align: center; /* Optional: Center the text */
+}
