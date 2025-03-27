@@ -1,4 +1,5 @@
 import React from 'react';
+import '../styles.css'; // Добавьте эту строку для импорта стилей
 
 interface SupportDialogProps {
   isOpen: boolean;
@@ -14,8 +15,8 @@ export const SupportDialog: React.FC<SupportDialogProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="groq-dialog-overlay" onClick={onClose}>
-      <div className="groq-dialog-content" onClick={e => e.stopPropagation()}>
+    <div className="groq-support-dialog-overlay" onClick={onClose}>
+      <div className="groq-support-dialog" onClick={e => e.stopPropagation()}>
         <h3>Поддержать разработку</h3>
         <div className="groq-dialog-body">
           <p>
@@ -27,11 +28,11 @@ export const SupportDialog: React.FC<SupportDialogProps> = ({
               href={supportLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="groq-button primary"
+              className="groq-support-button"
             >
               Поддержать
             </a>
-            <button onClick={onClose} className="groq-button secondary">
+            <button onClick={onClose} className="groq-close-button">
               Закрыть
             </button>
           </div>

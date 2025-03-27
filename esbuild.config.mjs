@@ -7,6 +7,9 @@ import postcss from 'postcss';
 import autoprefixer from 'autoprefixer';
 import postcssPresetEnv from 'postcss-preset-env';
 import path from 'path';
+import browserslistToEsbuild from 'browserslist-to-esbuild';
+import postcssImport from 'postcss-import';
+import browserslist from 'browserslist';
 
 const isProduction = process.argv.includes('production');
 
@@ -25,7 +28,10 @@ const postCssPlugin = {
     build.onLoad({ filter: /\.css$/ }, async (args) => {
       try {
         const css = await fs.readFile(args.path, 'utf8');
-        const result = await postcss([autoprefixer(), postcssPresetEnv()]).process(css, {
+        const result = await postcss([
+					postcssImport(), autoprefixer(),	postcssPresetEnv()
+					]
+				).process(css, {
           from: args.path,
           to: path.join('dist', path.basename(args.path)),
         });
@@ -55,22 +61,26 @@ const copyFilesPlugin = {
           await fs.access(staticSrc);
           await fs.mkdir(staticDest, { recursive: true });
           await fs.cp(staticSrc, staticDest, { recursive: true });
-          console.log('📂 Статические файлы скопированы в dist/static/');
+          console.log('📂  Статические файлы скопированы в dist/static/');
         } catch {}
       } catch (err) {
-        console.error('❌ Ошибка при копировании файлов:', err);
+        console.error('❌  Ошибка при копировании файлов:', err);
       }
     });
   },
 };
 
+const target = browserslistToEsbuild(browserslist(undefined, { path: process.cwd() }));
+
 const config = {
   banner: { js: banner },
-  entryPoints: ['src/main.ts', 'src/styles/main.css'],
+  entryPoints: ['src/main.ts', 'src/styles.css'],
   bundle: true,
   platform: 'node',
+	mainFields: ['module', 'main'],
+	conditions: ['require', 'node'],
   format: 'cjs',
-  target: 'es2022',
+  target,
   external: ['obsidian', 'electron', '@codemirror/*', '@lezer/*', ...builtins],
   sourcemap: !isProduction ? 'inline' : false,
   minify: isProduction,
@@ -97,9 +107,10 @@ const config = {
     console.log(`👀  Ожидание изменений (первая сборка: ${formatDuration(Date.now() - start)})`);
     console.log(`🔥  Сервер запущен: http://${server.host}:${server.port}`);
 
-    exec('obsidian', (err) => {
+    const obsidianPath = process.env.OBSIDIAN_EXECUTABLE_PATH || 'obsidian';
+    exec(obsidianPath, (err) => {
       if (err) {
-        console.error('❌  Не удалось запустить Obsidian:', err);
+        console.error(`❌  Не удалось запустить Obsidian (${obsidianPath}):`, err);
       }
     });
 

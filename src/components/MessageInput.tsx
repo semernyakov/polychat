@@ -1,4 +1,5 @@
 import React, { KeyboardEvent } from 'react';
+import '../styles.css'; // Добавьте эту строку для импорта стилей
 
 interface MessageInputProps {
   value: string;
@@ -23,7 +24,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   };
 
   return (
-    <div className="groq-message-input">
+    <div className="groq-chat-input">
       <textarea
         value={value}
         onChange={e => onChange(e.target.value)}
@@ -34,8 +35,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
       />
       <div className="groq-message-input__hint">
         Максимальное количество символов: 1000 <br />
-        Нажмите <kbd>Enter</kbd> для отправки сообщения, <kbd>Shift + Enter</kbd> для переноса
-        строки
+        Нажмите <kbd>Enter</kbd> для отправки сообщения, <kbd>Shift + Enter</kbd> для переноса строки
       </div>
       <div className="groq-message-input__counter">
         <small>{value.length} / 1000</small>

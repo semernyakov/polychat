@@ -7,7 +7,7 @@ import { GroqService } from './services/groqService';
 import { HistoryService } from './services/historyService';
 import { GroqChatSettingsTab } from './settings/GroqChatSettingsTab';
 import { GroqPluginInterface } from './types/plugin';
-import './styles/main.css'; // Добавлен импорт стилей
+import './styles.css'; // Добавлен импорт стилей
 
 export default class GroqChatPlugin extends Plugin implements GroqPluginInterface {
   settings = { ...DEFAULT_SETTINGS };

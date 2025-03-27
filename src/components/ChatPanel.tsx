@@ -7,6 +7,7 @@ import { ModelSelector } from './ModelSelector';
 import { MessageInput } from './MessageInput';
 import { SupportDialog } from './SupportDialog';
 import { SupportButton } from './SupportButton';
+import '../styles.css'; // Добавьте эту строку для импорта стилей
 
 interface ChatPanelProps {
   plugin: GroqPluginInterface;
@@ -67,27 +68,30 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ plugin }) => {
 
   if (!plugin.settings.apiKey) {
     return (
-      <div className="groq-auth-warning">Пожалуйста, настройте API ключ в настройках плагина</div>
+      <div className="groq-api-key-warning">Пожалуйста, настройте API ключ в настройках плагина</div>
     );
   }
 
   return (
-    <div className="groq-chat-panel">
-      <div className="groq-chat-header">
-        <ModelSelector selectedModel={selectedModel} onSelectModel={handleModelChange} />
-        <SupportButton onClick={() => setIsSupportOpen(true)} />
-      </div>
+		<div className="groq-chat">
+			<div className="groq-chat__header">
+				<ModelSelector selectedModel={selectedModel} onSelectModel={handleModelChange} />
+				<SupportButton onClick={() => setIsSupportOpen(true)} />
+			</div>
 
-      <MessageList messages={messages} isLoading={isLoading} />
+			<MessageList messages={messages} isLoading={isLoading} />
 
-      <MessageInput
-        value={inputValue}
-        onChange={setInputValue}
-        onSend={handleSendMessage}
-        disabled={isLoading}
-      />
+			<div className="groq-chat__input-container">
+				<MessageInput
+					value={inputValue}
+					onChange={setInputValue}
+					onSend={handleSendMessage}
+					disabled={isLoading}
+				/>
+			</div>
 
-      <SupportDialog isOpen={isSupportOpen} onClose={() => setIsSupportOpen(false)} />
-    </div>
-  );
+			<SupportDialog isOpen={isSupportOpen} onClose={() => setIsSupportOpen(false)} />
+		</div>
+	);
 };
+

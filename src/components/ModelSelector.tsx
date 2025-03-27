@@ -1,4 +1,5 @@
 import React from 'react';
+import '../styles.css'; // Добавьте эту строку для импорта стилей
 import { GroqModel, getModelInfo } from '../types/models';
 
 interface ModelSelectorProps {

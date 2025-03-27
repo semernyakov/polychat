@@ -1,4 +1,5 @@
 import React from 'react';
+import '../styles.css'; // Добавьте эту строку для импорта стилей
 
 interface SupportButtonProps {
   onClick?: () => void;

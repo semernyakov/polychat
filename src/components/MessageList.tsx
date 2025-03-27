@@ -1,6 +1,7 @@
 import React from 'react';
 import { Message } from '../types/message';
 import { MessageItem } from './MessageItem';
+import '../styles.css';
 
 interface MessageListProps {
   messages: Message[];
@@ -9,7 +10,7 @@ interface MessageListProps {
 
 export const MessageList: React.FC<MessageListProps> = ({ messages, isLoading }) => {
   return (
-    <div className="groq-message-list">
+    <div className="groq-chat__messages">
       {messages.map(message => (
         <MessageItem key={message.id} message={message} />
       ))}
