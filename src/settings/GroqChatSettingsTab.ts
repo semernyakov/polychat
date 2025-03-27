@@ -1,5 +1,4 @@
 import { App, PluginSettingTab, Setting } from 'obsidian';
-import GroqChatPlugin from '../main';
 import { AuthService } from '../services/authService';
 import { GroqModel, getModelInfo } from '../types/models';
 import { HistoryStorageMethod } from '../types/settings';
@@ -13,10 +12,10 @@ export class GroqChatSettingsTab extends PluginSettingTab {
 
   constructor(
     app: App,
-    private readonly plugin: GroqPluginInterface, // Ensure correct typing
+    private readonly plugin: GroqPluginInterface,
   ) {
     super(app, plugin);
-    this.authService = new AuthService(plugin, plugin.groqService as GroqService); // Cast to GroqService
+    this.authService = new AuthService(plugin, plugin.groqService as GroqService);
   }
 
   display(): void {
@@ -40,6 +39,7 @@ export class GroqChatSettingsTab extends PluginSettingTab {
     this.addMaxTokensSetting();
     this.addHistoryStorageSettings();
     this.addNotePathSetting();
+    this.addDisplayModeSetting();
   }
 
   private renderActionButtons(): void {
@@ -58,10 +58,26 @@ export class GroqChatSettingsTab extends PluginSettingTab {
     container.createEl('button', {
       text: 'Сбросить настройки',
     }).onclick = async () => {
-      await this.plugin.resetSettings(); // Исправлено: добавлен await
+      await this.plugin.resetSettings();
       this.display();
       new Notice('Настройки сброшены');
     };
+  }
+
+  private addDisplayModeSetting(): void {
+    new Setting(this.containerEl)
+      .setName('Режим отображения')
+      .setDesc('Как открывать чат по умолчанию')
+      .addDropdown(dropdown => {
+        dropdown
+          .addOption('tab', 'Во вкладке')
+          .addOption('sidepanel', 'В боковой панели')
+          .setValue(this.plugin.settings.displayMode)
+          .onChange(async value => {
+            this.plugin.settings.displayMode = value as 'tab' | 'sidepanel';
+            await this.plugin.saveSettings();
+          });
+      });
   }
 
   private addApiKeySetting(): void {
@@ -150,7 +166,7 @@ export class GroqChatSettingsTab extends PluginSettingTab {
           .onChange(async value => {
             this.plugin.settings.historyStorageMethod = value as HistoryStorageMethod;
             await this.plugin.saveSettings();
-            this.display(); // Перерисовываем для обновления notePath
+            this.display();
           });
       });
   }

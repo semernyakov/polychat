@@ -10,7 +10,9 @@ export interface GroqPluginInterface extends Plugin {
 
   saveSettings(): Promise<void>;
   loadSettings(): Promise<void>;
-  resetSettings(): Promise<void>; // Added resetSettings method
+  resetSettings(): Promise<void>;
+
+  changeDisplayMode(mode: 'tab' | 'sidepanel'): Promise<void>; // Добавлен новый метод
 
   readonly groqService: {
     sendMessage(content: string, model: GroqModel): Promise<Message>;
@@ -22,6 +24,7 @@ export interface GroqPluginInterface extends Plugin {
     getHistory(): Promise<Message[]>;
     addMessage(message: Message): Promise<void>;
     clearHistory(): Promise<void>;
+    getCurrentMessages(): Message[]; // Добавлен новый метод
   };
 
   readonly authService: {

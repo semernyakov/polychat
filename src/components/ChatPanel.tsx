@@ -6,15 +6,23 @@ import { MessageList } from './MessageList';
 import { ModelSelector } from './ModelSelector';
 import { MessageInput } from './MessageInput';
 import { SupportDialog } from './SupportDialog';
-import { FiTrash2, FiChevronUp, FiChevronDown, FiHeart } from 'react-icons/fi';
+import { FiTrash2, FiChevronUp, FiChevronDown, FiHeart, FiSidebar, FiSquare } from 'react-icons/fi';
 import '../styles.css';
 
 interface ChatPanelProps {
   plugin: GroqPluginInterface;
+  displayMode: 'tab' | 'sidepanel';
+  initialMessages?: Message[];
+  onDisplayModeChange: (mode: 'tab' | 'sidepanel') => void;
 }
 
-export const ChatPanel: React.FC<ChatPanelProps> = ({ plugin }) => {
-  const [messages, setMessages] = useState<Message[]>([]);
+export const ChatPanel: React.FC<ChatPanelProps> = ({
+  plugin,
+  displayMode,
+  initialMessages = [],
+  onDisplayModeChange
+}) => {
+  const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [selectedModel, setSelectedModel] = useState<GroqModel>(plugin.settings.model);
@@ -23,17 +31,22 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ plugin }) => {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const loadHistory = async () => {
-      try {
-        const history = await plugin.historyService.getHistory();
-        setMessages(history);
-        scrollToBottom();
-      } catch (error) {
-        console.error('Ошибка загрузки истории:', error);
-      }
-    };
-    loadHistory();
-  }, [plugin]);
+    if (initialMessages.length > 0) {
+      setMessages(initialMessages);
+      scrollToBottom();
+    } else {
+      const loadHistory = async () => {
+        try {
+          const history = await plugin.historyService.getHistory();
+          setMessages(history);
+          scrollToBottom();
+        } catch (error) {
+          console.error('Ошибка загрузки истории:', error);
+        }
+      };
+      loadHistory();
+    }
+  }, [plugin, initialMessages]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -89,6 +102,11 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ plugin }) => {
     plugin.saveSettings();
   };
 
+  const toggleDisplayMode = () => {
+    const newMode = displayMode === 'tab' ? 'sidepanel' : 'tab';
+    onDisplayModeChange(newMode);
+  };
+
   if (!plugin.settings.apiKey) {
     return (
       <div className="groq-api-key-warning">
@@ -98,7 +116,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ plugin }) => {
   }
 
   return (
-    <div className="groq-chat">
+    <div className={`groq-chat groq-chat--${displayMode}`}>
       <div className="groq-chat__header">
         <div className="groq-chat__header-left">
           <ModelSelector
@@ -108,11 +126,18 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ plugin }) => {
         </div>
         <div className="groq-chat__header-right">
           <button
+            onClick={toggleDisplayMode}
+            className="groq-display-mode-button"
+            title={displayMode === 'tab' ? 'Показать в боковой панели' : 'Показать во вкладке'}
+          >
+            {displayMode === 'tab' ? <FiSidebar size={16} /> : <FiSquare size={16} />}
+          </button>
+          <button
             onClick={() => setIsSupportOpen(true)}
             className="groq-support-header-button"
             title="Поддержать разработчика"
           >
-            &nbsp;&nbsp;<FiHeart size={16} />&nbsp;&nbsp;Поддержать!&nbsp;&nbsp;
+            <FiHeart size={16} />
           </button>
           <button
             onClick={scrollToTop}

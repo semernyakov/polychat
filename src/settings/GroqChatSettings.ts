@@ -7,12 +7,13 @@ import { HistoryStorageMethod } from '../types/settings';
 export interface GroqChatSettings {
   apiKey: string;
   model: GroqModel;
-  temperature: number; // 0-2
-  maxTokens: number; // 1-32768
+  temperature: number;
+  maxTokens: number;
   historyStorageMethod: HistoryStorageMethod;
-  maxHistoryLength: number; // >=1
+  maxHistoryLength: number;
   notePath: string;
   storeHistory: boolean;
+  displayMode: 'tab' | 'sidepanel'; // Новое поле
 }
 
 /**
@@ -27,4 +28,5 @@ export const DEFAULT_SETTINGS: Readonly<GroqChatSettings> = Object.freeze({
   maxHistoryLength: 20,
   notePath: 'groq-chat-history.md',
   storeHistory: true,
+  displayMode: 'tab' // Значение по умолчанию
 });

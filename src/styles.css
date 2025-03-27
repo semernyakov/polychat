@@ -452,3 +452,46 @@
   align-items: center;
   gap: 0.5rem;
 }
+
+/* Режимы отображения */
+.groq-chat--tab {
+  width: 100%;
+  height: 100vh;
+}
+
+.groq-chat--sidepanel {
+  width: var(--sidepanel-width);
+  height: 100%;
+  border-left: 1px solid var(--background-modifier-border);
+}
+
+/* Кнопка переключения режима */
+.groq-display-mode-button {
+  background: none;
+  border: none;
+  padding: 0.25rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--groq-transition-duration) ease;
+  opacity: 0.7;
+  border-radius: var(--groq-border-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.groq-display-mode-button:hover {
+  color: var(--interactive-accent);
+  opacity: 1;
+  background-color: var(--background-modifier-hover);
+}
+
+/* Адаптация для боковой панели */
+.groq-chat--sidepanel .groq-chat__messages {
+  max-height: 60vh;
+}
+
+.groq-chat--sidepanel .groq-chat__input-container {
+  position: relative;
+  bottom: auto;
+}
