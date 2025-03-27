@@ -34,6 +34,12 @@ export const MessageInput: React.FC<MessageInputProps> = React.memo(({
     }
   }, [value]);
 
+  useEffect(() => {
+    if (textareaRef.current && !disabled) {
+      textareaRef.current.focus();
+    }
+  }, [disabled]);
+
   return (
     <div className="groq-chat-input">
       <textarea
@@ -62,3 +68,5 @@ export const MessageInput: React.FC<MessageInputProps> = React.memo(({
     </div>
   );
 });
+
+MessageInput.displayName = 'MessageInput';

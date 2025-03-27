@@ -48,16 +48,26 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
     }
   }, [plugin, initialMessages]);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  useEffect(() => {
+    const handleResize = () => {
+      scrollToBottom();
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
-  const scrollToTop = () => {
+  const scrollToBottom = useCallback(() => {
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  }, []);
+
+  const scrollToTop = useCallback(() => {
     messagesContainerRef.current?.scrollTo({
       top: 0,
       behavior: 'smooth'
     });
-  };
+  }, []);
 
   const handleSendMessage = useCallback(async () => {
     if (!inputValue.trim() || isLoading) return;
@@ -85,7 +95,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
     } finally {
       setIsLoading(false);
     }
-  }, [inputValue, isLoading, plugin, selectedModel]);
+  }, [inputValue, isLoading, plugin, selectedModel, scrollToBottom]);
 
   const handleClearHistory = async () => {
     try {
@@ -166,19 +176,21 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
         </div>
       </div>
 
-      <div className="groq-chat__messages" ref={messagesContainerRef}>
-        <MessageList messages={messages} isLoading={isLoading} />
-        <div ref={messagesEndRef} />
-      </div>
+      <div className="groq-chat__content">
+        <div className="groq-chat__messages-container" ref={messagesContainerRef}>
+          <MessageList messages={messages} isLoading={isLoading} />
+          <div ref={messagesEndRef} />
+        </div>
 
-      <div className="groq-chat__input-container">
-        <MessageInput
-          value={inputValue}
-          onChange={setInputValue}
-          onSend={handleSendMessage}
-          disabled={isLoading}
-          maxLength={1200}
-        />
+        <div className="groq-chat__input-container">
+          <MessageInput
+            value={inputValue}
+            onChange={setInputValue}
+            onSend={handleSendMessage}
+            disabled={isLoading}
+            maxLength={1200}
+          />
+        </div>
       </div>
 
       <SupportDialog
