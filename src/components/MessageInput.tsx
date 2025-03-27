@@ -21,7 +21,7 @@ export const MessageInput: React.FC<MessageInputProps> = React.memo(({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === 'Enter' && e.ctrlKey) {
       e.preventDefault();
       onSend();
     }
@@ -47,7 +47,7 @@ export const MessageInput: React.FC<MessageInputProps> = React.memo(({
         maxLength={maxLength}
       />
       <div className="groq-message-input__hint">
-        Нажмите <kbd>Enter</kbd> для отправки, <kbd>Shift+Enter</kbd> для переноса строки
+        Нажмите <kbd>Ctrl+Enter</kbd> для отправки, <kbd>Enter</kbd> для переноса строки
       </div>
       <div className="groq-message-input__counter">
         {value.length} / {maxLength}

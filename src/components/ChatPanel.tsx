@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { GroqPluginInterface } from '../types/plugin';
 import { Message } from '../types/message';
 import { GroqModel } from '../types/models';
@@ -6,8 +6,7 @@ import { MessageList } from './MessageList';
 import { ModelSelector } from './ModelSelector';
 import { MessageInput } from './MessageInput';
 import { SupportDialog } from './SupportDialog';
-import { SupportButton } from './SupportButton';
-import { FiTrash2 } from 'react-icons/fi';
+import { FiTrash2, FiChevronUp, FiChevronDown, FiHeart } from 'react-icons/fi';
 import '../styles.css';
 
 interface ChatPanelProps {
@@ -20,18 +19,32 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ plugin }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedModel, setSelectedModel] = useState<GroqModel>(plugin.settings.model);
   const [isSupportOpen, setIsSupportOpen] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const loadHistory = async () => {
       try {
         const history = await plugin.historyService.getHistory();
         setMessages(history);
+        scrollToBottom();
       } catch (error) {
         console.error('Ошибка загрузки истории:', error);
       }
     };
     loadHistory();
   }, [plugin]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const scrollToTop = () => {
+    messagesContainerRef.current?.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
 
   const handleSendMessage = useCallback(async () => {
     if (!inputValue.trim() || isLoading) return;
@@ -53,6 +66,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ plugin }) => {
 
       setMessages(prev => [...prev, response]);
       await plugin.historyService.addMessage(response);
+      scrollToBottom();
     } catch (error) {
       console.error('Ошибка отправки сообщения:', error);
     } finally {
@@ -94,6 +108,29 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ plugin }) => {
         </div>
         <div className="groq-chat__header-right">
           <button
+            onClick={() => setIsSupportOpen(true)}
+            className="groq-support-header-button"
+            title="Поддержать разработчика"
+          >
+            &nbsp;&nbsp;<FiHeart size={16} />&nbsp;&nbsp;Поддержать!&nbsp;&nbsp;
+          </button>
+          <button
+            onClick={scrollToTop}
+            className="groq-scroll-button"
+            title="К началу диалога"
+            disabled={messages.length === 0}
+          >
+            <FiChevronUp size={16} />
+          </button>
+          <button
+            onClick={scrollToBottom}
+            className="groq-scroll-button"
+            title="К концу диалога"
+            disabled={messages.length === 0}
+          >
+            <FiChevronDown size={16} />
+          </button>
+          <button
             onClick={handleClearHistory}
             className="groq-clear-button"
             title="Очистить историю"
@@ -101,11 +138,13 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ plugin }) => {
           >
             <FiTrash2 size={16} />
           </button>
-          <SupportButton onClick={() => setIsSupportOpen(true)} />
         </div>
       </div>
 
-      <MessageList messages={messages} isLoading={isLoading} />
+      <div className="groq-chat__messages" ref={messagesContainerRef}>
+        <MessageList messages={messages} isLoading={isLoading} />
+        <div ref={messagesEndRef} />
+      </div>
 
       <div className="groq-chat__input-container">
         <MessageInput

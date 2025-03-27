@@ -11,7 +11,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({ selectedModel, onS
   return (
     <div className="groq-model-selector">
       <label htmlFor="model-select" className="groq-label">
-        Модель:
+        Модель:&nbsp;
       </label>
       <select
         id="model-select"
