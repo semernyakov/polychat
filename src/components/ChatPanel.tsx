@@ -7,7 +7,7 @@ import { ModelSelector } from './ModelSelector';
 import { MessageInput } from './MessageInput';
 import { SupportDialog } from './SupportDialog';
 import { SupportButton } from './SupportButton';
-import '../styles.css'; // Добавьте эту строку для импорта стилей
+import '../styles.css';
 
 interface ChatPanelProps {
   plugin: GroqPluginInterface;
@@ -26,7 +26,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ plugin }) => {
         const history = await plugin.historyService.getHistory();
         setMessages(history);
       } catch (error) {
-        console.error('Failed to load history:', error);
+        console.error('Ошибка загрузки истории:', error);
       }
     };
     loadHistory();
@@ -48,13 +48,12 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ plugin }) => {
 
     try {
       await plugin.historyService.addMessage(userMessage);
-
       const response = await plugin.groqService.sendMessage(inputValue, selectedModel);
 
       setMessages(prev => [...prev, response]);
       await plugin.historyService.addMessage(response);
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error('Ошибка отправки сообщения:', error);
     } finally {
       setIsLoading(false);
     }
@@ -68,30 +67,38 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ plugin }) => {
 
   if (!plugin.settings.apiKey) {
     return (
-      <div className="groq-api-key-warning">Пожалуйста, настройте API ключ в настройках плагина</div>
+      <div className="groq-api-key-warning">
+        ⚠️ Пожалуйста, установите API ключ в настройках плагина
+      </div>
     );
   }
 
   return (
-		<div className="groq-chat">
-			<div className="groq-chat__header">
-				<ModelSelector selectedModel={selectedModel} onSelectModel={handleModelChange} />
-				<SupportButton onClick={() => setIsSupportOpen(true)} />
-			</div>
+    <div className="groq-chat">
+      <div className="groq-chat__header">
+        <ModelSelector
+          selectedModel={selectedModel}
+          onSelectModel={handleModelChange}
+        />
+        <SupportButton onClick={() => setIsSupportOpen(true)} />
+      </div>
 
-			<MessageList messages={messages} isLoading={isLoading} />
+      <MessageList messages={messages} isLoading={isLoading} />
 
-			<div className="groq-chat__input-container">
-				<MessageInput
-					value={inputValue}
-					onChange={setInputValue}
-					onSend={handleSendMessage}
-					disabled={isLoading}
-				/>
-			</div>
+      <div className="groq-chat__input-container">
+        <MessageInput
+          value={inputValue}
+          onChange={setInputValue}
+          onSend={handleSendMessage}
+          disabled={isLoading}
+          maxLength={1200}
+        />
+      </div>
 
-			<SupportDialog isOpen={isSupportOpen} onClose={() => setIsSupportOpen(false)} />
-		</div>
-	);
+      <SupportDialog
+        isOpen={isSupportOpen}
+        onClose={() => setIsSupportOpen(false)}
+      />
+    </div>
+  );
 };
-
