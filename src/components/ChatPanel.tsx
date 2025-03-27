@@ -7,6 +7,7 @@ import { ModelSelector } from './ModelSelector';
 import { MessageInput } from './MessageInput';
 import { SupportDialog } from './SupportDialog';
 import { SupportButton } from './SupportButton';
+import { FiTrash2 } from 'react-icons/fi';
 import '../styles.css';
 
 interface ChatPanelProps {
@@ -59,6 +60,15 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ plugin }) => {
     }
   }, [inputValue, isLoading, plugin, selectedModel]);
 
+  const handleClearHistory = async () => {
+    try {
+      await plugin.historyService.clearHistory();
+      setMessages([]);
+    } catch (error) {
+      console.error('Ошибка очистки истории:', error);
+    }
+  };
+
   const handleModelChange = (model: GroqModel) => {
     setSelectedModel(model);
     plugin.settings.model = model;
@@ -76,11 +86,23 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ plugin }) => {
   return (
     <div className="groq-chat">
       <div className="groq-chat__header">
-        <ModelSelector
-          selectedModel={selectedModel}
-          onSelectModel={handleModelChange}
-        />
-        <SupportButton onClick={() => setIsSupportOpen(true)} />
+        <div className="groq-chat__header-left">
+          <ModelSelector
+            selectedModel={selectedModel}
+            onSelectModel={handleModelChange}
+          />
+        </div>
+        <div className="groq-chat__header-right">
+          <button
+            onClick={handleClearHistory}
+            className="groq-clear-button"
+            title="Очистить историю"
+            disabled={messages.length === 0 || isLoading}
+          >
+            <FiTrash2 size={16} />
+          </button>
+          <SupportButton onClick={() => setIsSupportOpen(true)} />
+        </div>
       </div>
 
       <MessageList messages={messages} isLoading={isLoading} />

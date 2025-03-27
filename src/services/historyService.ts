@@ -77,7 +77,6 @@ export class HistoryService {
     return history.slice(-maxLength);
   }
 
-  // Реализации методов хранения...
   private getFromLocalStorage(): Message[] {
     const data = localStorage.getItem('groq-chat-history');
     return data ? JSON.parse(data) : [];
@@ -92,7 +91,7 @@ export class HistoryService {
       const request = indexedDB.open('groq-chat-history', 1);
       request.onsuccess = () => {
         const db = request.result;
-        const transaction = db.transaction('history', 'readwrite');
+        const transaction = db.transaction('history', 'readonly');
         const store = transaction.objectStore('history');
         const result: Message[] = [];
         const cursor = store.openCursor();
@@ -118,39 +117,58 @@ export class HistoryService {
         const db = request.result;
         const transaction = db.transaction('history', 'readwrite');
         const store = transaction.objectStore('history');
-        history.forEach(message => {
-          const request = store.add(message);
-          request.onsuccess = () => {
-            // Success handler
-          };
-          request.onerror = () => reject(request.error);
-        });
-        transaction.oncomplete = () => {
-          resolve();
+
+        // Сначала очищаем хранилище
+        const clearRequest = store.clear();
+        clearRequest.onsuccess = () => {
+          // Затем добавляем новые сообщения
+          const requests = history.map(message => store.add(message));
+
+          Promise.all(requests.map(req =>
+            new Promise((res, rej) => {
+              req.onsuccess = res;
+              req.onerror = rej;
+            })
+          ))
+          .then(() => {
+            transaction.oncomplete = () => resolve();
+          })
+          .catch(reject);
         };
+        clearRequest.onerror = () => reject(clearRequest.error);
       };
       request.onerror = () => reject(request.error);
     });
   }
 
   private async getFromFile(): Promise<Message[]> {
-    const file = this.plugin.app.vault.getAbstractFileByPath(this.plugin.settings.notePath);
-    if (file instanceof TFile) {
-      const content = await this.plugin.app.vault.read(file);
-      return JSON.parse(content);
+    try {
+      const file = this.plugin.app.vault.getAbstractFileByPath(this.plugin.settings.notePath);
+      if (file instanceof TFile) {
+        const content = await this.plugin.app.vault.read(file);
+        return content ? JSON.parse(content) : [];
+      }
+      return [];
+    } catch (error) {
+      console.error('Error reading history file:', error);
+      return [];
     }
-    return [];
   }
 
   private async saveToFile(history: Message[]): Promise<void> {
-    const path = this.plugin.settings.notePath;
-    const content = JSON.stringify(history, null, 2);
+    try {
+      const path = this.plugin.settings.notePath;
+      const content = JSON.stringify(history, null, 2);
 
-    const file = this.plugin.app.vault.getAbstractFileByPath(path);
-    if (file instanceof TFile) {
-      await this.plugin.app.vault.modify(file, content);
-    } else {
-      await this.plugin.app.vault.create(path, content);
+      const file = this.plugin.app.vault.getAbstractFileByPath(path);
+      if (file instanceof TFile) {
+        await this.plugin.app.vault.modify(file, content);
+      } else {
+        await this.plugin.app.vault.create(path, content);
+      }
+    } catch (error) {
+      console.error('Error saving history to file:', error);
+      throw error;
     }
   }
 
@@ -161,20 +179,25 @@ export class HistoryService {
         const db = request.result;
         const transaction = db.transaction('history', 'readwrite');
         const store = transaction.objectStore('history');
-        store.clear();
-        transaction.oncomplete = () => {
-          resolve();
+        const clearRequest = store.clear();
+        clearRequest.onsuccess = () => {
+          transaction.oncomplete = () => resolve();
         };
-        transaction.onerror = () => reject(transaction.error);
+        clearRequest.onerror = () => reject(clearRequest.error);
       };
       request.onerror = () => reject(request.error);
     });
   }
 
   private async clearFile(): Promise<void> {
-    const file = this.plugin.app.vault.getAbstractFileByPath(this.plugin.settings.notePath);
-    if (file) {
-      await this.plugin.app.vault.delete(file);
+    try {
+      const file = this.plugin.app.vault.getAbstractFileByPath(this.plugin.settings.notePath);
+      if (file && file instanceof TFile) {
+        await this.plugin.app.vault.delete(file);
+      }
+    } catch (error) {
+      console.error('Error clearing history file:', error);
+      throw error;
     }
   }
 
