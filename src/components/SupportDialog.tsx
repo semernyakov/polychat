@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { FiExternalLink } from 'react-icons/fi';
-import '../styles.css';
+import '../styles.css'; // Используем единый style.css
 
 interface SupportDialogProps {
   isOpen: boolean;
@@ -11,18 +11,21 @@ interface SupportDialogProps {
 export const SupportDialog: React.FC<SupportDialogProps> = ({
   isOpen,
   onClose,
-  supportLink = 'https://yoomoney.ru/fundraise/194GT5A5R07.250321',
+  supportLink = 'https://yoomoney.ru/fundraise/194GT5A5R07.250321', // Используйте вашу ссылку
 }) => {
-  // Блокировка скролла при открытом диалоге
+  // Блокировка скролла фона при открытом диалоге
   useEffect(() => {
+    const body = document.body;
+    const originalOverflow = body.style.overflow;
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
+      body.style.overflow = 'hidden';
     } else {
-      document.body.style.overflow = '';
+      body.style.overflow = originalOverflow; // Восстанавливаем исходное значение
     }
 
+    // Очистка при размонтировании
     return () => {
-      document.body.style.overflow = '';
+      body.style.overflow = originalOverflow;
     };
   }, [isOpen]);
 
@@ -38,6 +41,7 @@ export const SupportDialog: React.FC<SupportDialogProps> = ({
       document.addEventListener('keydown', handleKeyDown);
     }
 
+    // Очистка слушателя
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
@@ -45,50 +49,51 @@ export const SupportDialog: React.FC<SupportDialogProps> = ({
 
   if (!isOpen) return null;
 
+  // Закрытие по клику на оверлей
+  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Убедимся, что клик был именно по оверлею, а не по содержимому
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   return (
-    <div className="groq-support-dialog-overlay" onClick={onClose}>
+    <div className="groq-support-dialog-overlay" onClick={handleOverlayClick}>
+      {/* Предотвращаем закрытие при клике на сам диалог */}
       <div className="groq-support-dialog" onClick={e => e.stopPropagation()}>
         <div className="groq-dialog-header">
           <h3>Поддержать разработку</h3>
           <button
             onClick={onClose}
-            className="groq-dialog-close"
+            className="groq-dialog-close groq-icon-button" // Общий стиль для иконок-кнопок
             aria-label="Закрыть"
           >
-            &times;
+            × {/* Можно заменить иконкой FiX */}
           </button>
         </div>
 
         <div className="groq-dialog-content">
           <p>
-            Мы используем сервис Юмани для сбора средств на развитие проекта.
-            Ваша поддержка поможет улучшить плагин и добавить новые функции.
+            Этот плагин разрабатывается энтузиастом в свободное время.
+            Ваша поддержка поможет ускорить разработку, добавить новые функции и поддерживать проект в актуальном состоянии.
+            Спасибо за использование!
           </p>
-
-          {/*<div className="groq-dialog-qr">*/}
-          {/*  <img*/}
-          {/*    src="https://yoomoney.ru/transfer/money-form/qr?receiver=410011000000000&quickpay-form=small&sum=100&targets=Поддержка плагина Obsidian"*/}
-          {/*    alt="QR-код для перевода"*/}
-          {/*    width={150}*/}
-          {/*    onError={(e) => {*/}
-          {/*      (e.target as HTMLImageElement).style.display = 'none';*/}
-          {/*    }}*/}
-          {/*  />*/}
-          {/*</div>*/}
+          {/* Можно добавить QR код или другие способы поддержки */}
         </div>
 
         <div className="groq-dialog-actions">
+          {/* Используем общий стиль .groq-button */}
           <a
             href={supportLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="groq-support-button"
+            className="groq-button groq-button--primary groq-support-button"
           >
-            <FiExternalLink /> Перейти к оплате
+            <FiExternalLink /> Перейти к поддержке
           </a>
           <button
             onClick={onClose}
-            className="groq-dialog-secondary-button"
+            className="groq-button groq-dialog-secondary-button"
           >
             Закрыть
           </button>

@@ -1,6 +1,6 @@
 import React from 'react';
-import '../styles.css'; // Добавьте эту строку для импорта стилей
-import { GroqModel, getModelInfo } from '../types/models';
+import '../styles.css'; // Используем единый style.css
+import { GroqModel, getModelInfo } from '../types/models'; // Убедитесь, что типы существуют
 
 interface ModelSelectorProps {
   selectedModel: GroqModel;
@@ -10,21 +10,26 @@ interface ModelSelectorProps {
 export const ModelSelector: React.FC<ModelSelectorProps> = ({ selectedModel, onSelectModel }) => {
   return (
     <div className="groq-model-selector">
-      <label htmlFor="model-select" className="groq-label">
-        Модель:&nbsp;
+      {/* Скрываем label визуально, но оставляем для доступности */}
+      <label htmlFor="model-select" className="groq-visually-hidden">
+        Выберите модель Groq:
       </label>
       <select
         id="model-select"
         value={selectedModel}
         onChange={e => onSelectModel(e.target.value as GroqModel)}
         className="groq-select"
-        aria-label="Выберите модель"
+        aria-label="Выберите модель Groq" // Добавляем aria-label
       >
-        {Object.values(GroqModel).map(model => (
-          <option key={model} value={model}>
-            {getModelInfo(model).name}
-          </option>
-        ))}
+        {Object.values(GroqModel).map(model => {
+          // Получаем информацию о модели, обрабатываем возможную ошибку
+          const modelInfo = getModelInfo(model);
+          return (
+            <option key={model} value={model}>
+              {modelInfo?.name || model} {/* Показываем имя или ID модели */}
+            </option>
+          );
+        })}
       </select>
     </div>
   );
