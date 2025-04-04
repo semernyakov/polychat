@@ -107,25 +107,18 @@
   width: 100%;
   height: 100%; /* Заполняет .groq-chat__messages-container */
   position: relative; /* Для индикатора загрузки и пустого состояния */
-  /* Отступы теперь внутри этого контейнера, а не в messages-container */
-  padding: calc(var(--spacing-unit) * 1.5);
+  padding: calc(var(--spacing-unit) * 1.5); /* Отступы внутри контейнера */
   overflow: hidden; /* Важно, чтобы react-window правильно работал */
 }
 
-/* Стили для самого компонента react-window List, если нужны */
+/* Стили для самого компонента react-window List */
 .groq-react-window-list {
   overflow-y: scroll !important; /* Убедимся, что прокрутка есть */
   scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
+  -webkit-overflow-scrolling: touch; /* Плавная прокрутка на iOS */
 }
-/* Убираем стандартную полосу прокрутки, если нужно кастомную (сложнее) */
-/*.groq-react-window-list::-webkit-scrollbar {
-  width: 6px;
-}
-.groq-react-window-list::-webkit-scrollbar-thumb {
-  background-color: var(--background-modifier-border);
-  border-radius: 3px;
-} */
+/* Можно добавить стили для кастомной полосы прокрутки, если стандартная не нравится */
+/* .groq-react-window-list::-webkit-scrollbar { ... } */
 
 
 /* --- Футер (поле ввода) --- */
@@ -139,31 +132,35 @@
 
 /* --- Сообщения --- */
 .groq-message {
-  margin-bottom: calc(var(--spacing-unit) * 1.5); /* Отступ между сообщениями */
+  /* Общий стиль сообщения */
+  margin-bottom: calc(var(--spacing-unit) * 2); /* !!! Увеличен отступ снизу для разделения !!! */
   border-radius: var(--border-radius);
   padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.5);
-  border: 1px solid transparent; /* Прозрачная рамка для единообразия */
-  word-wrap: break-word; /* Перенос длинных слов */
+  border: 1px solid transparent;
+  word-wrap: break-word;
   overflow-wrap: break-word;
+  max-width: 85%; /* Ограничиваем максимальную ширину сообщений */
 }
 
 .groq-message:last-child {
-  margin-bottom: 0; /* Убираем отступ у последнего сообщения */
+  margin-bottom: 0; /* Убираем отступ у последнего сообщения в списке */
 }
 
+/* Сообщение пользователя */
 .groq-message--user {
   background-color: var(--interactive-accent);
   color: var(--text-on-accent);
   border-color: var(--interactive-accent-hover);
-  /* Сдвигаем вправо (опционально) */
-  /* margin-left: 40px; */
+  margin-left: auto; /* !!! Выравнивание по правому краю !!! */
+  margin-right: 0; /* Убедимся, что правый отступ 0 */
 }
 
+/* Сообщение ассистента */
 .groq-message--assistant {
   background-color: var(--background-secondary);
   border-color: var(--background-modifier-border);
-   /* Сдвигаем влево (опционально) */
-  /* margin-right: 40px; */
+  margin-right: auto; /* !!! Выравнивание по левому краю !!! */
+  margin-left: 0; /* Убедимся, что левый отступ 0 */
 }
 
 .groq-message__header {
@@ -191,7 +188,9 @@
 }
 
 .groq-message__content {
-  /* Стили для контента внутри Markdown */
+  /* --- Разрешаем выделение текста --- */
+  user-select: text; /* Явно разрешаем выделение */
+  /* --- Стили для Markdown контента --- */
 }
 .groq-message__content p:first-child { margin-top: 0; }
 .groq-message__content p:last-child { margin-bottom: 0; }
@@ -219,50 +218,54 @@
     margin: 1em 0;
 }
 
-/* Инлайн-код */
+/* --- Стилизация КОДА --- */
+
+/* 1. Строчный код (inline code) - тег `code.groq-inline-code` */
 .groq-inline-code {
-    background-color: var(--background-modifier-border);
+    background-color: var(--background-modifier-hover); /* Слегка выделяющийся фон */
     color: var(--text-normal);
-    padding: 0.1em 0.4em;
+    padding: 0.15em 0.4em 0.1em; /* Небольшие вертикальные и горизонтальные отступы */
+    margin: 0 0.1em; /* Небольшой отступ от окружающего текста */
     border-radius: 4px;
-    font-family: var(--font-monospace);
-    font-size: 0.9em;
+    font-family: var(--font-monospace); /* Моноширинный шрифт */
+    font-size: 0.9em; /* Чуть меньше основного текста */
+    word-break: break-all; /* Разрывать длинные строки кода, если нужно */
 }
+/* Строчный код в сообщении пользователя */
 .groq-message--user .groq-inline-code {
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.2); /* Фон на акцентном */
     color: var(--text-on-accent);
 }
 
-
-/* --- Блоки кода --- */
+/* 2. Базовый контейнер для ВСЕХ блоков кода (с подсветкой и без) */
 .groq-code-container {
-  margin: var(--spacing-unit) 0;
+  margin: var(--spacing-unit) 0; /* Отступы сверху/снизу */
   border-radius: var(--border-radius);
-  overflow: hidden;
-  background-color: #1e1e1e; /* Цвет фона из темы vsDark prism */
+  overflow: hidden; /* Обрезает pre по границам */
+  background-color: #1e1e1e; /* Фон как в vsDark (Obsidian Dark) */
   border: 1px solid var(--background-modifier-border);
+  position: relative; /* Для кнопки копирования */
 }
-/* Для пользовательских сообщений фон кода может быть другим */
+/* Блок кода в сообщении пользователя */
 .groq-message--user .groq-code-container {
-   background-color: rgba(0, 0, 0, 0.2); /* Темнее на фоне акцента */
+   background-color: rgba(0, 0, 0, 0.2);
    border-color: rgba(255, 255, 255, 0.3);
 }
 
-
-.groq-code-header {
+/* Шапка для блока кода С ПОДСВЕТКОЙ (т.е. НЕ для no-highlight) */
+.groq-code-container:not(.groq-code-container--no-highlight) .groq-code-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: calc(var(--spacing-unit) * 0.5) var(--spacing-unit);
-  background-color: var(--background-modifier-border);
+  background-color: var(--background-modifier-border); /* Темная шапка */
   font-size: 0.85em;
+  color: var(--text-muted);
 }
-.groq-message--user .groq-code-header {
+.groq-message--user .groq-code-container:not(.groq-code-container--no-highlight) .groq-code-header {
    background-color: rgba(0, 0, 0, 0.3);
 }
-
-
-.groq-code-language {
+.groq-code-language { /* Язык в шапке */
   opacity: 0.8;
   text-transform: lowercase;
 }
@@ -270,20 +273,54 @@
     color: var(--text-on-accent);
     opacity: 0.8;
 }
+.groq-code-copy { /* Кнопка копирования в шапке */
+    color: var(--text-muted);
+}
+.groq-code-copy:hover {
+    color: var(--text-normal);
+    background-color: var(--background-modifier-hover);
+}
 
-/* Блок pre для подсветки */
-.groq-code-block {
-  margin: 0 !important; /* Переопределяем стили prism */
+/* Базовые стили для ВСЕХ блоков <pre> внутри контейнера */
+.groq-code-container pre.groq-code-block {
+  margin: 0 !important; /* Убираем внешние отступы */
+  /* Внутренние отступы для кода */
   padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.5) !important;
-  overflow-x: auto; /* Горизонтальная прокрутка для длинных строк */
-  font-family: var(--font-monospace);
-  font-size: 0.9em;
-  line-height: 1.4;
-  background: none !important; /* Убираем фон от prism, используем фон .groq-code-container */
+  overflow-x: auto; /* Горизонтальная прокрутка */
+  font-family: var(--font-monospace) !important; /* Явно задаем моноширинный шрифт */
+  font-size: 0.9em; /* Размер шрифта кода */
+  line-height: 1.5; /* Межстрочный интервал */
+  background: none !important; /* Фон задан на .groq-code-container */
+  color: #d4d4d4; /* Базовый цвет текста для темы vsDark */
+  white-space: pre; /* Сохраняем пробелы и переносы */
+  user-select: text; /* Разрешаем выделение кода */
+  /* Стили для скроллбара внутри блока кода (опционально) */
+  /* scrollbar-width: thin; */
+  /* scrollbar-color: var(--background-modifier-border) transparent; */
 }
-.groq-code-block span {
-    /* Стили для токенов, если нужны */
+
+/* Специфичные стили для блока БЕЗ ПОДСВЕТКИ Prism */
+.groq-code-container.groq-code-container--no-highlight pre.groq-code-block--no-highlight {
+    /* Наследует базовые стили .groq-code-block */
+    /* Отступ сверху может быть меньше, т.к. нет шапки */
+    padding-top: calc(var(--spacing-unit) * 0.75) !important;
+    padding-bottom: calc(var(--spacing-unit) * 0.75) !important;
 }
+.groq-code-container.groq-code-container--no-highlight pre.groq-code-block--no-highlight code {
+    /* Стили для тега code внутри блока без подсветки */
+    color: inherit; /* Наследовать цвет от pre (#d4d4d4) */
+    background: none; /* Убедимся, что нет фона */
+    padding: 0; /* Убираем padding от inline стилей, если есть */
+    font-family: inherit; /* Наследуем шрифт */
+    font-size: inherit; /* Наследуем размер */
+    display: block; /* Убедимся, что code занимает всю ширину pre */
+    white-space: inherit; /* Наследуем white-space от pre */
+}
+
+
+/* Специфичные стили для блока С ПОДСВЕТКОЙ Prism (если нужны) */
+/* Обычно стили токенов приходят из темы prismTheme (vsDark) */
+
 
 /* --- Общие стили кнопок --- */
 .groq-button,
@@ -303,6 +340,7 @@
   text-decoration: none; /* Для ссылок, стилизованных под кнопки */
   transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
   white-space: nowrap; /* Предотвращаем перенос текста */
+  user-select: none; /* Запрещаем выделение текста на кнопках */
 }
 
 .groq-button:hover,
@@ -331,6 +369,7 @@
 .groq-button--primary:disabled {
     background-color: var(--interactive-accent);
     border-color: var(--interactive-accent);
+    opacity: 0.5; /* Добавляем opacity и для primary disabled */
 }
 
 
@@ -373,11 +412,11 @@
     gap: var(--spacing-unit);
 }
 
-.groq-chat-input textarea {
+.groq-chat-input__textarea {
   flex-grow: 1; /* Занимает доступное пространство */
   width: 100%; /* Для случая, если flex-grow не сработает */
-  min-height: 44px;
-  max-height: 200px; /* Ограничение высоты */
+  min-height: 44px; /* Начальная высота примерно для 2 строк */
+  max-height: 200px; /* Ограничение высоты, после этого появится скролл */
   padding: calc(var(--spacing-unit) * 1) calc(var(--spacing-unit) * 1.5);
   border-radius: var(--border-radius);
   border: 1px solid var(--background-modifier-border);
@@ -387,10 +426,10 @@
   font-family: var(--font-family);
   font-size: var(--font-size);
   line-height: 1.4;
-  overflow-y: auto; /* Полоса прокрутки, если текст не влезает */
+  overflow-y: auto; /* Полоса прокрутки, если текст не влезает из-за max-height */
 }
 
-.groq-chat-input textarea:focus {
+.groq-chat-input__textarea:focus {
   outline: none;
   border-color: var(--interactive-accent);
   box-shadow: 0 0 0 1px var(--interactive-accent);
@@ -398,6 +437,8 @@
 
 .groq-chat-input__send-button {
     flex-shrink: 0; /* Не сжимается */
+    height: 44px; /* Фиксируем высоту кнопки под min-height textarea */
+    padding: 0 calc(var(--spacing-unit) * 1.5); /* Горизонтальный падинг для кнопки */
     /* Стилизуем кнопку отправки как основную */
     /* Применяются стили .groq-button и .groq-button--primary через классы в компоненте */
 }
@@ -430,6 +471,10 @@
 .groq-message-input__counter {
   /* Стили счетчика символов */
 }
+.groq-message-input__counter[style*="--text-error"] { /* Стиль для превышения лимита */
+    font-weight: bold;
+}
+
 
 /* --- Выбор модели --- */
 .groq-model-selector {
@@ -452,29 +497,37 @@
   color: var(--text-normal);
   font-size: 0.9em; /* Чуть меньше основного */
   cursor: pointer;
+  min-width: 120px; /* Минимальная ширина для селекта */
 }
 .groq-select:hover {
     border-color: var(--text-muted);
 }
+.groq-select:focus {
+    outline: none;
+    border-color: var(--interactive-accent);
+    box-shadow: 0 0 0 1px var(--interactive-accent);
+}
 
 /* --- Индикаторы загрузки --- */
-.groq-loading-indicator {
+.groq-loading-indicator { /* Индикатор загрузки ответа */
   position: absolute; /* Позиционирование относительно .groq-chat__messages */
   bottom: 10px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: var(--background-secondary-alt);
+  background-color: rgba(42, 42, 42, 0.8); /* Полупрозрачный фон */
+  backdrop-filter: blur(2px); /* Размытие фона (если поддерживается) */
   color: var(--text-muted);
   padding: calc(var(--spacing-unit)*0.5) var(--spacing-unit);
   border-radius: var(--border-radius);
-  z-index: 20;
+  z-index: 20; /* Поверх списка */
   display: flex;
   align-items: center;
   gap: var(--spacing-unit);
   font-size: 0.9em;
+  pointer-events: none; /* Не мешает кликам по списку */
 }
 
-.groq-chat__loading-history {
+.groq-chat__loading-history { /* Индикатор загрузки истории */
     position: absolute;
     top: 50%;
     left: 50%;
@@ -485,6 +538,7 @@
     gap: var(--spacing-unit);
     color: var(--text-muted);
     z-index: 15;
+    pointer-events: none;
 }
 
 
@@ -509,6 +563,7 @@
   transform: translate(-50%, -50%);
   color: var(--text-muted);
   text-align: center;
+  pointer-events: none;
 }
 
 .groq-api-key-warning {
@@ -573,6 +628,7 @@
 .groq-dialog-content {
   padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 2);
   flex-grow: 1; /* Занимает доступное пространство */
+  user-select: text; /* Разрешаем выделение текста в диалоге */
 }
 .groq-dialog-content p {
     margin-bottom: var(--spacing-unit);
@@ -630,5 +686,8 @@
   }
    .groq-chat__input-container {
        padding: var(--spacing-unit);
+   }
+   .groq-message {
+       max-width: 95%; /* Чуть шире на мобильных */
    }
 }

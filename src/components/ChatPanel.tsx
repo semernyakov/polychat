@@ -2,9 +2,9 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { GroqPluginInterface } from '../types/plugin';
 import { Message } from '../types/message';
 import { GroqModel } from '../types/models';
-import { MessageList, MessageListHandles } from './MessageList'; // Импортируем MessageListHandles
+import { MessageList, MessageListHandles } from './MessageList';
 import { ModelSelector } from './ModelSelector';
-import { MessageInput } from './MessageInput';
+import { MessageInput } from './MessageInput'; // Убедитесь, что импорт правильный
 import { SupportDialog } from './SupportDialog';
 import { FiTrash2, FiChevronUp, FiChevronDown, FiHeart, FiSidebar, FiSquare } from 'react-icons/fi';
 import '../styles.css'; // Используем единый style.css
@@ -34,16 +34,13 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
     const loadData = async () => {
       if (initialMessages.length > 0) {
         setMessages(initialMessages);
-        // Прокрутка вниз теперь обрабатывается внутри MessageList
       } else {
         try {
           setIsLoading(true); // Показываем загрузку во время получения истории
           const history = await plugin.historyService.getHistory();
           setMessages(history);
-          // Прокрутка вниз теперь обрабатывается внутри MessageList
         } catch (error) {
           console.error('Ошибка загрузки истории:', error);
-          // Можно добавить уведомление для пользователя
         } finally {
           setIsLoading(false);
         }
@@ -51,8 +48,6 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
     };
     loadData();
   }, [plugin.historyService, initialMessages]); // Зависимость от historyService
-
-  // Удален useEffect для window.resize, так как AutoSizer справится с этим
 
   // Функции прокрутки теперь вызывают методы MessageList через ref
   const handleScrollToTop = useCallback(() => {
@@ -64,41 +59,50 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
   }, []);
 
   const handleSendMessage = useCallback(async () => {
-    if (!inputValue.trim() || isLoading) return;
+    const trimmedValue = inputValue.trim(); // Используем обрезанное значение
+    if (!trimmedValue || isLoading) return;
 
     const userMessage: Message = {
-      id: `user-${Date.now()}`, // Более уникальный ID
+      id: `user-${Date.now()}`,
       role: 'user',
-      content: inputValue,
+      content: trimmedValue, // Отправляем обрезанное значение
       timestamp: Date.now(),
     };
 
-    const currentMessages = [...messages, userMessage];
-    setMessages(currentMessages);
-    setInputValue('');
+    // Оптимистичное обновление UI
+    setMessages(prev => [...prev, userMessage]);
+    setInputValue(''); // Очищаем поле ввода *сразу*
     setIsLoading(true);
 
     try {
-      await plugin.historyService.addMessage(userMessage);
-      const response = await plugin.groqService.sendMessage(userMessage.content, selectedModel); // Передаем только контент
+      // Сохраняем сообщение пользователя в историю асинхронно
+       plugin.historyService.addMessage(userMessage).catch(err => console.error("Ошибка сохранения user message:", err));
+
+      // Отправляем запрос к API
+      const response = await plugin.groqService.sendMessage(trimmedValue, selectedModel);
+
       // Добавляем ответ ассистента после получения
       setMessages(prev => [...prev, response]);
-      await plugin.historyService.addMessage(response);
-      // Прокрутка вниз обрабатывается автоматически в MessageList useEffect
+      // Сохраняем ответ ассистента в историю асинхронно
+      plugin.historyService.addMessage(response).catch(err => console.error("Ошибка сохранения assistant message:", err));
+
     } catch (error) {
       console.error('Ошибка отправки сообщения:', error);
-      // Возможно, стоит добавить сообщение об ошибке в чат
+      const errorMessageContent = `Произошла ошибка при отправке сообщения: ${error instanceof Error ? error.message : String(error)}`;
       const errorMessage: Message = {
          id: `error-${Date.now()}`,
-         role: 'assistant',
-         content: `Произошла ошибка при отправке сообщения: ${error instanceof Error ? error.message : String(error)}`,
+         role: 'assistant', // Отображаем как сообщение ассистента
+         content: errorMessageContent,
          timestamp: Date.now(),
-      }
-      setMessages(prev => [...prev, errorMessage]);
+      };
+       // Добавляем сообщение об ошибке в UI
+       setMessages(prev => [...prev, errorMessage]);
+       // Не сохраняем системные ошибки в историю (или можно сохранять, по желанию)
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Снимаем флаг загрузки в любом случае
     }
-  }, [inputValue, isLoading, plugin.historyService, plugin.groqService, selectedModel, messages]); // Добавили messages в зависимости
+    // Прокрутка вниз будет обработана в MessageList useEffect после обновления messages
+  }, [inputValue, isLoading, plugin.historyService, plugin.groqService, selectedModel]); // Зависимости для useCallback
 
   const handleClearHistory = async () => {
     try {
@@ -141,7 +145,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
         <div className="groq-chat__header-right">
           <button
             onClick={toggleDisplayMode}
-            className="groq-icon-button groq-display-mode-button" // Используем общий класс для иконок-кнопок
+            className="groq-icon-button groq-display-mode-button"
             title={displayMode === 'tab' ? 'Показать в боковой панели' : 'Показать во вкладке'}
           >
             {displayMode === 'tab' ? <FiSidebar size={16} /> : <FiSquare size={16} />}
@@ -154,7 +158,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
             <FiHeart size={16} />
           </button>
           <button
-            onClick={handleScrollToTop} // Исправленный обработчик
+            onClick={handleScrollToTop}
             className="groq-icon-button groq-scroll-button"
             title="К началу диалога"
             disabled={messages.length === 0}
@@ -162,7 +166,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
             <FiChevronUp size={16} />
           </button>
           <button
-            onClick={handleScrollToBottom} // Исправленный обработчик
+            onClick={handleScrollToBottom}
             className="groq-icon-button groq-scroll-button"
             title="К концу диалога"
             disabled={messages.length === 0}
@@ -187,9 +191,9 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
           <MessageList
             ref={messageListRef} // Передаем ref
             messages={messages}
-            isLoading={isLoading && messages.length > 0} // Показываем спиннер только если есть сообщения
+            isLoading={isLoading && messages.length > 0} // Показываем спиннер ответа только если есть сообщения
           />
-           {/* Индикатор загрузки истории */}
+           {/* Индикатор загрузки истории (если isLoading и нет сообщений) */}
            {isLoading && messages.length === 0 && (
              <div className="groq-chat__loading-history">
                 <div className="groq-spinner"></div>
@@ -199,12 +203,13 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
         </div>
 
         <div className="groq-chat__input-container">
+          {/* Передаем все необходимые пропсы в MessageInput */}
           <MessageInput
             value={inputValue}
             onChange={setInputValue}
-            onSend={handleSendMessage}
+            onSend={handleSendMessage} // Передаем нашу функцию отправки
             disabled={isLoading}
-            maxLength={1200} // Уточните максимальную длину, если она есть у API
+            maxLength={8000} // Примерный лимит, уточните у Groq API для выбранной модели
           />
         </div>
       </div>
