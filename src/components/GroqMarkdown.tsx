@@ -1,3 +1,4 @@
+// GroqMarkdown.tsx
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -15,18 +16,31 @@ type CodeProps = {
 
 const CodeBlock = React.memo(({ language, code }: { language: string; code: string }) => {
   const [isCopied, setIsCopied] = React.useState(false);
+  const [copyError, setCopyError] = React.useState(false);
+  const timeoutId = React.useRef<NodeJS.Timeout>();
 
   const handleCopy = () => {
+    setCopyError(false);
     navigator.clipboard
       .writeText(code)
       .then(() => {
         setIsCopied(true);
-        setTimeout(() => setIsCopied(false), 1500);
+        timeoutId.current = setTimeout(() => setIsCopied(false), 1500);
       })
-      .catch(err => {
+      .catch((err) => {
         console.error('Ошибка копирования кода:', err);
+        setCopyError(true);
+        timeoutId.current = setTimeout(() => setCopyError(false), 1500);
       });
   };
+
+  React.useEffect(() => {
+    return () => {
+      if (timeoutId.current) {
+        clearTimeout(timeoutId.current);
+      }
+    };
+  }, []);
 
   return (
     <div className="groq-code-container">
@@ -38,10 +52,23 @@ const CodeBlock = React.memo(({ language, code }: { language: string; code: stri
           aria-label="Копировать код"
           title="Копировать код"
         >
-          {isCopied ? <FiCheck size={14} /> : <FiCopy size={14} />}
+          {copyError ? (
+            <span style={{ color: 'red' }}>!</span>
+          ) : isCopied ? (
+            <FiCheck size={14} color="#4CAF50" />
+          ) : (
+            <FiCopy size={14} />
+          )}
         </button>
       </div>
-      <Highlight code={code} language={language || 'plaintext'} theme={prismTheme}>
+      <Highlight
+        code={code}
+        language={language || 'plaintext'}
+        theme={prismTheme}
+        // customProps={{
+        //   // Add custom props if needed
+        // }}
+      >
         {({ className, style, tokens, getLineProps, getTokenProps }) => (
           <pre className={`groq-code-block ${className}`} style={style}>
             {tokens.map((line, i) => (
@@ -59,7 +86,7 @@ const CodeBlock = React.memo(({ language, code }: { language: string; code: stri
 });
 
 const CodeRenderer: React.FC<CodeProps> = ({ inline, className = '', children }) => {
-  const match = /language-(\w+)/.exec(className || '');
+  const match = /language-(\w+)/.exec(className);
   const code = String(children).replace(/\n$/, '');
 
   if (!inline && match) {
@@ -84,8 +111,23 @@ export const GroqMarkdown: React.FC<{ content: string }> = ({ content }) => {
       remarkPlugins={[remarkGfm]}
       components={{
         code: CodeRenderer,
-        p({ children }) {
-          return <p>{children}</p>;
+        p({ node, children }) {
+          const hasBlockElement = node?.children?.some(
+            (child: any) =>
+              child.type === 'element' &&
+              ['div', 'pre', 'ul', 'ol', 'table'].includes(child.tagName?.toLowerCase())
+          );
+          return hasBlockElement ? (
+            <>
+              {React.Children.toArray(children)
+                .filter(Boolean)
+                .map((child, index) => (
+                  <React.Fragment key={index}>{child}</React.Fragment>
+                ))}
+            </>
+          ) : (
+            <p>{children}</p>
+          );
         },
       }}
     >

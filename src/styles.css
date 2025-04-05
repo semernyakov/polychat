@@ -241,10 +241,24 @@
   padding: 0.15em 0.4em 0.1em; /* Небольшие вертикальные и горизонтальные отступы */
   margin: 0 0.1em; /* Небольшой отступ от окружающего текста */
   border-radius: 4px;
-  font-family: var(--font-monospace); /* Моноширинный шрифт */
   font-size: 0.9em; /* Чуть меньше основного текста */
-  word-break: break-all; /* Разрывать длинные строки кода, если нужно */
+  /*word-break: break-all; !* Разрывать длинные строки кода, если нужно *!*/
+	display: inline;
+  white-space: pre-wrap; /* Перенос длинных строк */
+
 }
+
+.groq-code-container pre.groq-code-block {
+  white-space: pre-wrap; /* Перенос строк */
+  word-break: break-word; /* Разрыв длинных слов */
+  max-width: 100%; /* Запрет растягивания */
+}
+
+/* Убрать margin у параграфов внутри сообщений */
+.groq-message__content p {
+  margin: 0.5em 0;
+}
+
 /* Строчный код в сообщении пользователя */
 .groq-message--user .groq-inline-code {
   background-color: rgba(255, 255, 255, 0.2); /* Фон на акцентном */

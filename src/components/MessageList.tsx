@@ -64,7 +64,7 @@ export const MessageList = React.memo(
 
       return (
         <div key={`message-${id}`} style={{ ...style, paddingBottom: 12 }}>
-          <div ref={el => measureRow(el, index, id)}>
+          <div ref={(el) => measureRow(el, index, id)}>
             <MessageItem message={message} key={`item-${id}`} />
           </div>
         </div>
@@ -85,8 +85,8 @@ export const MessageList = React.memo(
       const estimate = () => {
         const content = message.content || '';
         const baseSize = 65;
-        const charsPerLine = 60;
-        const lineHeight = 20;
+        const charsPerLine = 60; // Уточните по CSS
+        const lineHeight = 20; // Уточните по CSS
         const numLines = Math.ceil(content.length / charsPerLine);
         const codeBlockBonus = content.includes('```') ? 80 : 0;
         const calculatedHeight = baseSize + numLines * lineHeight + codeBlockBonus;
@@ -120,9 +120,8 @@ export const MessageList = React.memo(
                   itemCount={messages.length}
                   itemSize={getItemSize}
                   estimatedItemSize={120}
-                  itemKey={index => messages[index].id || `msg-${index}`}
+                  itemKey={(index) => messages[index].id || `msg-${index}`}
                   className="groq-react-window-list"
-                  key="virtualized-list"
                 >
                   {Row}
                 </List>
@@ -130,11 +129,11 @@ export const MessageList = React.memo(
             }}
           </AutoSizer>
         ) : (
-          !isLoading && <div className="groq-chat__empty" key="empty-message">Нет сообщений для отображения</div>
+          !isLoading && <div className="groq-chat__empty">Нет сообщений для отображения</div>
         )}
 
         {isLoading && (
-          <div className="groq-loading-indicator" key="loading-indicator">
+          <div className="groq-loading-indicator">
             <div className="groq-spinner"></div>
             <span>Генерация ответа...</span>
           </div>
