@@ -88,7 +88,12 @@ const config = {
   treeShaking: true,
   logLevel: 'info',
   plugins: [postCssPlugin, copyFilesPlugin],
-  loader: { '.css': 'css' },
+	loader: {
+    '.css': 'css',
+    '.woff2': 'file', // для обработки .woff2
+    '.woff': 'file',  // добавлено для обработки .woff
+    '.ttf': 'file',   // для обработки .ttf
+  },
 };
 
 (async () => {

@@ -21,10 +21,14 @@ export const MessageItem: React.FC<{ message: Message }> = React.memo(({ message
     }
   };
 
+  const props = {
+    className: `groq-message groq-message--${message.role}`,
+  };
+
   return (
-    <div className={`groq-message groq-message--${message.role}`}>
+    <div key={message.id} {...props}>
       <div className="groq-message__header">
-         <div className="groq-message__meta">
+        <div className="groq-message__meta">
           <span className="groq-message__role">
             {message.role === 'user' ? 'Вы' : 'Ассистент'}
           </span>
