@@ -83,7 +83,8 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
 
       // Добавляем ответ ассистента после получения
       setMessages(prev => [...prev, response]);
-      // Сохраняем ответ ассистента в историю асинхронно
+
+			// Сохраняем ответ ассистента в историю асинхронно
       plugin.historyService.addMessage(response).catch(err => console.error("Ошибка сохранения assistant message:", err));
 
     } catch (error) {
