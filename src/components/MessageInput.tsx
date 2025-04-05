@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FiSend } from 'react-icons/fi';
-import '../styles.css'; // Используем единый style.css
+import '../styles.css'; // Используем единый стиль
 
 interface MessageInputProps {
   value: string;
   onChange: (value: string) => void;
   onSend: () => void;
+  onKeyDown?: (e: React.KeyboardEvent) => void;
   disabled?: boolean;
   maxLength?: number;
 }
@@ -14,6 +15,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   value,
   onChange,
   onSend,
+  onKeyDown,
   disabled = false,
   maxLength,
 }) => {
@@ -24,34 +26,33 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   useEffect(() => {
     const textarea = textareaRef.current;
     if (textarea) {
-      textarea.style.height = 'auto'; // Сброс высоты для правильного расчета scrollHeight
-      const scrollHeight = textarea.scrollHeight;
-      textarea.style.height = `${scrollHeight}px`;
+      textarea.style.height = 'auto'; // Сброс высоты
+      textarea.style.height = `${textarea.scrollHeight}px`; // Установка новой
     }
   }, [value]);
 
-  // Обработчик нажатия клавиш для Ctrl+Enter
+  // Обработчик клавиш
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    // console.log('KeyDown Event:', event.key, 'Ctrl:', event.ctrlKey, 'Meta:', event.metaKey, 'Composing:', isComposing); // DEBUG
+    if (isComposing) return;
 
-    // Не отправляем, если идет ввод с помощью IME
-    if (isComposing) {
-        // console.log('KeyDown prevented: IME composition'); // DEBUG
-        return;
+    // Shift+Enter = перенос строки (по умолчанию)
+    if (event.key === 'Enter' && event.shiftKey) {
+      return;
     }
 
-    // Проверяем Ctrl+Enter (или Cmd+Enter для Mac)
+    // Ctrl+Enter или Cmd+Enter = отправка
     if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
-      // console.log('KeyDown detected: Ctrl+Enter'); // DEBUG
-      event.preventDefault(); // Предотвращаем вставку новой строки
+      event.preventDefault();
 
       const trimmedValue = value.trim();
-      if (!disabled && trimmedValue) { // Отправляем только если не отключено и есть текст
-        // console.log('KeyDown calling onSend()'); // DEBUG
+      if (!disabled && trimmedValue) {
         onSend();
-      } else {
-        // console.log('KeyDown prevented: Disabled or empty value'); // DEBUG
       }
+    }
+
+    // Дополнительно вызываем внешний обработчик
+    if (onKeyDown) {
+      onKeyDown(event);
     }
   };
 
@@ -72,15 +73,9 @@ export const MessageInput: React.FC<MessageInputProps> = ({
           ref={textareaRef}
           value={value}
           onChange={e => onChange(e.target.value)}
-          onKeyDown={handleKeyDown} // Привязываем обработчик
-          onCompositionStart={() => {
-            // console.log('Composition Start'); // DEBUG
-            setIsComposing(true);
-          }}
-          onCompositionEnd={() => {
-            // console.log('Composition End'); // DEBUG
-            setIsComposing(false);
-          }}
+          onKeyDown={handleKeyDown}
+          onCompositionStart={() => setIsComposing(true)}
+          onCompositionEnd={() => setIsComposing(false)}
           placeholder="Введите сообщение..."
           disabled={disabled}
           rows={1}
@@ -100,7 +95,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
       </div>
       <div className="groq-chat-input__footer">
         <span className="groq-message-input__hint">
-          <kbd>Ctrl</kbd>+<kbd>Enter</kbd> для отправки
+          <kbd>Ctrl</kbd>+<kbd>Enter</kbd> — отправить, <kbd>Shift</kbd>+<kbd>Enter</kbd> — новая строка
         </span>
         {maxLength && (
           <span

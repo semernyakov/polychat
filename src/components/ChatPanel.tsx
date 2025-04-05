@@ -4,10 +4,12 @@ import { Message } from '../types/message';
 import { GroqModel } from '../types/models';
 import { MessageList, MessageListHandles } from './MessageList';
 import { ModelSelector } from './ModelSelector';
-import { MessageInput } from './MessageInput'; // Убедитесь, что импорт правильный
+import { MessageInput } from './MessageInput';
 import { SupportDialog } from './SupportDialog';
 import { FiTrash2, FiChevronUp, FiChevronDown, FiHeart, FiSidebar, FiSquare } from 'react-icons/fi';
-import '../styles.css'; // Используем единый style.css
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import '../styles.css';
 
 interface ChatPanelProps {
   plugin: GroqPluginInterface;
@@ -27,16 +29,31 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [selectedModel, setSelectedModel] = useState<GroqModel>(plugin.settings.model);
   const [isSupportOpen, setIsSupportOpen] = useState(false);
-  const messageListRef = useRef<MessageListHandles>(null); // Ref для управления MessageList
+  const messageListRef = useRef<MessageListHandles>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  // Загрузка истории при монтировании или изменении initialMessages
+  useEffect(() => {
+    const handleResize = () => {
+      messageListRef.current?.forceUpdate();
+    };
+
+    const resizeObserver = new ResizeObserver(handleResize);
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
+
   useEffect(() => {
     const loadData = async () => {
       if (initialMessages.length > 0) {
         setMessages(initialMessages);
       } else {
         try {
-          setIsLoading(true); // Показываем загрузку во время получения истории
+          setIsLoading(true);
           const history = await plugin.historyService.getHistory();
           setMessages(history);
         } catch (error) {
@@ -47,9 +64,8 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
       }
     };
     loadData();
-  }, [plugin.historyService, initialMessages]); // Зависимость от historyService
+  }, [plugin.historyService, initialMessages]);
 
-  // Функции прокрутки теперь вызывают методы MessageList через ref
   const handleScrollToTop = useCallback(() => {
     messageListRef.current?.scrollToTop();
   }, []);
@@ -59,51 +75,36 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
   }, []);
 
   const handleSendMessage = useCallback(async () => {
-    const trimmedValue = inputValue.trim(); // Используем обрезанное значение
+    const trimmedValue = inputValue.trim();
     if (!trimmedValue || isLoading) return;
 
     const userMessage: Message = {
       id: `user-${Date.now()}`,
       role: 'user',
-      content: trimmedValue, // Отправляем обрезанное значение
+      content: trimmedValue,
       timestamp: Date.now(),
     };
 
-    // Оптимистичное обновление UI
     setMessages(prev => [...prev, userMessage]);
-    setInputValue(''); // Очищаем поле ввода *сразу*
+    setInputValue('');
     setIsLoading(true);
 
     try {
-      // Сохраняем сообщение пользователя в историю асинхронно
-       plugin.historyService.addMessage(userMessage).catch(err => console.error("Ошибка сохранения user message:", err));
+      plugin.historyService.addMessage(userMessage).catch(err => console.error("Ошибка сохранения user message:", err));
 
-      // Отправляем запрос к API
-      const response = await plugin.groqService.sendMessage(trimmedValue, selectedModel);
+      const assistantMessage = await plugin.groqService.sendMessage(trimmedValue, selectedModel);
 
-      // Добавляем ответ ассистента после получения
-      setMessages(prev => [...prev, response]);
+      setMessages(prev => [...prev, assistantMessage]);
 
-			// Сохраняем ответ ассистента в историю асинхронно
-      plugin.historyService.addMessage(response).catch(err => console.error("Ошибка сохранения assistant message:", err));
+      plugin.historyService.addMessage(assistantMessage).catch(err => console.error("Ошибка сохранения assistant message:", err));
 
     } catch (error) {
       console.error('Ошибка отправки сообщения:', error);
-      const errorMessageContent = `Произошла ошибка при отправке сообщения: ${error instanceof Error ? error.message : String(error)}`;
-      const errorMessage: Message = {
-         id: `error-${Date.now()}`,
-         role: 'assistant', // Отображаем как сообщение ассистента
-         content: errorMessageContent,
-         timestamp: Date.now(),
-      };
-       // Добавляем сообщение об ошибке в UI
-       setMessages(prev => [...prev, errorMessage]);
-       // Не сохраняем системные ошибки в историю (или можно сохранять, по желанию)
+      toast.error(`Произошла ошибка при отправке сообщения: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
-      setIsLoading(false); // Снимаем флаг загрузки в любом случае
+      setIsLoading(false);
     }
-    // Прокрутка вниз будет обработана в MessageList useEffect после обновления messages
-  }, [inputValue, isLoading, plugin.historyService, plugin.groqService, selectedModel]); // Зависимости для useCallback
+  }, [inputValue, isLoading, plugin.historyService, plugin.groqService, selectedModel]);
 
   const handleClearHistory = async () => {
     try {
@@ -125,6 +126,15 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
     onDisplayModeChange(newMode);
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && e.ctrlKey) {
+      e.preventDefault();
+      handleSendMessage();
+    } else if (e.key === 'Enter' && e.shiftKey) {
+      return;
+    }
+  };
+
   if (!plugin.settings.apiKey) {
     return (
       <div className="groq-api-key-warning">
@@ -134,8 +144,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
   }
 
   return (
-    // Класс groq-container обеспечивает базовую структуру flex
-    <div className={`groq-container groq-chat groq-chat--${displayMode}`}>
+    <div className={`groq-container groq-chat groq-chat--${displayMode}`} ref={containerRef}>
       <div className="groq-chat__header">
         <div className="groq-chat__header-left">
           <ModelSelector
@@ -144,73 +153,47 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
           />
         </div>
         <div className="groq-chat__header-right">
-          <button
-            onClick={toggleDisplayMode}
-            className="groq-icon-button groq-display-mode-button"
-            title={displayMode === 'tab' ? 'Показать в боковой панели' : 'Показать во вкладке'}
-          >
+          <button onClick={toggleDisplayMode} className="groq-icon-button groq-display-mode-button" title={displayMode === 'tab' ? 'Показать в боковой панели' : 'Показать во вкладке'}>
             {displayMode === 'tab' ? <FiSidebar size={16} /> : <FiSquare size={16} />}
           </button>
-          <button
-            onClick={() => setIsSupportOpen(true)}
-            className="groq-icon-button groq-support-header-button"
-            title="Поддержать разработчика"
-          >
+          <button onClick={() => setIsSupportOpen(true)} className="groq-icon-button groq-support-header-button" title="Поддержать разработчика">
             <FiHeart size={16} />
           </button>
-          <button
-            onClick={handleScrollToTop}
-            className="groq-icon-button groq-scroll-button"
-            title="К началу диалога"
-            disabled={messages.length === 0}
-          >
+          <button onClick={handleScrollToTop} className="groq-icon-button groq-scroll-button" title="К началу диалога" disabled={messages.length === 0}>
             <FiChevronUp size={16} />
           </button>
-          <button
-            onClick={handleScrollToBottom}
-            className="groq-icon-button groq-scroll-button"
-            title="К концу диалога"
-            disabled={messages.length === 0}
-          >
+          <button onClick={handleScrollToBottom} className="groq-icon-button groq-scroll-button" title="К концу диалога" disabled={messages.length === 0}>
             <FiChevronDown size={16} />
           </button>
-          <button
-            onClick={handleClearHistory}
-            className="groq-icon-button groq-clear-button"
-            title="Очистить историю"
-            disabled={messages.length === 0 || isLoading}
-          >
+          <button onClick={handleClearHistory} className="groq-icon-button groq-clear-button" title="Очистить историю" disabled={messages.length === 0 || isLoading}>
             <FiTrash2 size={16} />
           </button>
         </div>
       </div>
 
-      {/* groq-chat__content теперь основной гибкий контейнер */}
       <div className="groq-chat__content">
-        {/* groq-chat__messages-container - контейнер для AutoSizer */}
         <div className="groq-chat__messages-container">
           <MessageList
-            ref={messageListRef} // Передаем ref
+            ref={messageListRef}
             messages={messages}
-            isLoading={isLoading && messages.length > 0} // Показываем спиннер ответа только если есть сообщения
+            isLoading={isLoading && messages.length > 0}
           />
-           {/* Индикатор загрузки истории (если isLoading и нет сообщений) */}
-           {isLoading && messages.length === 0 && (
-             <div className="groq-chat__loading-history">
-                <div className="groq-spinner"></div>
-                <span>Загрузка истории...</span>
-             </div>
-           )}
+          {isLoading && messages.length === 0 && (
+            <div className="groq-chat__loading-history">
+              <div className="groq-spinner"></div>
+              <span>Загрузка истории...</span>
+            </div>
+          )}
         </div>
 
         <div className="groq-chat__input-container">
-          {/* Передаем все необходимые пропсы в MessageInput */}
           <MessageInput
             value={inputValue}
             onChange={setInputValue}
-            onSend={handleSendMessage} // Передаем нашу функцию отправки
+            onSend={handleSendMessage}
+            onKeyDown={handleKeyDown}
             disabled={isLoading}
-            maxLength={8000} // Примерный лимит, уточните у Groq API для выбранной модели
+            maxLength={8000}
           />
         </div>
       </div>
@@ -219,6 +202,8 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
         isOpen={isSupportOpen}
         onClose={() => setIsSupportOpen(false)}
       />
+
+      <ToastContainer />
     </div>
   );
 };
