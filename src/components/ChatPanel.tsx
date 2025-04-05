@@ -1,6 +1,8 @@
+// ChatPanel.tsx
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { GroqPluginInterface } from '../types/plugin';
-import { Message } from '../types/message';
+import { Message } from '../types/types';
+import { MessageUtils } from '../utils/messageUtils';
 import { GroqModel } from '../types/models';
 import { MessageList, MessageListHandles } from './MessageList';
 import { ModelSelector } from './ModelSelector';
@@ -22,49 +24,61 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
   plugin,
   displayMode,
   initialMessages = [],
-  onDisplayModeChange
+  onDisplayModeChange,
 }) => {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isHistoryLoading, setIsHistoryLoading] = useState(false);
+  const [hasLoadedHistory, setHasLoadedHistory] = useState(false);
   const [selectedModel, setSelectedModel] = useState<GroqModel>(plugin.settings.model);
   const [isSupportOpen, setIsSupportOpen] = useState(false);
   const messageListRef = useRef<MessageListHandles>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // ResizeObserver
   useEffect(() => {
     const handleResize = () => {
       messageListRef.current?.forceUpdate();
     };
-
     const resizeObserver = new ResizeObserver(handleResize);
-    if (containerRef.current) {
-      resizeObserver.observe(containerRef.current);
+    const currentContainer = containerRef.current;
+    if (currentContainer) {
+      resizeObserver.observe(currentContainer);
     }
-
     return () => {
+      if (currentContainer) {
+        resizeObserver.unobserve(currentContainer);
+      }
       resizeObserver.disconnect();
     };
   }, []);
 
   useEffect(() => {
-    const loadData = async () => {
-      if (initialMessages.length > 0) {
+    if (initialMessages.length > 0) {
+      if (JSON.stringify(messages) !== JSON.stringify(initialMessages)) {
         setMessages(initialMessages);
-      } else {
+      }
+      setHasLoadedHistory(true);
+      setIsHistoryLoading(false);
+    } else if (!hasLoadedHistory) {
+      const loadHistory = async () => {
+        setIsHistoryLoading(true);
         try {
-          setIsLoading(true);
           const history = await plugin.historyService.getHistory();
           setMessages(history);
+          setHasLoadedHistory(true);
         } catch (error) {
           console.error('Ошибка загрузки истории:', error);
+          toast.error('Не удалось загрузить историю сообщений.');
+          setHasLoadedHistory(true);
         } finally {
-          setIsLoading(false);
+          setIsHistoryLoading(false);
         }
-      }
-    };
-    loadData();
-  }, [plugin.historyService, initialMessages]);
+      };
+      loadHistory();
+    }
+  }, [plugin.historyService, hasLoadedHistory, initialMessages]);
 
   const handleScrollToTop = useCallback(() => {
     messageListRef.current?.scrollToTop();
@@ -78,40 +92,44 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
     const trimmedValue = inputValue.trim();
     if (!trimmedValue || isLoading) return;
 
-    const userMessage: Message = {
-      id: `user-${Date.now()}`,
-      role: 'user',
-      content: trimmedValue,
-      timestamp: Date.now(),
-    };
-
-    setMessages(prev => [...prev, userMessage]);
+    const userMessage: Message = MessageUtils.create('user', trimmedValue);
     setInputValue('');
     setIsLoading(true);
 
     try {
-      plugin.historyService.addMessage(userMessage).catch(err => console.error("Ошибка сохранения user message:", err));
+      await plugin.historyService.addMessage(userMessage).catch((err) => {
+        console.error('Ошибка сохранения user message:', err);
+        toast.warn('Не удалось сохранить ваше сообщение в истории.');
+      });
 
       const assistantMessage = await plugin.groqService.sendMessage(trimmedValue, selectedModel);
 
-      setMessages(prev => [...prev, assistantMessage]);
+      setMessages((prev) => [...prev, userMessage, assistantMessage]);
 
-      plugin.historyService.addMessage(assistantMessage).catch(err => console.error("Ошибка сохранения assistant message:", err));
-
+      await plugin.historyService.addMessage(assistantMessage).catch((err) => {
+        console.error('Ошибка сохранения assistant message:', err);
+        toast.warn('Не удалось сохранить ответ ассистента в истории.');
+      });
     } catch (error) {
       console.error('Ошибка отправки сообщения:', error);
-      toast.error(`Произошла ошибка при отправке сообщения: ${error instanceof Error ? error.message : String(error)}`);
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      toast.error(`Ошибка: ${errorMsg}`);
+      const errorMessage = MessageUtils.create('assistant', `Произошла ошибка: ${errorMsg}`);
+      setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }
-  }, [inputValue, isLoading, plugin.historyService, plugin.groqService, selectedModel]);
+  }, [inputValue, isLoading, plugin, selectedModel]);
 
   const handleClearHistory = async () => {
     try {
       await plugin.historyService.clearHistory();
       setMessages([]);
+      setHasLoadedHistory(true);
+      toast.success('История очищена');
     } catch (error) {
       console.error('Ошибка очистки истории:', error);
+      toast.error('Не удалось очистить историю.');
     }
   };
 
@@ -126,46 +144,53 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
     onDisplayModeChange(newMode);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && e.ctrlKey) {
-      e.preventDefault();
-      handleSendMessage();
-    } else if (e.key === 'Enter' && e.shiftKey) {
-      return;
-    }
-  };
-
   if (!plugin.settings.apiKey) {
-    return (
-      <div className="groq-api-key-warning">
-        ⚠️ Пожалуйста, установите API ключ Groq в настройках плагина.
-      </div>
-    );
+    return <div className="groq-api-key-warning">...</div>;
   }
 
   return (
     <div className={`groq-container groq-chat groq-chat--${displayMode}`} ref={containerRef}>
       <div className="groq-chat__header">
         <div className="groq-chat__header-left">
-          <ModelSelector
-            selectedModel={selectedModel}
-            onSelectModel={handleModelChange}
-          />
+          <ModelSelector selectedModel={selectedModel} onSelectModel={handleModelChange} />
         </div>
         <div className="groq-chat__header-right">
-          <button onClick={toggleDisplayMode} className="groq-icon-button groq-display-mode-button" title={displayMode === 'tab' ? 'Показать в боковой панели' : 'Показать во вкладке'}>
+          <button
+            onClick={toggleDisplayMode}
+            className="groq-icon-button groq-display-mode-button"
+            title={displayMode === 'tab' ? 'Показать в боковой панели' : 'Показать во вкладке'}
+          >
             {displayMode === 'tab' ? <FiSidebar size={16} /> : <FiSquare size={16} />}
           </button>
-          <button onClick={() => setIsSupportOpen(true)} className="groq-icon-button groq-support-header-button" title="Поддержать разработчика">
+          <button
+            onClick={() => setIsSupportOpen(true)}
+            className="groq-icon-button groq-support-header-button"
+            title="Поддержать разработчика"
+          >
             <FiHeart size={16} />
           </button>
-          <button onClick={handleScrollToTop} className="groq-icon-button groq-scroll-button" title="К началу диалога" disabled={messages.length === 0}>
+          <button
+            onClick={handleScrollToTop}
+            className="groq-icon-button groq-scroll-button"
+            title="К началу диалога"
+            disabled={messages.length === 0}
+          >
             <FiChevronUp size={16} />
           </button>
-          <button onClick={handleScrollToBottom} className="groq-icon-button groq-scroll-button" title="К концу диалога" disabled={messages.length === 0}>
+          <button
+            onClick={handleScrollToBottom}
+            className="groq-icon-button groq-scroll-button"
+            title="К концу диалога"
+            disabled={messages.length === 0}
+          >
             <FiChevronDown size={16} />
           </button>
-          <button onClick={handleClearHistory} className="groq-icon-button groq-clear-button" title="Очистить историю" disabled={messages.length === 0 || isLoading}>
+          <button
+            onClick={handleClearHistory}
+            className="groq-icon-button groq-clear-button"
+            title="Очистить историю"
+            disabled={messages.length === 0 || isLoading}
+          >
             <FiTrash2 size={16} />
           </button>
         </div>
@@ -173,12 +198,8 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
 
       <div className="groq-chat__content">
         <div className="groq-chat__messages-container">
-          <MessageList
-            ref={messageListRef}
-            messages={messages}
-            isLoading={isLoading && messages.length > 0}
-          />
-          {isLoading && messages.length === 0 && (
+          <MessageList ref={messageListRef} messages={messages} isLoading={isLoading} />
+          {isHistoryLoading && (
             <div className="groq-chat__loading-history">
               <div className="groq-spinner"></div>
               <span>Загрузка истории...</span>
@@ -191,19 +212,15 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
             value={inputValue}
             onChange={setInputValue}
             onSend={handleSendMessage}
-            onKeyDown={handleKeyDown}
-            disabled={isLoading}
+            disabled={isLoading || isHistoryLoading}
             maxLength={8000}
           />
         </div>
       </div>
 
-      <SupportDialog
-        isOpen={isSupportOpen}
-        onClose={() => setIsSupportOpen(false)}
-      />
+      <SupportDialog isOpen={isSupportOpen} onClose={() => setIsSupportOpen(false)} />
 
-      <ToastContainer />
+      <ToastContainer position="bottom-right" autoClose={3000} theme="dark" />
     </div>
   );
 };

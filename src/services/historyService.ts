@@ -1,5 +1,5 @@
 import { GroqPluginInterface } from '../types/plugin';
-import { Message, ChatHistory } from '../types/message';
+import { Message } from '../types/types';
 import { TFile, Notice } from 'obsidian';
 import { HistoryStorageMethod } from '../types/settings';
 
@@ -124,16 +124,19 @@ export class HistoryService {
           // Затем добавляем новые сообщения
           const requests = history.map(message => store.add(message));
 
-          Promise.all(requests.map(req =>
-            new Promise((res, rej) => {
-              req.onsuccess = res;
-              req.onerror = rej;
+          Promise.all(
+            requests.map(
+              req =>
+                new Promise((res, rej) => {
+                  req.onsuccess = res;
+                  req.onerror = rej;
+                }),
+            ),
+          )
+            .then(() => {
+              transaction.oncomplete = () => resolve();
             })
-          ))
-          .then(() => {
-            transaction.oncomplete = () => resolve();
-          })
-          .catch(reject);
+            .catch(reject);
         };
         clearRequest.onerror = () => reject(clearRequest.error);
       };

@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
-import { Message } from '../types/message';
+import { Message } from '../types/types';
 import { MessageUtils } from '../utils/messageUtils';
-import GroqMarkdown from './GroqMarkdown';
+import { GroqMarkdown } from './GroqMarkdown';
 import { FiCopy, FiCheck } from 'react-icons/fi';
 import '../styles.css';
 
@@ -21,17 +21,11 @@ export const MessageItem: React.FC<{ message: Message }> = React.memo(({ message
     }
   };
 
-  const props = {
-    className: `groq-message groq-message--${message.role}`,
-  };
-
   return (
-    <div key={message.id} {...props}>
+    <div key={message.id} className={`groq-message groq-message--${message.role}`}>
       <div className="groq-message__header">
         <div className="groq-message__meta">
-          <span className="groq-message__role">
-            {message.role === 'user' ? 'Вы' : 'Ассистент'}
-          </span>
+          <span className="groq-message__role">{message.role === 'user' ? 'Вы' : 'Ассистент'}</span>
           <time
             className="groq-message__timestamp"
             dateTime={new Date(message.timestamp).toISOString()}
@@ -41,18 +35,14 @@ export const MessageItem: React.FC<{ message: Message }> = React.memo(({ message
           </time>
         </div>
         {message.role === 'assistant' && message.content && (
-            <button
-              onClick={handleCopy}
-              className="groq-icon-button groq-copy-button"
-              aria-label="Копировать сообщение"
-              title="Копировать сообщение"
-            >
-              {isCopied ? (
-                <FiCheck className="groq-icon-check" size={14}/>
-              ) : (
-                <FiCopy size={14}/>
-              )}
-            </button>
+          <button
+            onClick={handleCopy}
+            className="groq-icon-button groq-copy-button"
+            aria-label="Копировать сообщение"
+            title="Копировать сообщение"
+          >
+            {isCopied ? <FiCheck className="groq-icon-check" size={14} /> : <FiCopy size={14} />}
+          </button>
         )}
       </div>
       <div className="groq-message__content">

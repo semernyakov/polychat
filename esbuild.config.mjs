@@ -25,16 +25,16 @@ function formatDuration(ms) {
 const postCssPlugin = {
   name: 'postcss-plugin',
   setup(build) {
-    build.onLoad({ filter: /\.css$/ }, async (args) => {
+    build.onLoad({ filter: /\.css$/ }, async args => {
       try {
         const css = await fs.readFile(args.path, 'utf8');
-        const result = await postcss([
-					postcssImport(), autoprefixer(),	postcssPresetEnv()
-					]
-				).process(css, {
-          from: args.path,
-          to: path.join('dist', path.basename(args.path)),
-        });
+        const result = await postcss([postcssImport(), autoprefixer(), postcssPresetEnv()]).process(
+          css,
+          {
+            from: args.path,
+            to: path.join('dist', path.basename(args.path)),
+          },
+        );
         return { contents: result.css, loader: 'css' };
       } catch (err) {
         return {
@@ -77,8 +77,8 @@ const config = {
   entryPoints: ['src/main.ts', 'src/styles.css'],
   bundle: true,
   platform: 'node',
-	mainFields: ['module', 'main'],
-	conditions: ['require', 'node'],
+  mainFields: ['module', 'main'],
+  conditions: ['require', 'node'],
   format: 'cjs',
   target,
   external: ['obsidian', 'electron', '@codemirror/*', '@lezer/*', ...builtins],
@@ -88,11 +88,11 @@ const config = {
   treeShaking: true,
   logLevel: 'info',
   plugins: [postCssPlugin, copyFilesPlugin],
-	loader: {
+  loader: {
     '.css': 'css',
     '.woff2': 'file', // для обработки .woff2
-    '.woff': 'file',  // добавлено для обработки .woff
-    '.ttf': 'file',   // для обработки .ttf
+    '.woff': 'file', // добавлено для обработки .woff
+    '.ttf': 'file', // для обработки .ttf
   },
 };
 
@@ -113,7 +113,7 @@ const config = {
     console.log(`🔥  Сервер запущен: http://${server.host}:${server.port}`);
 
     const obsidianPath = process.env.OBSIDIAN_EXECUTABLE_PATH || 'obsidian';
-    exec(obsidianPath, (err) => {
+    exec(obsidianPath, err => {
       if (err) {
         console.error(`❌  Не удалось запустить Obsidian (${obsidianPath}):`, err);
       }

@@ -40,13 +40,13 @@ export default class GroqChatPlugin extends Plugin implements GroqPluginInterfac
     this.addCommand({
       id: 'open-groq-chat-tab',
       name: 'Open in Tab',
-      callback: () => this.changeDisplayMode('tab')
+      callback: () => this.changeDisplayMode('tab'),
     });
 
     this.addCommand({
       id: 'open-groq-chat-sidepanel',
       name: 'Open in Sidepanel',
-      callback: () => this.changeDisplayMode('sidepanel')
+      callback: () => this.changeDisplayMode('sidepanel'),
     });
   }
 
@@ -59,9 +59,8 @@ export default class GroqChatPlugin extends Plugin implements GroqPluginInterfac
     await this.saveSettings();
 
     // Сохраняем текущее состояние чата
-    const messages = this.currentLeaf?.view instanceof GroqChatView
-      ? this.currentLeaf.view.getMessages()
-      : [];
+    const messages =
+      this.currentLeaf?.view instanceof GroqChatView ? this.currentLeaf.view.getMessages() : [];
 
     // Закрываем текущий view
     if (this.currentLeaf) {
@@ -69,14 +68,15 @@ export default class GroqChatPlugin extends Plugin implements GroqPluginInterfac
     }
 
     // Открываем в новом режиме
-    const leaf = mode === 'tab'
-      ? this.app.workspace.getLeaf(true)
-      : this.app.workspace.getRightLeaf(false) || this.app.workspace.getLeaf('split', 'vertical');
+    const leaf =
+      mode === 'tab'
+        ? this.app.workspace.getLeaf(true)
+        : this.app.workspace.getRightLeaf(false) || this.app.workspace.getLeaf('split', 'vertical');
 
     await leaf.setViewState({
       type: VIEW_TYPE_GROQ_CHAT,
       active: true,
-      state: { messages } // Передаем сохраненные сообщения
+      state: { messages }, // Передаем сохраненные сообщения
     });
 
     this.currentLeaf = leaf;

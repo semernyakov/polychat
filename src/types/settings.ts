@@ -13,7 +13,7 @@ export type HistoryStorageMethod = 'memory' | 'localStorage' | 'indexedDB' | 'fi
  * Настройки плагина
  */
 export interface GroqChatSettings {
-	displayMode: 'tab' | 'sidepanel';
+  displayMode: 'tab' | 'sidepanel';
   apiKey: string;
   model: GroqModel;
   temperature: number;
@@ -23,14 +23,3 @@ export interface GroqChatSettings {
   notePath: string;
   storeHistory: boolean;
 }
-
-// export const DEFAULT_SETTINGS: Readonly<GroqChatSettings> = Object.freeze({
-//   apiKey: '',
-//   model: GroqModel.LLAMA3_70B,
-//   temperature: 0.7,
-//   maxTokens: 4096,
-//   historyStorageMethod: 'memory',
-//   maxHistoryLength: 20,
-//   notePath: 'groq-chat-history.md',
-//   storeHistory: true,
-// });

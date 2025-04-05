@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 import { VariableSizeList as List } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import { Message } from '../types/message';
+import { Message } from '../types/types';
 import { MessageItem } from './MessageItem';
 import '../styles.css';
 
@@ -16,8 +16,8 @@ export interface MessageListHandles {
   forceUpdate: () => void;
 }
 
-export const MessageList = React.memo(forwardRef<MessageListHandles, MessageListProps>(
-  ({ messages, isLoading }, ref) => {
+export const MessageList = React.memo(
+  forwardRef<MessageListHandles, MessageListProps>(({ messages, isLoading }, ref) => {
     const listRef = useRef<List>(null);
     const sizeMap = useRef<Record<string, number>>({});
     const rowHeights = useRef<Record<string, number>>({});
@@ -62,16 +62,10 @@ export const MessageList = React.memo(forwardRef<MessageListHandles, MessageList
       const message = messages[index];
       const id = message.id || `msg-${index}`;
 
-      // Добавим вертикальный отступ между сообщениями
-      const rowStyle: React.CSSProperties = {
-        ...style,
-        paddingBottom: 12, // отступ между сообщениями
-      };
-
       return (
-        <div style={rowStyle}>
-          <div ref={(el) => measureRow(el, index, id)}>
-            <MessageItem message={message} />
+        <div key={`message-${id}`} style={{ ...style, paddingBottom: 12 }}>
+          <div ref={el => measureRow(el, index, id)}>
+            <MessageItem message={message} key={`item-${id}`} />
           </div>
         </div>
       );
@@ -82,10 +76,10 @@ export const MessageList = React.memo(forwardRef<MessageListHandles, MessageList
       const id = message.id || `msg-${index}`;
 
       if (rowHeights.current[id]) {
-        return rowHeights.current[id] + 12; // Учитываем отступ
+        return rowHeights.current[id] + 12;
       }
       if (sizeMap.current[id]) {
-        return sizeMap.current[id] + 12; // Учитываем отступ
+        return sizeMap.current[id] + 12;
       }
 
       const estimate = () => {
@@ -95,13 +89,13 @@ export const MessageList = React.memo(forwardRef<MessageListHandles, MessageList
         const lineHeight = 20;
         const numLines = Math.ceil(content.length / charsPerLine);
         const codeBlockBonus = content.includes('```') ? 80 : 0;
-        const calculatedHeight = baseSize + (numLines * lineHeight) + codeBlockBonus;
+        const calculatedHeight = baseSize + numLines * lineHeight + codeBlockBonus;
         return Math.max(80, calculatedHeight);
       };
 
       const estimatedSize = estimate();
       sizeMap.current[id] = estimatedSize;
-      return estimatedSize + 12; // Добавляем отступ
+      return estimatedSize + 12;
     };
 
     useEffect(() => {
@@ -111,9 +105,9 @@ export const MessageList = React.memo(forwardRef<MessageListHandles, MessageList
     }, [messages]);
 
     return (
-      <div className="groq-chat__messages">
+      <div className="groq-chat__messages" key="message-list-container">
         {messages.length > 0 ? (
-          <AutoSizer>
+          <AutoSizer key="auto-sizer">
             {({ height, width }) => {
               if (height === 0 || width === 0) {
                 return null;
@@ -126,8 +120,9 @@ export const MessageList = React.memo(forwardRef<MessageListHandles, MessageList
                   itemCount={messages.length}
                   itemSize={getItemSize}
                   estimatedItemSize={120}
-                  itemKey={(index) => messages[index].id || `msg-${index}`}
+                  itemKey={index => messages[index].id || `msg-${index}`}
                   className="groq-react-window-list"
+                  key="virtualized-list"
                 >
                   {Row}
                 </List>
@@ -135,18 +130,18 @@ export const MessageList = React.memo(forwardRef<MessageListHandles, MessageList
             }}
           </AutoSizer>
         ) : (
-          !isLoading && <div className="groq-chat__empty">Нет сообщений для отображения</div>
+          !isLoading && <div className="groq-chat__empty" key="empty-message">Нет сообщений для отображения</div>
         )}
 
         {isLoading && (
-          <div className="groq-loading-indicator">
+          <div className="groq-loading-indicator" key="loading-indicator">
             <div className="groq-spinner"></div>
             <span>Генерация ответа...</span>
           </div>
         )}
       </div>
     );
-  }
-));
+  }),
+);
 
 MessageList.displayName = 'MessageList';

@@ -1,7 +1,7 @@
 import { Groq } from 'groq-sdk';
 import { GroqPluginInterface } from '../types/plugin';
 import { GroqModel } from '../types/models';
-import { Message } from '../types/message';
+import { Message } from '../types/types';
 
 export class GroqService {
   private client: Groq;

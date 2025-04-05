@@ -1,5 +1,5 @@
-import { GroqModel } from './models';
-import { GroqChatSettings } from './settings';
+// import { GroqModel } from './models';
+// import { GroqChatSettings } from './settings';
 
 export type MessageRole = 'user' | 'assistant' | 'system';
 
@@ -17,6 +17,13 @@ export interface Message {
     completion_time?: number;
     total_time?: number;
   };
+}
+
+export interface ChatHistory {
+  version: 1;
+  messages: Message[];
+  createdAt: number;
+  updatedAt: number;
 }
 
 export interface ModelSettings {

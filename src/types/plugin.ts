@@ -1,6 +1,6 @@
 import { App, Plugin } from 'obsidian';
 import { GroqChatSettings } from './settings';
-import { Message } from './message';
+import { Message } from './types';
 import { GroqModel } from './models';
 
 export interface GroqPluginInterface extends Plugin {
@@ -12,23 +12,20 @@ export interface GroqPluginInterface extends Plugin {
   loadSettings(): Promise<void>;
   resetSettings(): Promise<void>;
 
-  changeDisplayMode(mode: 'tab' | 'sidepanel'): Promise<void>; // Добавлен новый метод
+  changeDisplayMode(mode: 'tab' | 'sidepanel'): Promise<void>;
 
   readonly groqService: {
     sendMessage(content: string, model: GroqModel): Promise<Message>;
     getAvailableModels(): Promise<GroqModel[]>;
-    validateApiKey(apiKey: string): Promise<boolean>;
   };
 
   readonly historyService: {
     getHistory(): Promise<Message[]>;
     addMessage(message: Message): Promise<void>;
     clearHistory(): Promise<void>;
-    getCurrentMessages(): Message[]; // Добавлен новый метод
   };
 
   readonly authService: {
-    validateApiKey(apiKey: string): Promise<boolean>;
     setApiKey(apiKey: string): Promise<void>;
   };
 }

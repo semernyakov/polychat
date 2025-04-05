@@ -1,30 +1,16 @@
-// src/types/models.ts
-
-/**
- * Категории моделей Groq
- */
 export type ModelCategory = 'text' | 'audio' | 'vision';
 
-/**
- * Информация о разработчике модели
- */
 export interface ModelDeveloper {
   name: string;
   url?: string;
 }
 
-/**
- * Основные параметры модели
- */
 export interface ModelParams {
   maxTokens: number;
-  maxFileSize?: number; // в MB (для audio/vision моделей)
-  isPreview?: boolean;
+  maxDuration?: number;
+  maxFileSize?: number;
 }
 
-/**
- * Полная информация о модели
- */
 export interface ModelInfo extends ModelParams {
   id: GroqModel;
   name: string;
@@ -33,32 +19,19 @@ export interface ModelInfo extends ModelParams {
   developer: ModelDeveloper;
 }
 
-/**
- * Доступные модели Groq
- */
 export enum GroqModel {
-  // Основные текстовые модели
   LLAMA3_70B = 'llama3-70b-8192',
   LLAMA3_8B = 'llama3-8b-8192',
   MIXTRAL_8X7B = 'mixtral-8x7b-32768',
   GEMMA_7B = 'gemma-7b-it',
-
-  // Модели Claude
   CLAUDE_3_OPUS = 'claude-3-opus-20240229',
   CLAUDE_3_SONNET = 'claude-3-sonnet-20240229',
   CLAUDE_3_HAIKU = 'claude-3-haiku-20240307',
-
-  // Аудио модели
   WHISPER_LARGE = 'whisper-large-v3',
-
-  // Премиум модели
   LLAMA3_70B_PREMIUM = 'llama-3.3-70b-versatile',
   LLAMA3_8B_PREMIUM = 'llama-3.1-8b-instant',
 }
 
-/**
- * Конфигурация всех моделей
- */
 export const MODEL_INFO: Record<GroqModel, ModelInfo> = {
   [GroqModel.LLAMA3_70B]: {
     id: GroqModel.LLAMA3_70B,
@@ -120,7 +93,8 @@ export const MODEL_INFO: Record<GroqModel, ModelInfo> = {
     id: GroqModel.WHISPER_LARGE,
     name: 'Whisper Large',
     description: 'Транскрипция аудио',
-    maxTokens: 0,
+    maxDuration: 300,
+		maxTokens: 32768,
     category: 'audio',
     maxFileSize: 25,
     developer: { name: 'OpenAI' },
@@ -143,30 +117,16 @@ export const MODEL_INFO: Record<GroqModel, ModelInfo> = {
   },
 };
 
-/**
- * Модель по умолчанию
- */
 export const DEFAULT_MODEL = GroqModel.LLAMA3_70B;
 
-/**
- * Получить информацию о модели по ID
- */
 export const getModelInfo = (modelId: GroqModel): ModelInfo => {
   const info = MODEL_INFO[modelId];
-  if (!info) {
-    throw new Error(`Model ${modelId} not found`);
-  }
+  if (!info) throw new Error(`Model ${modelId} not found`);
   return info;
 };
 
-/**
- * Проверка, является ли модель аудио-моделью
- */
 export const isAudioModel = (modelId: GroqModel): boolean =>
   getModelInfo(modelId).category === 'audio';
 
-/**
- * Проверка, является ли модель vision-моделью
- */
 export const isVisionModel = (modelId: GroqModel): boolean =>
   getModelInfo(modelId).category === 'vision';

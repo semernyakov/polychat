@@ -1,5 +1,5 @@
-import { GroqPluginInterface } from './plugin';
-import { Message } from './message';
+// import { GroqPluginInterface } from './plugin';
+import { Message } from './types';
 
 export interface ChatState {
   messages: Message[];

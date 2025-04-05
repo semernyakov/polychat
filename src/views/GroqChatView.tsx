@@ -2,7 +2,7 @@ import { ItemView, WorkspaceLeaf } from 'obsidian';
 import { createRoot } from 'react-dom/client';
 import { ChatPanel } from '../components/ChatPanel';
 import type { GroqPluginInterface } from '../types/plugin';
-import { Message } from '../types/message';
+import { Message } from '../types/types';
 
 export const VIEW_TYPE_GROQ_CHAT = 'groq-chat-view';
 
@@ -17,7 +17,7 @@ export class GroqChatView extends ItemView {
   constructor(
     leaf: WorkspaceLeaf,
     private readonly plugin: GroqPluginInterface,
-    state?: GroqChatViewState
+    state?: GroqChatViewState,
   ) {
     super(leaf);
     this.messages = state?.messages || [];
@@ -58,8 +58,8 @@ export class GroqChatView extends ItemView {
         plugin={this.plugin}
         displayMode={this.plugin.settings.displayMode}
         initialMessages={this.messages}
-        onDisplayModeChange={(mode) => this.plugin.changeDisplayMode(mode)}
-      />
+        onDisplayModeChange={mode => this.plugin.changeDisplayMode(mode)}
+      />,
     );
   }
 }

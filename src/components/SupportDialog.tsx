@@ -74,9 +74,9 @@ export const SupportDialog: React.FC<SupportDialogProps> = ({
 
         <div className="groq-dialog-content">
           <p>
-            Этот плагин разрабатывается энтузиастом в свободное время.
-            Ваша поддержка поможет ускорить разработку, добавить новые функции и поддерживать проект в актуальном состоянии.
-            Спасибо за использование!
+            Этот плагин разрабатывается энтузиастом в свободное время. Ваша поддержка поможет
+            ускорить разработку, добавить новые функции и поддерживать проект в актуальном
+            состоянии. Спасибо за использование!
           </p>
           {/* Можно добавить QR код или другие способы поддержки */}
         </div>
@@ -91,10 +91,7 @@ export const SupportDialog: React.FC<SupportDialogProps> = ({
           >
             <FiExternalLink /> Перейти к поддержке
           </a>
-          <button
-            onClick={onClose}
-            className="groq-button groq-dialog-secondary-button"
-          >
+          <button onClick={onClose} className="groq-button groq-dialog-secondary-button">
             Закрыть
           </button>
         </div>

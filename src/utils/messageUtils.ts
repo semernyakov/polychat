@@ -1,4 +1,4 @@
-import { Message } from '../types/message';
+import { Message } from '../types/types';
 
 export const MessageUtils = {
   create: (role: Message['role'], content: string): Message => ({

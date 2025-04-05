@@ -95,7 +95,8 @@ export const MessageInput: React.FC<MessageInputProps> = ({
       </div>
       <div className="groq-chat-input__footer">
         <span className="groq-message-input__hint">
-          <kbd>Ctrl</kbd>+<kbd>Enter</kbd> — отправить, <kbd>Shift</kbd>+<kbd>Enter</kbd> — новая строка
+          <kbd>Ctrl</kbd>+<kbd>Enter</kbd> — отправить, <kbd>Shift</kbd>+<kbd>Enter</kbd> — новая
+          строка
         </span>
         {maxLength && (
           <span
