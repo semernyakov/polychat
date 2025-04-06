@@ -599,11 +599,6 @@ pre.groq-code-block--no-highlight code {
   right: var(--size-4-2);
 }
 
-/* Кнопки в диалоге (текстовые) */
-.groq-dialog-actions .groq-button {
-  /* Наследует .groq-button */
-  /* Можно добавить специфичные отступы, если нужно */
-}
 
 /* Кнопки копирования кода (иконки) */
 .groq-code-copy {

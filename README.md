@@ -24,6 +24,8 @@ A plugin for [Obsidian](https://obsidian.md) that integrates Groq's AI chat capa
 - Custom model selection
 - Chat history
 - Context-aware responses
+- Raw/Markdown source view toggle for assistant messages.
+- Configurable default display mode (tab or side panel).
 
 ## Installation
 
@@ -38,7 +40,7 @@ A plugin for [Obsidian](https://obsidian.md) that integrates Groq's AI chat capa
 1. Get your API key from [Groq Console](https://console.groq.com)
 2. Open plugin settings in Obsidian
 3. Enter your API key
-4. Configure additional settings as needed
+4. Configure additional settings as needed (Note: Settings have been updated, including options for default display mode and history storage. See plugin settings for details.)
 
 ## Usage
 
