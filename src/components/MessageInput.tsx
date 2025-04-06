@@ -8,7 +8,7 @@ interface MessageInputProps {
   onSend: () => void;
   onKeyDown?: (e: React.KeyboardEvent) => void;
   disabled?: boolean;
-  maxLength?: number;
+  maxTokens?: number;
 }
 
 export const MessageInput: React.FC<MessageInputProps> = ({
@@ -17,7 +17,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   onSend,
   onKeyDown,
   disabled = false,
-  maxLength,
+  maxTokens,
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isComposing, setIsComposing] = useState(false); // Для поддержки IME
@@ -63,7 +63,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   };
 
   const currentLength = value.length;
-  const isOverLimit = !!(maxLength && currentLength > maxLength);
+  const isOverLimit = !!(maxTokens && currentLength > maxTokens);
   const isSendDisabled = Boolean(disabled || !value.trim() || isOverLimit);
 
   return (
@@ -81,7 +81,6 @@ export const MessageInput: React.FC<MessageInputProps> = ({
           rows={1}
           className="groq-chat-input__textarea"
           aria-label="Поле ввода сообщения"
-          maxLength={maxLength}
         />
         <button
           onClick={handleSendClick}
@@ -98,12 +97,13 @@ export const MessageInput: React.FC<MessageInputProps> = ({
           <kbd>Ctrl</kbd>+<kbd>Enter</kbd> — отправить, <kbd>Shift</kbd>+<kbd>Enter</kbd> — новая
           строка
         </span>
-        {maxLength && (
+        {maxTokens !== undefined && (
           <span
             className="groq-message-input__counter"
             style={{ color: isOverLimit ? 'var(--text-error)' : 'inherit' }}
+            title="Приблизительное количество символов / Максимум токенов для модели"
           >
-            {currentLength}/{maxLength}
+            {currentLength}/{maxTokens.toLocaleString()} (символы/токены)
           </span>
         )}
       </div>

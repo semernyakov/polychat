@@ -36,6 +36,8 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
 
   // Получаем все модели из MODEL_INFO для итерации
   const allModelInfos = Object.values(MODEL_INFO);
+  const selectedModelInfo = getModelInfo(selectedModel);
+  const isAvailable = availableModels.includes(selectedModel);
 
   return (
     <div className="groq-model-selector">

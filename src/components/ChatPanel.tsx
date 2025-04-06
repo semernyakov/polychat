@@ -3,15 +3,16 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { GroqPluginInterface } from '../types/plugin';
 import { Message } from '../types/types';
 import { MessageUtils } from '../utils/messageUtils';
-import { GroqModel } from '../types/models';
+import { GroqModel, getModelInfo } from '../types/models';
 import { MessageList, MessageListHandles } from './MessageList';
 import { ModelSelector } from './ModelSelector';
 import { MessageInput } from './MessageInput';
 import { SupportDialog } from './SupportDialog';
-import { FiTrash2, FiChevronUp, FiChevronDown, FiHeart, FiSidebar, FiSquare } from 'react-icons/fi';
+import { FiTrash2, FiChevronUp, FiChevronDown, FiHeart, FiSidebar, FiSquare, FiInfo } from 'react-icons/fi';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles.css';
+import { ModelInfoDialog } from './ModelInfoDialog';
 
 interface ChatPanelProps {
   plugin: GroqPluginInterface;
@@ -33,19 +34,26 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
   const [hasLoadedHistory, setHasLoadedHistory] = useState(false);
   const [selectedModel, setSelectedModel] = useState<GroqModel>(plugin.settings.model);
   const [isSupportOpen, setIsSupportOpen] = useState(false);
+  const [isModelInfoOpen, setIsModelInfoOpen] = useState(false);
   const messageListRef = useRef<MessageListHandles>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [availableModels, setAvailableModels] = useState<GroqModel[]>([]);
 
-  // Callback для передачи в ModelSelector
-  const fetchAvailableModels = useCallback(async () => {
-    // Проверяем наличие groqService перед вызовом
-    if (plugin.groqService) {
-      return plugin.groqService.getAvailableModels();
+  const fetchAvailableModels = useCallback(async (): Promise<GroqModel[]> => {
+    try {
+      const models = await plugin.groqService.getAvailableModels();
+      setAvailableModels(models);
+      return models;
+    } catch (error) {
+      console.error('Failed to fetch available models:', error);
+      setAvailableModels([]);
+      return [];
     }
-    // Возвращаем пустой массив или выбрасываем ошибку, если сервис недоступен
-    console.warn('GroqService is not available when fetching models.');
-    return [];
-  }, [plugin.groqService]); // Зависимость от groqService
+  }, [plugin.groqService]);
+
+  useEffect(() => {
+    fetchAvailableModels();
+  }, [fetchAvailableModels]);
 
   // ResizeObserver
   useEffect(() => {
@@ -155,6 +163,8 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
     onDisplayModeChange(newMode);
   };
 
+  const selectedModelInfo = getModelInfo(selectedModel);
+
   if (!plugin.settings.apiKey) {
     return <div className="groq-api-key-warning">...</div>;
   }
@@ -170,6 +180,13 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
           />
         </div>
         <div className="groq-chat__header-right">
+          <button
+            onClick={() => setIsModelInfoOpen(true)}
+            className="groq-icon-button groq-model-info-button"
+            title="Информация о модели"
+          >
+            <FiInfo size={16} />
+          </button>
           <button
             onClick={toggleDisplayMode}
             className="groq-icon-button groq-display-mode-button"
@@ -228,12 +245,18 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
             onChange={setInputValue}
             onSend={handleSendMessage}
             disabled={isLoading || isHistoryLoading}
-            maxLength={8000}
+            maxTokens={selectedModelInfo.maxTokens}
           />
         </div>
       </div>
 
       <SupportDialog isOpen={isSupportOpen} onClose={() => setIsSupportOpen(false)} />
+      <ModelInfoDialog
+        isOpen={isModelInfoOpen}
+        onClose={() => setIsModelInfoOpen(false)}
+        modelInfo={selectedModelInfo}
+        isAvailable={availableModels.includes(selectedModel)}
+      />
 
       <ToastContainer position="bottom-right" autoClose={3000} theme="dark" />
     </div>

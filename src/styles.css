@@ -350,96 +350,199 @@
 /* Специфичные стили для блока С ПОДСВЕТКОЙ Prism (если нужны) */
 /* Обычно стили токенов приходят из темы prismTheme (vsDark) */
 
-/* --- Общие стили кнопок --- */
+/* --- Общие стили кнопок (минималистичные, БЕЗ ГРАНИЦ И ТЕНЕЙ) --- */
 .groq-button,
 .groq-icon-button {
-  display: inline-flex; /* Для выравнивания иконки и текста */
+  /* Сброс некоторых браузерных стилей */
+  appearance: none;
+  background: none;
+  border: none;
+  font: inherit;
+  text-decoration: none;
+  
+  /* Основные стили Obsidian */
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: calc(var(--spacing-unit) * 0.75) calc(var(--spacing-unit) * 1.5);
-  border-radius: var(--border-radius);
-  border: 1px solid transparent;
-  background-color: var(--interactive-normal);
-  color: var(--text-normal);
-  cursor: pointer;
-  font-size: var(--font-size);
-  font-weight: 500;
-  line-height: 1.2;
-  text-decoration: none; /* Для ссылок, стилизованных под кнопки */
-  transition:
-    background-color 0.15s ease,
-    border-color 0.15s ease,
-    color 0.15s ease;
-  white-space: nowrap; /* Предотвращаем перенос текста */
-  user-select: none; /* Запрещаем выделение текста на кнопках */
+  padding: var(--size-4-1) var(--size-4-3); /* Стандартный паддинг Obsidian */
+  height: var(--input-height); /* Стандартная высота */
+  font-size: var(--font-ui-small);
+  font-weight: var(--font-medium); /* Стандартная жирность */
+  line-height: 1.5;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: var(--cursor, pointer);
+  user-select: none;
+
+  /* Внешний вид - БЕЗ ГРАНИЦЫ */
+  /* border: 1px solid transparent;  */
+  background-color: var(--interactive-normal); 
+  color: var(--text-muted); 
+  
+  /* Убираем transition для border и box-shadow */
+  transition: background-color 0.1s linear, color 0.1s linear;
+  box-shadow: none !important;
+  border: none !important;
 }
 
 .groq-button:hover,
 .groq-icon-button:hover {
   background-color: var(--interactive-hover);
-  border-color: var(--background-modifier-border);
+  border-color: transparent; /* Убеждаемся: граница прозрачная */
+  color: var(--text-normal); 
+  cursor: pointer;
+}
+
+.groq-button:focus,
+.groq-icon-button:focus {
+  outline: none; 
+}
+
+.groq-button:focus-visible,
+.groq-icon-button:focus-visible {
+   /* БЕЗ ТЕНИ и БЕЗ ГРАНИЦЫ */
+   box-shadow: none; /* Явно убираем тень */
+   border-color: transparent; /* Убеждаемся: граница прозрачная */
+   background-color: var(--interactive-hover); 
+   color: var(--text-normal); 
 }
 
 .groq-button:disabled,
 .groq-icon-button:disabled {
-  opacity: 0.5;
+  background-color: var(--interactive-normal); 
+  border-color: transparent; /* Убеждаемся: граница прозрачная */
+  color: var(--text-muted); 
   cursor: not-allowed;
-  background-color: var(--interactive-normal); /* Не меняем цвет фона при disabled hover */
+  opacity: var(--opacity-disabled); 
 }
 
-/* Первичная кнопка */
+/* --- Основная кнопка (минималистичная, БЕЗ ГРАНИЦ И ТЕНЕЙ) --- */
 .groq-button--primary {
-  background-color: var(--interactive-accent);
+  background-color: var(--interactive-accent); 
+  border-color: transparent; /* Убеждаемся: граница прозрачная */
   color: var(--text-on-accent);
-  border-color: var(--interactive-accent);
+  font-weight: var(--font-semibold); 
 }
+
 .groq-button--primary:hover {
   background-color: var(--interactive-accent-hover);
-  border-color: var(--interactive-accent-hover);
+  border-color: transparent; /* Убеждаемся: граница прозрачная */
+  color: var(--text-on-accent);
 }
+
+.groq-button--primary:focus-visible {
+   /* БЕЗ ТЕНИ и БЕЗ ГРАНИЦЫ */
+   box-shadow: none; /* Явно убираем тень */
+   border-color: transparent; /* Убеждаемся: граница прозрачная */
+   background-color: var(--interactive-accent-hover); 
+   /* color: var(--text-on-accent); */
+}
+
 .groq-button--primary:disabled {
-  background-color: var(--interactive-accent);
-  border-color: var(--interactive-accent);
-  opacity: 0.5; /* Добавляем opacity и для primary disabled */
+  background-color: var(--interactive-accent); 
+  border-color: transparent; /* Убеждаемся: граница прозрачная */
+  color: var(--text-on-accent); 
+  cursor: not-allowed;
+  opacity: var(--opacity-disabled); 
 }
 
-/* Кнопки-иконки (без текста) */
-/* Предполагается использование как модификатор: class="groq-button groq-icon-button" */
+/* --- Кнопки-иконки (минималистичные, БЕЗ ГРАНИЦ И ТЕНЕЙ) --- */
 .groq-icon-button {
-  /* --- Общие свойства наследуются от .groq-button --- */
-  /* display, align-items, justify-content, border-radius, cursor, font-size, line-height, text-decoration, transition, white-space, user-select */
-
-  /* --- Переопределения для иконки --- */
-  padding: calc(var(--spacing-unit) * 0.75); /* Делаем квадратными, переопределяет padding .groq-button */
-  background: none; /* Прозрачный фон, переопределяет background-color .groq-button */
-  border: none; /* Убираем границу, переопределяет border .groq-button */
-  color: var(--text-muted); /* Другой цвет текста, переопределяет color .groq-button */
-  /* font-weight наследуется от .groq-button */
+  padding: var(--size-4-1); /* Уменьшенный паддинг для иконок */
+  width: var(--clickable-icon-size); /* Стандартный размер */
+  height: var(--clickable-icon-size);
+  background-color: transparent; 
+  border-color: transparent; /* Убеждаемся: граница прозрачная */
+  color: var(--icon-color, var(--text-muted)); 
+  flex-shrink: 0; /* Чтобы не сжимались в flex-контейнере */
 }
 
 .groq-icon-button:hover {
-  /* --- Переопределения для hover иконки --- */
-  color: var(--text-normal); /* Отличается от .groq-button:hover */
-  background-color: var(--background-modifier-hover); /* Отличается от .groq-button:hover */
-  border-color: transparent; /* Убедимся, что граница не появляется при hover */
+  background-color: var(--background-modifier-hover); 
+  border-color: transparent; /* Убеждаемся: граница прозрачная */
+  color: var(--icon-color-hover, var(--text-normal)); 
+}
+
+.groq-icon-button:focus-visible {
+   /* БЕЗ ТЕНИ и БЕЗ ГРАНИЦЫ */
+   box-shadow: none; /* Явно убираем тень */
+   border-color: transparent; /* Убеждаемся: граница прозрачная */
+   background-color: var(--background-modifier-hover); 
+   color: var(--icon-color-hover, var(--text-normal));
 }
 
 .groq-icon-button:disabled {
-  /* --- Общие свойства disabled наследуются от .groq-button:disabled --- */
-  /* opacity, cursor */
+    background-color: transparent;
+    border-color: transparent; /* Убеждаемся: граница прозрачная */
+    color: var(--icon-color, var(--text-muted)); 
+    cursor: not-allowed;
+    opacity: var(--opacity-disabled);
+}
 
-  /* --- Переопределения для disabled иконки --- */
-  background: none; /* Сохраняем прозрачный фон */
-  color: var(--text-muted); /* Сохраняем цвет текста */
-  /* opacity наследуется от .groq-button:disabled */
+/* --- Применения к конкретным кнопкам --- */
+
+/* Кнопка отправки (текстовая, основная) */
+.groq-chat-input__send-button {
+  /* Наследует .groq-button, .groq-button--primary */
+  height: var(--input-height); /* Явно задаем высоту */
+  /* Убираем авто-размеры, если были */
+  /* height: auto; */
+  /* min-width: auto; */
+  /* align-self: stretch; */ 
 }
-/* Кнопки копирования */
-.groq-copy-button,
+
+/* Кнопки в хедере (иконки) */
+.groq-display-mode-button,
+.groq-support-header-button,
+.groq-model-info-button,
+.groq-scroll-button,
+.groq-clear-button {
+  /* Наследуют .groq-icon-button */
+  margin-left: var(--size-4-1); /* Отступ между кнопками */
+}
+
+/* Кнопка закрытия диалога (иконка) */
+.groq-dialog-close {
+    /* Наследует .groq-icon-button */
+    position: absolute;
+    top: var(--size-4-2);
+    right: var(--size-4-2);
+}
+
+/* Кнопки в диалоге (текстовые) */
+.groq-dialog-actions .groq-button {
+    /* Наследует .groq-button */
+    /* Можно добавить специфичные отступы, если нужно */
+}
+
+.groq-dialog-actions .groq-button--primary {
+    /* Наследует .groq-button, .groq-button--primary */
+}
+
+.groq-dialog-secondary-button {
+    /* Наследует .groq-button */
+}
+
+/* Кнопки копирования кода (иконки) */
 .groq-code-copy {
-  /* Наследуют стили .groq-icon-button */
+    /* Наследует .groq-icon-button */
+    position: absolute;
+    top: var(--size-4-1);
+    right: var(--size-4-1);
+    z-index: 1; /* Поверх кода */
+    background-color: var(--background-secondary); 
+    border-color: transparent; /* Убеждаемся: граница прозрачная */
+    opacity: 0.6;
 }
-.groq-icon-check {
-  color: var(--text-accent); /* Цвет галочки */
+
+.groq-code-container:hover .groq-code-copy {
+    opacity: 1;
+}
+
+.groq-code-copy:hover {
+    background-color: var(--background-secondary-alt);
+    border-color: transparent; /* Убеждаемся: граница прозрачная */
 }
 
 /* --- Поле ввода сообщения --- */
@@ -476,14 +579,6 @@
   outline: none;
   border-color: var(--interactive-accent);
   box-shadow: 0 0 0 1px var(--interactive-accent);
-}
-
-.groq-chat-input__send-button {
-  flex-shrink: 0; /* Не сжимается */
-  height: 44px; /* Фиксируем высоту кнопки под min-height textarea */
-  padding: 0 calc(var(--spacing-unit) * 1.5); /* Горизонтальный падинг для кнопки */
-  /* Стилизуем кнопку отправки как основную */
-  /* Применяются стили .groq-button и .groq-button--primary через классы в компоненте */
 }
 
 .groq-chat-input__footer {
@@ -734,4 +829,95 @@
   .groq-message {
     max-width: 95%; /* Чуть шире на мобильных */
   }
+}
+
+.groq-model-info {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--groq-border-color);
+  border-radius: 4px;
+  background-color: var(--groq-background-color);
+}
+
+.groq-model-info__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.groq-model-info__header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.groq-model-info__status {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.groq-model-info__status.main {
+  background-color: var(--groq-primary-color);
+  color: white;
+}
+
+.groq-model-info__status.preview {
+  background-color: var(--groq-secondary-color);
+  color: white;
+}
+
+.groq-model-info__description {
+  margin: 0.5rem 0;
+  color: var(--groq-text-color);
+  font-size: 0.9rem;
+}
+
+.groq-model-info__details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.groq-model-info__detail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.groq-model-info__label {
+  font-size: 0.875rem;
+  color: var(--groq-text-color-secondary);
+}
+
+.groq-model-info__value {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--groq-text-color);
+}
+
+.groq-model-info__warning {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  border-radius: 4px;
+  background-color: var(--groq-warning-color);
+  color: white;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* --- Кнопка информации о модели --- */
+.groq-model-info-button {
+  /* margin-right: var(--spacing-unit); */
+  color: var(--text-muted);
+  transition: color 0.2s ease;
+}
+
+.groq-model-info-button:hover {
+  color: var(--text-normal);
 }

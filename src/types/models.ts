@@ -10,6 +10,8 @@ export interface ModelParams {
   maxTokens: number;
   maxDuration?: number;
   maxFileSize?: number;
+  tokensPerMinute?: number;  // TPM
+  requestsPerMinute?: number; // RPM
 }
 
 export interface ModelInfo extends ModelParams {
@@ -57,6 +59,8 @@ export const MODEL_INFO: Record<GroqModel, ModelInfo> = {
     category: 'text',
     developer: { name: 'Alibaba Cloud' },
     releaseStatus: 'main',
+    tokensPerMinute: 6000,
+    requestsPerMinute: 30,
   },
   [GroqModel.WHISPER_LARGE_V3]: {
     id: GroqModel.WHISPER_LARGE_V3,
@@ -68,6 +72,8 @@ export const MODEL_INFO: Record<GroqModel, ModelInfo> = {
     category: 'audio',
     developer: { name: 'OpenAI' },
     releaseStatus: 'main',
+    tokensPerMinute: 7200,
+    requestsPerMinute: 20,
   },
   [GroqModel.LLAMA_4_SCOUT_17B]: {
     id: GroqModel.LLAMA_4_SCOUT_17B,
@@ -77,6 +83,8 @@ export const MODEL_INFO: Record<GroqModel, ModelInfo> = {
     category: 'text',
     developer: { name: 'Meta' },
     releaseStatus: 'preview',
+    tokensPerMinute: 6000,
+    requestsPerMinute: 30,
   },
   [GroqModel.QWEN_2_5_32B]: {
     id: GroqModel.QWEN_2_5_32B,
@@ -86,6 +94,8 @@ export const MODEL_INFO: Record<GroqModel, ModelInfo> = {
     category: 'text',
     developer: { name: 'Alibaba Cloud' },
     releaseStatus: 'main',
+    tokensPerMinute: 6000,
+    requestsPerMinute: 30,
   },
   [GroqModel.WHISPER_LARGE_V3_TURBO]: {
     id: GroqModel.WHISPER_LARGE_V3_TURBO,
@@ -95,6 +105,8 @@ export const MODEL_INFO: Record<GroqModel, ModelInfo> = {
     category: 'audio',
     developer: { name: 'OpenAI' },
     releaseStatus: 'main',
+    tokensPerMinute: 7200,
+    requestsPerMinute: 20,
   },
   [GroqModel.GEMMA2_9B_IT]: {
     id: GroqModel.GEMMA2_9B_IT,
@@ -104,6 +116,8 @@ export const MODEL_INFO: Record<GroqModel, ModelInfo> = {
     category: 'text',
     developer: { name: 'Google' },
     releaseStatus: 'main',
+    tokensPerMinute: 15000,
+    requestsPerMinute: 30,
   },
   [GroqModel.LLAMA_3_3_70B_VERSATILE]: {
     id: GroqModel.LLAMA_3_3_70B_VERSATILE,
@@ -113,6 +127,8 @@ export const MODEL_INFO: Record<GroqModel, ModelInfo> = {
     category: 'text',
     developer: { name: 'Meta' },
     releaseStatus: 'main',
+    tokensPerMinute: 6000,
+    requestsPerMinute: 30,
   },
   [GroqModel.LLAMA_3_1_8B_INSTANT]: {
     id: GroqModel.LLAMA_3_1_8B_INSTANT,
@@ -122,6 +138,8 @@ export const MODEL_INFO: Record<GroqModel, ModelInfo> = {
     category: 'text',
     developer: { name: 'Meta' },
     releaseStatus: 'main',
+    tokensPerMinute: 6000,
+    requestsPerMinute: 30,
   },
   [GroqModel.DEEPSEEK_R1_DISTILL_LLAMA_70B]: {
     id: GroqModel.DEEPSEEK_R1_DISTILL_LLAMA_70B,
@@ -131,6 +149,8 @@ export const MODEL_INFO: Record<GroqModel, ModelInfo> = {
     category: 'text',
     developer: { name: 'DeepSeek / Meta' },
     releaseStatus: 'main',
+    tokensPerMinute: 6000,
+    requestsPerMinute: 30,
   },
   [GroqModel.LLAMA3_8B]: {
     id: GroqModel.LLAMA3_8B,
@@ -140,6 +160,8 @@ export const MODEL_INFO: Record<GroqModel, ModelInfo> = {
     category: 'text',
     developer: { name: 'Meta' },
     releaseStatus: 'main',
+    tokensPerMinute: 6000,
+    requestsPerMinute: 30,
   },
   [GroqModel.LLAMA_3_2_11B_VISION]: {
     id: GroqModel.LLAMA_3_2_11B_VISION,
@@ -149,6 +171,8 @@ export const MODEL_INFO: Record<GroqModel, ModelInfo> = {
     category: 'vision',
     developer: { name: 'Meta' },
     releaseStatus: 'preview',
+    tokensPerMinute: 7000,
+    requestsPerMinute: 30,
   },
   [GroqModel.PLAYAI_TTS_ARABIC]: {
     id: GroqModel.PLAYAI_TTS_ARABIC,
@@ -158,6 +182,8 @@ export const MODEL_INFO: Record<GroqModel, ModelInfo> = {
     category: 'audio',
     developer: { name: 'PlayAI' },
     releaseStatus: 'main',
+    tokensPerMinute: 600,
+    requestsPerMinute: 2,
   },
   [GroqModel.LLAMA3_70B]: {
     id: GroqModel.LLAMA3_70B,
@@ -167,6 +193,8 @@ export const MODEL_INFO: Record<GroqModel, ModelInfo> = {
     category: 'text',
     developer: { name: 'Meta' },
     releaseStatus: 'main',
+    tokensPerMinute: 6000,
+    requestsPerMinute: 30,
   },
   [GroqModel.LLAMA_3_3_70B_SPECDEC]: {
     id: GroqModel.LLAMA_3_3_70B_SPECDEC,
@@ -176,6 +204,8 @@ export const MODEL_INFO: Record<GroqModel, ModelInfo> = {
     category: 'text',
     developer: { name: 'Meta' },
     releaseStatus: 'main',
+    tokensPerMinute: 6000,
+    requestsPerMinute: 30,
   },
   [GroqModel.LLAMA_3_2_90B_VISION]: {
     id: GroqModel.LLAMA_3_2_90B_VISION,
@@ -185,6 +215,8 @@ export const MODEL_INFO: Record<GroqModel, ModelInfo> = {
     category: 'vision',
     developer: { name: 'Meta' },
     releaseStatus: 'preview',
+    tokensPerMinute: 7000,
+    requestsPerMinute: 15,
   },
   [GroqModel.LLAMA_GUARD_3_8B]: {
     id: GroqModel.LLAMA_GUARD_3_8B,
@@ -194,6 +226,8 @@ export const MODEL_INFO: Record<GroqModel, ModelInfo> = {
     category: 'text',
     developer: { name: 'Meta' },
     releaseStatus: 'main',
+    tokensPerMinute: 15000,
+    requestsPerMinute: 30,
   },
   [GroqModel.ALLAM_2_7B]: {
     id: GroqModel.ALLAM_2_7B,
@@ -203,6 +237,8 @@ export const MODEL_INFO: Record<GroqModel, ModelInfo> = {
     category: 'text',
     developer: { name: 'SDAIA' },
     releaseStatus: 'main',
+    tokensPerMinute: 6000,
+    requestsPerMinute: 30,
   },
   [GroqModel.MISTRAL_SABA_24B]: {
     id: GroqModel.MISTRAL_SABA_24B,
@@ -212,6 +248,8 @@ export const MODEL_INFO: Record<GroqModel, ModelInfo> = {
     category: 'text',
     developer: { name: 'Mistral AI' },
     releaseStatus: 'main',
+    tokensPerMinute: 6000,
+    requestsPerMinute: 30,
   },
   [GroqModel.PLAYAI_TTS]: {
     id: GroqModel.PLAYAI_TTS,
@@ -221,6 +259,8 @@ export const MODEL_INFO: Record<GroqModel, ModelInfo> = {
     category: 'audio',
     developer: { name: 'PlayAI' },
     releaseStatus: 'main',
+    tokensPerMinute: 600,
+    requestsPerMinute: 2,
   },
   [GroqModel.QWEN_QWQ_32B]: {
     id: GroqModel.QWEN_QWQ_32B,
@@ -230,6 +270,8 @@ export const MODEL_INFO: Record<GroqModel, ModelInfo> = {
     category: 'text',
     developer: { name: 'Alibaba Cloud' },
     releaseStatus: 'main',
+    tokensPerMinute: 6000,
+    requestsPerMinute: 30,
   },
   [GroqModel.LLAMA_3_2_3B_PREVIEW]: {
     id: GroqModel.LLAMA_3_2_3B_PREVIEW,
@@ -239,6 +281,8 @@ export const MODEL_INFO: Record<GroqModel, ModelInfo> = {
     category: 'text',
     developer: { name: 'Meta' },
     releaseStatus: 'preview',
+    tokensPerMinute: 7000,
+    requestsPerMinute: 30,
   },
   [GroqModel.LLAMA_3_2_1B_PREVIEW]: {
     id: GroqModel.LLAMA_3_2_1B_PREVIEW,
@@ -248,6 +292,8 @@ export const MODEL_INFO: Record<GroqModel, ModelInfo> = {
     category: 'text',
     developer: { name: 'Meta' },
     releaseStatus: 'preview',
+    tokensPerMinute: 7000,
+    requestsPerMinute: 30,
   },
   [GroqModel.DEEPSEEK_R1_DISTILL_QWEN_32B]: {
     id: GroqModel.DEEPSEEK_R1_DISTILL_QWEN_32B,
@@ -257,6 +303,8 @@ export const MODEL_INFO: Record<GroqModel, ModelInfo> = {
     category: 'text',
     developer: { name: 'DeepSeek / Alibaba Cloud' },
     releaseStatus: 'main',
+    tokensPerMinute: 6000,
+    requestsPerMinute: 30,
   },
   [GroqModel.DISTIL_WHISPER_LARGE_V3_EN]: {
     id: GroqModel.DISTIL_WHISPER_LARGE_V3_EN,
@@ -266,6 +314,8 @@ export const MODEL_INFO: Record<GroqModel, ModelInfo> = {
     category: 'audio',
     developer: { name: 'Hugging Face' },
     releaseStatus: 'main',
+    tokensPerMinute: 7200,
+    requestsPerMinute: 20,
   },
 };
 
