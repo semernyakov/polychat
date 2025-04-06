@@ -29,11 +29,13 @@ A plugin for [Obsidian](https://obsidian.md) that integrates Groq's AI chat capa
 
 ### Supported Models (Examples)
 
-- **Llama 3 70B**: Powerful model for complex tasks.
-- **Llama 3 8B**: Fast and efficient model.
-- **Mixtral 8x7B**: Mixture-of-Experts model, versatile.
-- **Gemma 2 9B**: Efficient model by Google.
-- **Whisper Large V3**: For audio transcription (Note: Audio input not yet implemented in plugin).
+- **Llama 3 70B:** Powerful general-purpose model by Meta (Context: 8192 tokens). Excellent for complex tasks requiring deep understanding and text generation.
+- **Llama 3 8B:** Fast and efficient model by Meta (Context: 8192 tokens). Good for everyday tasks, chatbots, and quick responses.
+- **Llama 3.1 8B Instant:** Improved fast 8B model by Meta (Context: 131072 tokens). Offers a significantly larger context window for handling long documents or conversations.
+- **Llama 3.3 70B Versatile:** Improved versatile 70B model by Meta (Context: 32768 tokens). Provides an increased context compared to the standard 70B model.
+- **Mixtral 8x7B:** Mixture-of-Experts model by Mistral AI (Context: 32768 tokens). Efficient for a wide range of tasks due to its architecture.
+- **Gemma2 9B IT:** Efficient instruct model by Google (Context: 8192 tokens). Optimized for following instructions and text generation.
+- **Whisper Large V3:** Audio transcription model by OpenAI (Note: Audio input not yet implemented in plugin).
 
 ## Installation
 
