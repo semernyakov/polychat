@@ -27,6 +27,14 @@ A plugin for [Obsidian](https://obsidian.md) that integrates Groq's AI chat capa
 - Raw/Markdown source view toggle for assistant messages.
 - Configurable default display mode (tab or side panel).
 
+### Supported Models (Examples)
+
+- **Llama 3 70B**: Powerful model for complex tasks.
+- **Llama 3 8B**: Fast and efficient model.
+- **Mixtral 8x7B**: Mixture-of-Experts model, versatile.
+- **Gemma 2 9B**: Efficient model by Google.
+- **Whisper Large V3**: For audio transcription (Note: Audio input not yet implemented in plugin).
+
 ## Installation
 
 1. Open Obsidian Settings
