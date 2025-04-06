@@ -8,7 +8,15 @@ import { MessageList, MessageListHandles } from './MessageList';
 import { ModelSelector } from './ModelSelector';
 import { MessageInput } from './MessageInput';
 import { SupportDialog } from './SupportDialog';
-import { FiTrash2, FiChevronUp, FiChevronDown, FiHeart, FiSidebar, FiSquare, FiInfo } from 'react-icons/fi';
+import {
+  FiTrash2,
+  FiChevronUp,
+  FiChevronDown,
+  FiHeart,
+  FiSidebar,
+  FiSquare,
+  FiInfo,
+} from 'react-icons/fi';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles.css';
@@ -116,16 +124,16 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
     setIsLoading(true);
 
     try {
-      await plugin.historyService.addMessage(userMessage).catch((err) => {
+      await plugin.historyService.addMessage(userMessage).catch(err => {
         console.error('Ошибка сохранения user message:', err);
         toast.warn('Не удалось сохранить ваше сообщение в истории.');
       });
 
       const assistantMessage = await plugin.groqService.sendMessage(trimmedValue, selectedModel);
 
-      setMessages((prev) => [...prev, userMessage, assistantMessage]);
+      setMessages(prev => [...prev, userMessage, assistantMessage]);
 
-      await plugin.historyService.addMessage(assistantMessage).catch((err) => {
+      await plugin.historyService.addMessage(assistantMessage).catch(err => {
         console.error('Ошибка сохранения assistant message:', err);
         toast.warn('Не удалось сохранить ответ ассистента в истории.');
       });
@@ -134,7 +142,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
       const errorMsg = error instanceof Error ? error.message : String(error);
       toast.error(`Ошибка: ${errorMsg}`);
       const errorMessage = MessageUtils.create('assistant', `Произошла ошибка: ${errorMsg}`);
-      setMessages((prev) => [...prev, errorMessage]);
+      setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }

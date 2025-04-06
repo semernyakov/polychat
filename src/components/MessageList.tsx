@@ -64,38 +64,11 @@ export const MessageList = React.memo(
 
       return (
         <div key={`message-${id}`} style={{ ...style, paddingBottom: 12 }}>
-          <div ref={(el) => measureRow(el, index, id)}>
+          <div ref={el => measureRow(el, index, id)}>
             <MessageItem message={message} key={`item-${id}`} />
           </div>
         </div>
       );
-    };
-
-    const getItemSize = (index: number): number => {
-      const message = messages[index];
-      const id = message.id || `msg-${index}`;
-
-      if (rowHeights.current[id]) {
-        return rowHeights.current[id] + 12;
-      }
-      if (sizeMap.current[id]) {
-        return sizeMap.current[id] + 12;
-      }
-
-      const estimate = () => {
-        const content = message.content || '';
-        const baseSize = 65;
-        const charsPerLine = 60; // Уточните по CSS
-        const lineHeight = 20; // Уточните по CSS
-        const numLines = Math.ceil(content.length / charsPerLine);
-        const codeBlockBonus = content.includes('```') ? 80 : 0;
-        const calculatedHeight = baseSize + numLines * lineHeight + codeBlockBonus;
-        return Math.max(80, calculatedHeight);
-      };
-
-      const estimatedSize = estimate();
-      sizeMap.current[id] = estimatedSize;
-      return estimatedSize + 12;
     };
 
     useEffect(() => {
@@ -109,9 +82,37 @@ export const MessageList = React.memo(
         {messages.length > 0 ? (
           <AutoSizer key="auto-sizer">
             {({ height, width }) => {
+              const getItemSize = (index: number): number => {
+                const message = messages[index];
+                const id = message.id || `msg-${index}`;
+
+                if (rowHeights.current[id]) {
+                  return rowHeights.current[id] + 12;
+                }
+                if (sizeMap.current[id]) {
+                  return sizeMap.current[id] + 12;
+                }
+
+                const estimate = () => {
+                  const content = message.content || '';
+                  const baseSize = 65;
+                  const charsPerLine = 60;
+                  const lineHeight = 20;
+                  const numLines = Math.ceil(content.length / charsPerLine);
+                  const codeBlockBonus = content.includes('```') ? 80 : 0;
+                  const calculatedHeight = baseSize + numLines * lineHeight + codeBlockBonus;
+                  return Math.max(80, calculatedHeight);
+                };
+
+                const estimatedSize = estimate();
+                sizeMap.current[id] = estimatedSize;
+                return estimatedSize + 12;
+              };
+
               if (height === 0 || width === 0) {
                 return null;
               }
+              
               return (
                 <List
                   ref={listRef}
@@ -120,7 +121,7 @@ export const MessageList = React.memo(
                   itemCount={messages.length}
                   itemSize={getItemSize}
                   estimatedItemSize={120}
-                  itemKey={(index) => messages[index].id || `msg-${index}`}
+                  itemKey={index => messages[index].id || `msg-${index}`}
                   className="groq-react-window-list"
                 >
                   {Row}

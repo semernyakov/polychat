@@ -10,8 +10,8 @@ import { GroqPluginInterface } from './types/plugin';
 import './styles.css';
 
 export default class GroqChatPlugin extends Plugin implements GroqPluginInterface {
-  settings = { ...DEFAULT_SETTINGS };
-  defaultSettings = { ...DEFAULT_SETTINGS };
+  settings: GroqChatSettings = { ...DEFAULT_SETTINGS };
+  defaultSettings: Readonly<GroqChatSettings> = { ...DEFAULT_SETTINGS };
   authService!: AuthService;
   groqService!: GroqService;
   historyService!: HistoryService;
@@ -27,7 +27,7 @@ export default class GroqChatPlugin extends Plugin implements GroqPluginInterfac
 
     this.addCommands();
     this.addRibbonIcon('message-square', 'Groq Chat', () => this.activateView());
-    this.addSettingTab(new GroqChatSettingsTab(this.app, this));
+    this.addSettingTab(new GroqChatSettingsTab(this.app, this, this.authService));
   }
 
   private initializeServices(): void {

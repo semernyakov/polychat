@@ -12,7 +12,6 @@ export interface GroqChatSettings {
   historyStorageMethod: HistoryStorageMethod;
   maxHistoryLength: number;
   notePath: string;
-  storeHistory: boolean;
   displayMode: 'tab' | 'sidepanel'; // Новое поле
 }
 
@@ -27,6 +26,5 @@ export const DEFAULT_SETTINGS: Readonly<GroqChatSettings> = Object.freeze({
   historyStorageMethod: 'memory',
   maxHistoryLength: 20,
   notePath: 'groq-chat-history.md',
-  storeHistory: true,
   displayMode: 'tab', // Значение по умолчанию
 });

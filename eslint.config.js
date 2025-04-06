@@ -12,6 +12,7 @@ export default [
       'esbuild.config.mjs',
       'version-bump.js',
       'src/hot-reload.js',
+      'main.js',
     ],
   },
   js.configs.recommended,

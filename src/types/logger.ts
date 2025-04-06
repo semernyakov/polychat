@@ -1,7 +1,7 @@
-export interface Logger {
-  info(message: string, meta?: Record<string, unknown>): void;
-  warn(message: string, meta?: Record<string, unknown>): void;
-  error(message: string, meta?: Record<string, unknown>): void;
-  debug(message: string, meta?: Record<string, unknown>): void;
-  child(module: string): Logger;
+export interface LoggerService {
+  info(message: string, _meta?: any): void;
+  warn(message: string, _meta?: any): void;
+  error(message: string, _meta?: any): void;
+  debug(message: string, _meta?: any): void;
+  setModule(module: string): void;
 }

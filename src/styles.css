@@ -1,6 +1,6 @@
 /* style.css */
 
-/* --- Переменные Obsidian (примерные, могут отличаться) --- */
+/* --- Переменные Obsidian (обновленные) --- */
 :root {
   --font-family:
     -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell,
@@ -11,25 +11,41 @@
 
   --background-primary: #202020; /* Основной фон */
   --background-secondary: #2a2a2a; /* Вторичный фон (сообщения, шапка) */
-  --background-secondary-alt: #333333; /* Альтернативный вторичный (наведение) */
+  --background-secondary-alt: #2d2d2d;
   --background-modifier-border: #444444; /* Границы */
   --background-modifier-hover: #3a3a3a; /* Фон при наведении */
   --background-modifier-active: #4a4a4a; /* Фон при активации */
 
-  --text-normal: #e0e0e0; /* Основной текст */
-  --text-muted: #9e9e9e; /* Приглушенный текст (время, подсказки) */
-  --text-accent: #7e57c2; /* Акцентный цвет (ссылки, кнопки) */
-  --text-accent-hover: #9575cd; /* Акцент при наведении */
-  --text-on-accent: #ffffff; /* Текст на акцентном фоне */
-  --text-error: #ef5350; /* Текст ошибки */
+  --text-faint: #7a7a7a;
+  --text-muted: #9e9e9e;
+  --text-normal: #e0e0e0;
+  --text-accent: #7e57c2;
+  --text-accent-hover: #9575cd;
+  --text-on-accent: #ffffff;
+  --text-error: #ef5350;
+  --text-warning: #ffa726;
+  --text-success: #66bb6a;
 
-  --interactive-normal: #424242; /* Фон кнопок */
-  --interactive-hover: #525252; /* Фон кнопок при наведении */
-  --interactive-accent: var(--text-accent); /* Акцентные кнопки */
-  --interactive-accent-hover: var(--text-accent-hover); /* Акцентные кнопки при наведении */
+  --interactive-normal: #424242;
+  --interactive-hover: #525252;
+  --interactive-accent: var(--text-accent);
+  --interactive-accent-hover: var(--text-accent-hover);
+  --interactive-success: var(--text-success);
+  --interactive-warning: var(--text-warning);
+  --interactive-error: var(--text-error);
 
-  --border-radius: 6px; /* Радиус скругления */
-  --spacing-unit: 8px; /* Базовая единица отступа */
+  --border-radius: 6px;
+  --border-radius-small: 4px;
+  --border-width: 1px;
+  --border-color: var(--background-modifier-border);
+  --border-color-hover: var(--background-modifier-hover);
+  --border-color-active: var(--background-modifier-active);
+
+  --spacing-unit: 8px;
+  --spacing-small: calc(var(--spacing-unit) * 0.5);
+  --spacing-medium: var(--spacing-unit);
+  --spacing-large: calc(var(--spacing-unit) * 1.5);
+  --spacing-xlarge: calc(var(--spacing-unit) * 2);
 }
 
 /* --- Сброс и базовые стили --- */
@@ -53,19 +69,6 @@
   font-family: var(--font-family);
   font-size: var(--font-size);
   line-height: 1.5;
-}
-
-.groq-chat {
-  /* Стили специфичные для чата, если нужны, уже применены в .groq-container */
-}
-
-/* Режимы отображения (если нужны специфичные стили) */
-.groq-chat--tab {
-  /* Стили только для вкладки */
-}
-.groq-chat--sidepanel {
-  /* Стили только для боковой панели (например, max-width) */
-  /* max-width: 450px; */ /* Раскомментируйте, если нужно ограничить ширину */
 }
 
 /* --- Шапка чата --- */
@@ -135,14 +138,15 @@
 
 /* --- Сообщения --- */
 .groq-message {
-  /* Общий стиль сообщения */
-  margin-bottom: calc(var(--spacing-unit) * 2); /* !!! Увеличен отступ снизу для разделения !!! */
+  margin-bottom: var(--spacing-large);
   border-radius: var(--border-radius);
-  padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.5);
-  border: 1px solid transparent;
+  padding: var(--spacing-medium) var(--spacing-large);
+  border: var(--border-width) solid transparent;
   word-wrap: break-word;
-  overflow-wrap: break-word;
-  max-width: 85%; /* Ограничиваем максимальную ширину сообщений */
+  max-width: 85%;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .groq-message:last-child {
@@ -154,16 +158,16 @@
   background-color: var(--interactive-accent);
   color: var(--text-on-accent);
   border-color: var(--interactive-accent-hover);
-  margin-left: auto; /* !!! Выравнивание по правому краю !!! */
-  margin-right: 0; /* Убедимся, что правый отступ 0 */
+  margin-left: auto;
+  margin-right: 0;
 }
 
 /* Сообщение ассистента */
 .groq-message--assistant {
   background-color: var(--background-secondary);
-  border-color: var(--background-modifier-border);
-  margin-right: auto; /* !!! Выравнивание по левому краю !!! */
-  margin-left: 0; /* Убедимся, что левый отступ 0 */
+  border-color: var(--border-color);
+  margin-right: auto;
+  margin-left: 0;
 }
 
 .groq-message__header {
@@ -190,79 +194,215 @@
   font-size: 0.85em;
 }
 
+.groq-message__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-small); /* Небольшой отступ между кнопками */
+}
+
 .groq-message__content {
-  /* --- Разрешаем выделение текста --- */
-  user-select: text; /* Явно разрешаем выделение */
-  /* --- Стили для Markdown контента --- */
+  user-select: text;
+  line-height: 1.6;
 }
-.groq-message__content p:first-child {
-  margin-top: 0;
+
+.groq-message__content h1,
+.groq-message__content h2,
+.groq-message__content h3,
+.groq-message__content h4,
+.groq-message__content h5,
+.groq-message__content h6 {
+  margin: var(--spacing-large) 0 var(--spacing-medium);
+  font-weight: 600;
+  line-height: 1.3;
 }
-.groq-message__content p:last-child {
-  margin-bottom: 0;
+
+.groq-message__content h1 {
+  font-size: 1.5em;
 }
+.groq-message__content h2 {
+  font-size: 1.3em;
+}
+.groq-message__content h3 {
+  font-size: 1.2em;
+}
+
 .groq-message__content p {
-  margin: 0.75em 0;
+  margin: var(--spacing-medium) 0;
+  line-height: 1.6;
 }
+
 .groq-message__content ul,
 .groq-message__content ol {
-  padding-left: 2em;
-  margin: 0.75em 0;
+  padding-left: var(--spacing-large);
+  margin: var(--spacing-medium) 0;
 }
+
 .groq-message__content li {
-  margin-bottom: 0.25em;
+  margin-bottom: var(--spacing-small);
 }
+
 .groq-message__content blockquote {
-  border-left: 3px solid var(--background-modifier-border);
-  padding-left: 1em;
-  margin: 1em 0;
+  border-left: 3px solid var(--border-color);
+  padding-left: var(--spacing-medium);
+  margin: var(--spacing-medium) 0;
   color: var(--text-muted);
 }
-.groq-message__content a {
-  color: var(--text-accent);
-  text-decoration: none;
-}
-.groq-message__content a:hover {
-  text-decoration: underline;
-  color: var(--text-accent-hover);
-}
-.groq-message__content hr {
-  border: none;
-  border-top: 1px solid var(--background-modifier-border);
-  margin: 1em 0;
+
+.groq-message__content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: var(--spacing-medium) 0;
 }
 
-/* --- Стилизация КОДА --- */
+.groq-message__content th,
+.groq-message__content td {
+  padding: var(--spacing-small) var(--spacing-medium);
+  border: var(--border-width) solid var(--border-color);
+  text-align: left;
+}
 
-/* 1. Строчный код (inline code) - тег `code.groq-inline-code` */
+.groq-message__content th {
+  background-color: var(--background-secondary);
+  font-weight: 600;
+}
+
+/* --- Inline Code Styles --- */
+
+/* Base styles for inline code */
 .groq-inline-code {
-  background-color: var(--background-modifier-hover); /* Слегка выделяющийся фон */
+  /* Layout */
+  display: inline;
+  vertical-align: baseline;
+  white-space: pre-wrap;
+  word-break: break-word;
+
+  /* Spacing */
+  padding: 0.15em 0.4em;
+  margin: 0 0.1em;
+  line-height: 1.4;
+
+  /* Typography */
+  font-family: var(--font-monospace);
+  font-size: 0.9em;
+
+  /* Visual */
+  background-color: var(--background-secondary);
   color: var(--text-normal);
-  padding: 0.15em 0.4em 0.1em; /* Небольшие вертикальные и горизонтальные отступы */
-  margin: 0 0.1em; /* Небольшой отступ от окружающего текста */
-  border-radius: 4px;
-  font-size: 0.9em; /* Чуть меньше основного текста */
-  word-break: break-all; /* Разрывать длинные строки кода, если нужно *!*/
-	display: inline;
-  white-space: pre-wrap; /* Перенос длинных строк */
+  border: var(--border-width) solid var(--border-color);
+  border-radius: var(--border-radius-small);
 
+  /* Animation */
+  transition: all 0.2s ease;
+
+  /* Accessibility */
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
 }
 
-.groq-code-container pre.groq-code-block {
-  white-space: pre-wrap; /* Перенос строк */
-  word-break: break-word; /* Разрыв длинных слов */
-  max-width: 100%; /* Запрет растягивания */
-}
+/* Context-specific styles */
 
-/* Убрать margin у параграфов внутри сообщений */
-.groq-message__content p {
-  margin: 0.5em 0;
-}
-
-/* Строчный код в сообщении пользователя */
+/* User message context */
 .groq-message--user .groq-inline-code {
-  background-color: rgba(255, 255, 255, 0.2); /* Фон на акцентном */
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
   color: var(--text-on-accent);
+}
+
+/* Link context */
+.groq-message__content a .groq-inline-code {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Heading context */
+.groq-message__content h1 .groq-inline-code,
+.groq-message__content h2 .groq-inline-code,
+.groq-message__content h3 .groq-inline-code,
+.groq-message__content h4 .groq-inline-code,
+.groq-message__content h5 .groq-inline-code,
+.groq-message__content h6 .groq-inline-code {
+  font-size: 0.85em;
+  padding: 0.1em 0.3em;
+}
+
+/* List context */
+.groq-message__content li .groq-inline-code {
+  margin: 0 0.05em;
+}
+
+/* Table context */
+.groq-message__content td .groq-inline-code,
+.groq-message__content th .groq-inline-code {
+  margin: 0 0.05em;
+}
+
+/* Code block styles */
+.groq-code-container pre.groq-code-block {
+  /* Layout */
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-width: 100%;
+
+  /* Spacing */
+  margin: 0 !important;
+  padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.5) !important;
+
+  /* Typography */
+  font-family: var(--font-monospace) !important;
+  font-size: 0.9em;
+  line-height: 1.5;
+
+  /* Visual */
+  background: none !important;
+  color: #d4d4d4;
+
+  /* Interaction */
+  overflow-x: auto;
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+
+  /* Scrollbar (optional) */
+  scrollbar-width: thin;
+  scrollbar-color: var(--background-modifier-border) transparent;
+}
+
+/* Стили для блока БЕЗ ПОДСВЕТКИ (применяются к <pre>) */
+/* Добавляем стили, ранее бывшие на .groq-code-container */
+.groq-code-container pre.groq-code-block--no-highlight,
+pre.groq-code-block--no-highlight { /* Селектор на случай отсутствия .groq-code-container */
+  /* Наследует базовые стили .groq-code-block (padding, font, color, user-select, etc.) */
+  
+  /* Возвращаем стили контейнера */
+  margin: var(--spacing-unit) 0 !important; /* Вертикальный отступ */
+  border-radius: var(--border-radius) !important; /* Скругление */
+  background-color: #1e1e1e !important; /* Фон как у контейнера */
+  border: 1px solid var(--background-modifier-border) !important; /* Рамка */
+  overflow: auto !important; /* Управляем переполнением (x и y) */
+  
+  /* Возможно, нужны специфичные паддинги, если они отличаются от подсвеченного */
+  /* padding-top: calc(var(--spacing-unit) * 0.75) !important; */
+  /* padding-bottom: calc(var(--spacing-unit) * 0.75) !important; */
+}
+
+/* Стили для <code> внутри блока без подсветки */
+.groq-code-container pre.groq-code-block--no-highlight code,
+pre.groq-code-block--no-highlight code { 
+  /* Убираем стили, которые могли бы конфликтовать */
+  display: block; 
+  padding: 0; 
+  margin: 0;
+  background: none;
+  border: none;
+  border-radius: 0;
+  color: inherit; /* Наследуем цвет от <pre> */
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  white-space: inherit; /* Важно для сохранения форматирования */
 }
 
 /* 2. Базовый контейнер для ВСЕХ блоков кода (с подсветкой и без) */
@@ -311,77 +451,30 @@
   background-color: var(--background-modifier-hover);
 }
 
-/* Базовые стили для ВСЕХ блоков <pre> внутри контейнера */
-.groq-code-container pre.groq-code-block {
-  margin: 0 !important; /* Убираем внешние отступы */
-  /* Внутренние отступы для кода */
-  padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.5) !important;
-  overflow-x: auto; /* Горизонтальная прокрутка */
-  font-family: var(--font-monospace) !important; /* Явно задаем моноширинный шрифт */
-  font-size: 0.9em; /* Размер шрифта кода */
-  line-height: 1.5; /* Межстрочный интервал */
-  background: none !important; /* Фон задан на .groq-code-container */
-  color: #d4d4d4; /* Базовый цвет текста для темы vsDark */
-  white-space: pre; /* Сохраняем пробелы и переносы */
-  user-select: text; /* Разрешаем выделение кода */
-  /* Стили для скроллбара внутри блока кода (опционально) */
-  /* scrollbar-width: thin; */
-  /* scrollbar-color: var(--background-modifier-border) transparent; */
-}
-
-/* Специфичные стили для блока БЕЗ ПОДСВЕТКИ Prism */
-.groq-code-container.groq-code-container--no-highlight pre.groq-code-block--no-highlight {
-  /* Наследует базовые стили .groq-code-block */
-  /* Отступ сверху может быть меньше, т.к. нет шапки */
-  padding-top: calc(var(--spacing-unit) * 0.75) !important;
-  padding-bottom: calc(var(--spacing-unit) * 0.75) !important;
-}
-.groq-code-container.groq-code-container--no-highlight pre.groq-code-block--no-highlight code {
-  /* Стили для тега code внутри блока без подсветки */
-  color: inherit; /* Наследовать цвет от pre (#d4d4d4) */
-  background: none; /* Убедимся, что нет фона */
-  padding: 0; /* Убираем padding от inline стилей, если есть */
-  font-family: inherit; /* Наследуем шрифт */
-  font-size: inherit; /* Наследуем размер */
-  display: block; /* Убедимся, что code занимает всю ширину pre */
-  white-space: inherit; /* Наследуем white-space от pre */
-}
-
-/* Специфичные стили для блока С ПОДСВЕТКОЙ Prism (если нужны) */
-/* Обычно стили токенов приходят из темы prismTheme (vsDark) */
-
 /* --- Общие стили кнопок (минималистичные, БЕЗ ГРАНИЦ И ТЕНЕЙ) --- */
 .groq-button,
 .groq-icon-button {
-  /* Сброс некоторых браузерных стилей */
   appearance: none;
   background: none;
   border: none;
   font: inherit;
   text-decoration: none;
-  
-  /* Основные стили Obsidian */
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: var(--size-4-1) var(--size-4-3); /* Стандартный паддинг Obsidian */
-  height: var(--input-height); /* Стандартная высота */
+  padding: var(--spacing-small) var(--spacing-medium);
+  height: var(--input-height);
   font-size: var(--font-ui-small);
-  font-weight: var(--font-medium); /* Стандартная жирность */
+  font-weight: var(--font-medium);
   line-height: 1.5;
   text-align: center;
   white-space: nowrap;
   vertical-align: middle;
-  cursor: var(--cursor, pointer);
+  cursor: pointer;
   user-select: none;
-
-  /* Внешний вид - БЕЗ ГРАНИЦЫ */
-  /* border: 1px solid transparent;  */
-  background-color: var(--interactive-normal); 
-  color: var(--text-muted); 
-  
-  /* Убираем transition для border и box-shadow */
-  transition: background-color 0.1s linear, color 0.1s linear;
+  background-color: var(--interactive-normal);
+  color: var(--text-muted);
+  transition: all 0.2s ease;
   box-shadow: none !important;
   border: none !important;
 }
@@ -389,40 +482,36 @@
 .groq-button:hover,
 .groq-icon-button:hover {
   background-color: var(--interactive-hover);
-  border-color: transparent; /* Убеждаемся: граница прозрачная */
-  color: var(--text-normal); 
-  cursor: pointer;
+  color: var(--text-normal);
+  transform: translateY(-1px);
 }
 
 .groq-button:focus,
 .groq-icon-button:focus {
-  outline: none; 
+  outline: none;
 }
 
 .groq-button:focus-visible,
 .groq-icon-button:focus-visible {
-   /* БЕЗ ТЕНИ и БЕЗ ГРАНИЦЫ */
-   box-shadow: none; /* Явно убираем тень */
-   border-color: transparent; /* Убеждаемся: граница прозрачная */
-   background-color: var(--interactive-hover); 
-   color: var(--text-normal); 
+  box-shadow: none;
+  background-color: var(--interactive-hover);
+  color: var(--text-normal);
 }
 
 .groq-button:disabled,
 .groq-icon-button:disabled {
-  background-color: var(--interactive-normal); 
-  border-color: transparent; /* Убеждаемся: граница прозрачная */
-  color: var(--text-muted); 
+  background-color: var(--interactive-normal);
+  color: var(--text-muted);
   cursor: not-allowed;
-  opacity: var(--opacity-disabled); 
+  opacity: 0.5;
 }
 
 /* --- Основная кнопка (минималистичная, БЕЗ ГРАНИЦ И ТЕНЕЙ) --- */
 .groq-button--primary {
-  background-color: var(--interactive-accent); 
+  background-color: var(--interactive-accent);
   border-color: transparent; /* Убеждаемся: граница прозрачная */
   color: var(--text-on-accent);
-  font-weight: var(--font-semibold); 
+  font-weight: var(--font-semibold);
 }
 
 .groq-button--primary:hover {
@@ -432,52 +521,51 @@
 }
 
 .groq-button--primary:focus-visible {
-   /* БЕЗ ТЕНИ и БЕЗ ГРАНИЦЫ */
-   box-shadow: none; /* Явно убираем тень */
-   border-color: transparent; /* Убеждаемся: граница прозрачная */
-   background-color: var(--interactive-accent-hover); 
-   /* color: var(--text-on-accent); */
+  /* БЕЗ ТЕНИ и БЕЗ ГРАНИЦЫ */
+  box-shadow: none; /* Явно убираем тень */
+  border-color: transparent; /* Убеждаемся: граница прозрачная */
+  background-color: var(--interactive-accent-hover);
+  /* color: var(--text-on-accent); */
 }
 
 .groq-button--primary:disabled {
-  background-color: var(--interactive-accent); 
+  background-color: var(--interactive-accent);
   border-color: transparent; /* Убеждаемся: граница прозрачная */
-  color: var(--text-on-accent); 
+  color: var(--text-on-accent);
   cursor: not-allowed;
-  opacity: var(--opacity-disabled); 
+  opacity: var(--opacity-disabled);
 }
 
 /* --- Кнопки-иконки (минималистичные, БЕЗ ГРАНИЦ И ТЕНЕЙ) --- */
 .groq-icon-button {
-  padding: var(--size-4-1); /* Уменьшенный паддинг для иконок */
-  width: var(--clickable-icon-size); /* Стандартный размер */
+  padding: var(--spacing-small);
+  width: var(--clickable-icon-size);
   height: var(--clickable-icon-size);
-  background-color: transparent; 
-  border-color: transparent; /* Убеждаемся: граница прозрачная */
-  color: var(--icon-color, var(--text-muted)); 
-  flex-shrink: 0; /* Чтобы не сжимались в flex-контейнере */
+  background-color: transparent;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  border-radius: var(--border-radius-small);
 }
 
 .groq-icon-button:hover {
-  background-color: var(--background-modifier-hover); 
-  border-color: transparent; /* Убеждаемся: граница прозрачная */
-  color: var(--icon-color-hover, var(--text-normal)); 
+  background-color: var(--background-secondary);
+  color: var(--text-normal);
 }
 
 .groq-icon-button:focus-visible {
-   /* БЕЗ ТЕНИ и БЕЗ ГРАНИЦЫ */
-   box-shadow: none; /* Явно убираем тень */
-   border-color: transparent; /* Убеждаемся: граница прозрачная */
-   background-color: var(--background-modifier-hover); 
-   color: var(--icon-color-hover, var(--text-normal));
+  /* БЕЗ ТЕНИ и БЕЗ ГРАНИЦЫ */
+  box-shadow: none; /* Явно убираем тень */
+  border-color: transparent; /* Убеждаемся: граница прозрачная */
+  background-color: var(--background-modifier-hover);
+  color: var(--text-normal);
 }
 
 .groq-icon-button:disabled {
-    background-color: transparent;
-    border-color: transparent; /* Убеждаемся: граница прозрачная */
-    color: var(--icon-color, var(--text-muted)); 
-    cursor: not-allowed;
-    opacity: var(--opacity-disabled);
+  background-color: transparent;
+  border-color: transparent; /* Убеждаемся: граница прозрачная */
+  color: var(--text-muted);
+  cursor: not-allowed;
+  opacity: var(--opacity-disabled);
 }
 
 /* --- Применения к конкретным кнопкам --- */
@@ -487,9 +575,9 @@
   /* Наследует .groq-button, .groq-button--primary */
   height: var(--input-height); /* Явно задаем высоту */
   /* Убираем авто-размеры, если были */
-  /* height: auto; */
-  /* min-width: auto; */
-  /* align-self: stretch; */ 
+  height: auto;
+  min-width: auto;
+  align-self: stretch;
 }
 
 /* Кнопки в хедере (иконки) */
@@ -504,45 +592,45 @@
 
 /* Кнопка закрытия диалога (иконка) */
 .groq-dialog-close {
-    /* Наследует .groq-icon-button */
-    position: absolute;
-    top: var(--size-4-2);
-    right: var(--size-4-2);
+  /* Наследует .groq-icon-button */
+  position: absolute;
+  top: var(--size-4-2);
+  right: var(--size-4-2);
 }
 
 /* Кнопки в диалоге (текстовые) */
 .groq-dialog-actions .groq-button {
-    /* Наследует .groq-button */
-    /* Можно добавить специфичные отступы, если нужно */
+  /* Наследует .groq-button */
+  /* Можно добавить специфичные отступы, если нужно */
 }
 
 .groq-dialog-actions .groq-button--primary {
-    /* Наследует .groq-button, .groq-button--primary */
+  /* Наследует .groq-button, .groq-button--primary */
 }
 
 .groq-dialog-secondary-button {
-    /* Наследует .groq-button */
+  /* Наследует .groq-button */
 }
 
 /* Кнопки копирования кода (иконки) */
 .groq-code-copy {
-    /* Наследует .groq-icon-button */
-    position: absolute;
-    top: var(--size-4-1);
-    right: var(--size-4-1);
-    z-index: 1; /* Поверх кода */
-    background-color: var(--background-secondary); 
-    border-color: transparent; /* Убеждаемся: граница прозрачная */
-    opacity: 0.6;
+  /* Наследует .groq-icon-button */
+  position: absolute;
+  top: var(--size-4-1);
+  right: var(--size-4-1);
+  z-index: 1; /* Поверх кода */
+  background-color: var(--background-secondary);
+  border-color: transparent; /* Убеждаемся: граница прозрачная */
+  opacity: 0.6;
 }
 
 .groq-code-container:hover .groq-code-copy {
-    opacity: 1;
+  opacity: 1;
 }
 
 .groq-code-copy:hover {
-    background-color: var(--background-secondary-alt);
-    border-color: transparent; /* Убеждаемся: граница прозрачная */
+  background-color: var(--background-secondary-alt);
+  border-color: transparent; /* Убеждаемся: граница прозрачная */
 }
 
 /* --- Поле ввода сообщения --- */
@@ -647,22 +735,22 @@
 
 /* --- Индикаторы загрузки --- */
 .groq-loading-indicator {
-  /* Индикатор загрузки ответа */
-  position: absolute; /* Позиционирование относительно .groq-chat__messages */
-  bottom: 10px;
+  position: absolute;
+  bottom: var(--spacing-large);
   left: 50%;
   transform: translateX(-50%);
-  background-color: rgba(42, 42, 42, 0.8); /* Полупрозрачный фон */
-  backdrop-filter: blur(2px); /* Размытие фона (если поддерживается) */
+  background-color: var(--background-secondary);
+  backdrop-filter: blur(2px);
   color: var(--text-muted);
-  padding: calc(var(--spacing-unit) * 0.5) var(--spacing-unit);
+  padding: var(--spacing-small) var(--spacing-medium);
   border-radius: var(--border-radius);
-  z-index: 20; /* Поверх списка */
+  z-index: 20;
   display: flex;
   align-items: center;
-  gap: var(--spacing-unit);
+  gap: var(--spacing-medium);
   font-size: 0.9em;
-  pointer-events: none; /* Не мешает кликам по списку */
+  pointer-events: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .groq-chat__loading-history {
@@ -707,13 +795,17 @@
 }
 
 .groq-api-key-warning {
-  padding: calc(var(--spacing-unit) * 2);
+  padding: var(--spacing-large);
   background-color: var(--background-secondary);
   color: var(--text-error);
-  border: 1px solid var(--text-error);
+  border: var(--border-width) solid var(--text-error);
   border-radius: var(--border-radius);
-  margin: var(--spacing-unit);
+  margin: var(--spacing-medium);
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-medium);
 }
 
 /* --- Диалог поддержки --- */
@@ -736,21 +828,22 @@
   border-radius: var(--border-radius);
   width: 90%;
   max-width: 500px;
-  max-height: 90vh; /* Ограничение высоты */
-  overflow-y: auto; /* Прокрутка, если контент не влезает */
-  border: 1px solid var(--background-modifier-border);
+  max-height: 90vh;
+  overflow-y: auto;
+  border: var(--border-width) solid var(--border-color);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   display: flex;
-  flex-direction: column; /* Структура диалога */
+  flex-direction: column;
 }
 
 .groq-dialog-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.5);
-  border-bottom: 1px solid var(--background-modifier-border);
+  padding: var(--spacing-medium) var(--spacing-large);
+  border-bottom: var(--border-width) solid var(--border-color);
   flex-shrink: 0;
+  background-color: var(--background-secondary);
 }
 
 .groq-dialog-header h3 {
@@ -766,9 +859,9 @@
 }
 
 .groq-dialog-content {
-  padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 2);
-  flex-grow: 1; /* Занимает доступное пространство */
-  user-select: text; /* Разрешаем выделение текста в диалоге */
+  padding: var(--spacing-large);
+  flex-grow: 1;
+  user-select: text;
 }
 .groq-dialog-content p {
   margin-bottom: var(--spacing-unit);
@@ -778,10 +871,10 @@
 .groq-dialog-actions {
   display: flex;
   justify-content: flex-end;
-  gap: var(--spacing-unit);
-  padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.5);
-  border-top: 1px solid var(--background-modifier-border);
-  background-color: var(--background-secondary); /* Немного другой фон */
+  gap: var(--spacing-medium);
+  padding: var(--spacing-medium) var(--spacing-large);
+  border-top: var(--border-width) solid var(--border-color);
+  background-color: var(--background-secondary);
   flex-shrink: 0;
 }
 
@@ -810,40 +903,48 @@
 /* --- Адаптивность (пример) --- */
 @media (max-width: 600px) {
   .groq-chat__header {
-    flex-direction: column; /* Шапка в столбец на маленьких экранах */
-    height: auto; /* Автоматическая высота */
-    gap: var(--spacing-unit);
-    padding: var(--spacing-unit);
+    flex-direction: column;
+    height: auto;
+    gap: var(--spacing-medium);
+    padding: var(--spacing-medium);
   }
+
   .groq-chat__header-left,
   .groq-chat__header-right {
     width: 100%;
-    justify-content: space-between; /* Растягиваем элементы в рядах */
+    justify-content: space-between;
   }
+
   .groq-chat__messages {
-    padding: var(--spacing-unit); /* Уменьшаем отступы */
+    padding: var(--spacing-medium);
   }
+
   .groq-chat__input-container {
-    padding: var(--spacing-unit);
+    padding: var(--spacing-medium);
   }
+
   .groq-message {
-    max-width: 95%; /* Чуть шире на мобильных */
+    max-width: 95%;
+  }
+
+  .groq-model-info__details {
+    grid-template-columns: 1fr;
   }
 }
 
 .groq-model-info {
-  margin-top: 1rem;
-  padding: 1rem;
-  border: 1px solid var(--groq-border-color);
-  border-radius: 4px;
-  background-color: var(--groq-background-color);
+  margin-top: var(--spacing-large);
+  padding: var(--spacing-large);
+  border: var(--border-width) solid var(--border-color);
+  border-radius: var(--border-radius);
+  background-color: var(--background-secondary);
 }
 
 .groq-model-info__header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem;
+  margin-bottom: var(--spacing-medium);
 }
 
 .groq-model-info__header h3 {
@@ -853,62 +954,63 @@
 }
 
 .groq-model-info__status {
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
+  padding: var(--spacing-small) var(--spacing-medium);
+  border-radius: var(--border-radius-small);
   font-size: 0.875rem;
   font-weight: 500;
 }
 
 .groq-model-info__status.main {
-  background-color: var(--groq-primary-color);
-  color: white;
+  background-color: var(--interactive-accent);
+  color: var(--text-on-accent);
 }
 
 .groq-model-info__status.preview {
-  background-color: var(--groq-secondary-color);
-  color: white;
+  background-color: var(--interactive-warning);
+  color: var(--text-on-accent);
 }
 
 .groq-model-info__description {
-  margin: 0.5rem 0;
-  color: var(--groq-text-color);
+  margin: var(--spacing-medium) 0;
+  color: var(--text-normal);
   font-size: 0.9rem;
+  line-height: 1.6;
 }
 
 .groq-model-info__details {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 0.75rem;
-  margin-top: 1rem;
+  gap: var(--spacing-medium);
+  margin-top: var(--spacing-large);
 }
 
 .groq-model-info__detail {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: var(--spacing-small);
 }
 
 .groq-model-info__label {
   font-size: 0.875rem;
-  color: var(--groq-text-color-secondary);
+  color: var(--text-muted);
 }
 
 .groq-model-info__value {
   font-size: 0.9rem;
   font-weight: 500;
-  color: var(--groq-text-color);
+  color: var(--text-normal);
 }
 
 .groq-model-info__warning {
-  margin-top: 1rem;
-  padding: 0.75rem;
-  border-radius: 4px;
-  background-color: var(--groq-warning-color);
-  color: white;
+  margin-top: var(--spacing-large);
+  padding: var(--spacing-medium);
+  border-radius: var(--border-radius);
+  background-color: var(--interactive-warning);
+  color: var(--text-on-accent);
   font-size: 0.9rem;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--spacing-medium);
 }
 
 /* --- Кнопка информации о модели --- */
@@ -920,4 +1022,63 @@
 
 .groq-model-info-button:hover {
   color: var(--text-normal);
+}
+
+/* --- Стили для ссылок и изображений в markdown --- */
+.groq-message__content a {
+  color: var(--text-accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.groq-message__content a:hover {
+  color: var(--text-accent-hover);
+  border-bottom-color: var(--text-accent-hover);
+}
+
+.groq-message__content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--border-radius);
+  margin: var(--spacing-medium) 0;
+  display: block;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.groq-message__content img[alt] {
+  border: 1px solid var(--border-color);
+}
+
+.groq-message__content figure {
+  margin: var(--spacing-medium) 0;
+  text-align: center;
+}
+
+.groq-message__content figcaption {
+  font-size: 0.9em;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: var(--spacing-small);
+}
+
+/* Стили для отображения "сырого" контента */
+.groq-message__content--raw pre {
+  margin: 0;
+  padding: 0;
+  background: none;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.groq-message__content--raw pre code {
+  display: block;
+  padding: var(--spacing-medium);
+  font-family: var(--font-monospace);
+  font-size: 0.9em;
+  line-height: 1.5;
+  background-color: var(--background-primary);
+  border-radius: var(--border-radius-small);
+  color: var(--text-normal);
+  border: 1px solid var(--border-color);
 }

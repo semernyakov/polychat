@@ -13,11 +13,17 @@ export class GroqService {
     });
   }
 
-  private initializeClient(): void {
+  /**
+   * Обновляет внутренний клиент Groq новым API ключом.
+   * @param apiKey Новый API ключ. Пустая строка для сброса.
+   */
+  public updateApiKey(apiKey: string): void {
+    console.log('GroqService: Обновление API ключа...'); // Добавим лог для отладки
     this.client = new Groq({
-      apiKey: this.plugin.settings.apiKey,
+      apiKey: apiKey,
       dangerouslyAllowBrowser: true,
     });
+    console.log('GroqService: API ключ обновлен.');
   }
 
   async validateApiKey(apiKey: string): Promise<boolean> {

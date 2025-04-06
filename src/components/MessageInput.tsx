@@ -72,7 +72,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
         <textarea
           ref={textareaRef}
           value={value}
-          onChange={e => onChange(e.target.value)}
+          onChange={(_e) => onChange(_e.target.value)}
           onKeyDown={handleKeyDown}
           onCompositionStart={() => setIsComposing(true)}
           onCompositionEnd={() => setIsComposing(false)}
@@ -101,9 +101,9 @@ export const MessageInput: React.FC<MessageInputProps> = ({
           <span
             className="groq-message-input__counter"
             style={{ color: isOverLimit ? 'var(--text-error)' : 'inherit' }}
-            title="Приблизительное количество символов / Максимум токенов для модели"
+            title="Текущее кол-во символов / Макс. кол-во токенов для модели (приблизительное сравнение)"
           >
-            {currentLength}/{maxTokens.toLocaleString()} (символы/токены)
+            {currentLength.toLocaleString()}/{maxTokens.toLocaleString()} (символы/токены)
           </span>
         )}
       </div>

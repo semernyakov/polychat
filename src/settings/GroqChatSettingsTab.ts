@@ -8,14 +8,12 @@ import { GroqPluginInterface } from '../types/plugin';
 import { GroqService } from '../services/groqService';
 
 export class GroqChatSettingsTab extends PluginSettingTab {
-  private readonly authService: AuthService;
-
   constructor(
     app: App,
     private readonly plugin: GroqPluginInterface,
+    private readonly authService: AuthService,
   ) {
     super(app, plugin);
-    this.authService = new AuthService(plugin, plugin.groqService as GroqService);
   }
 
   display(): void {
@@ -37,8 +35,7 @@ export class GroqChatSettingsTab extends PluginSettingTab {
     this.addModelSetting();
     this.addTemperatureSetting();
     this.addMaxTokensSetting();
-    this.addHistoryStorageSettings();
-    this.addNotePathSetting();
+    this.addHistorySettings();
     this.addDisplayModeSetting();
   }
 
@@ -152,10 +149,10 @@ export class GroqChatSettingsTab extends PluginSettingTab {
       );
   }
 
-  private addHistoryStorageSettings(): void {
-    const setting = new Setting(this.containerEl)
+  private addHistorySettings(): void {
+    new Setting(this.containerEl)
       .setName('Хранение истории')
-      .setDesc('Выберите способ хранения истории чата')
+      .setDesc('Выберите способ хранения и максимальную длину истории')
       .addDropdown(dropdown => {
         dropdown
           .addOption('memory', 'В памяти')
@@ -168,27 +165,38 @@ export class GroqChatSettingsTab extends PluginSettingTab {
             await this.plugin.saveSettings();
             this.display();
           });
+      })
+      .addText(text => {
+        text.setPlaceholder('20')
+            .setValue(this.plugin.settings.maxHistoryLength.toString())
+            .onChange(async (value) => {
+                const num = parseInt(value);
+                this.plugin.settings.maxHistoryLength = (!isNaN(num) && num >= 0) ? num : 0;
+                await this.plugin.saveSettings();
+            });
+        text.inputEl.insertAdjacentHTML('afterend', '<span style="font-size: var(--font-ui-smaller); margin-left: 5px;">(0 = не хранить)</span>');
+        text.inputEl.type = 'number';
+        text.inputEl.min = '0';
       });
-  }
 
-  private addNotePathSetting(): void {
-    if (this.plugin.settings.historyStorageMethod !== 'file') return;
-
-    new Setting(this.containerEl)
-      .setName('Файл истории')
-      .setDesc('Путь к файлу для хранения истории')
-      .addText(text =>
-        text
-          .setPlaceholder('groq-chat-history.md')
-          .setValue(this.plugin.settings.notePath)
-          .onChange(async value => {
-            if (isValidFileName(value)) {
-              this.plugin.settings.notePath = value;
-              await this.plugin.saveSettings();
-            } else {
-              new Notice('Некорректное имя файла');
-            }
-          }),
-      );
+    if (this.plugin.settings.historyStorageMethod === 'file') {
+      new Setting(this.containerEl)
+        .setName('Файл истории')
+        .setDesc('Путь к файлу для хранения истории (если выбран метод "В файле")')
+        .addText(text =>
+          text
+            .setPlaceholder('groq-chat-history.md')
+            .setValue(this.plugin.settings.notePath)
+            .onChange(async value => {
+              const trimmedValue = value.trim();
+              if (isValidFileName(trimmedValue)) {
+                this.plugin.settings.notePath = trimmedValue;
+                await this.plugin.saveSettings();
+              } else {
+                new Notice('Некорректное имя/путь файла');
+              }
+            }),
+        );
+    }
   }
 }

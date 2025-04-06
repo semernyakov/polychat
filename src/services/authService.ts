@@ -37,25 +37,24 @@ export class AuthService {
     if (await this.validateApiKey(apiKey)) {
       this.plugin.settings.apiKey = apiKey;
       await this.plugin.saveSettings();
+      this.groqService.updateApiKey(apiKey);
       return;
     }
-    return;
   }
 
   async clearApiKey(): Promise<void> {
     this.plugin.settings.apiKey = '';
     await this.plugin.saveSettings();
+    this.groqService.updateApiKey('');
     new Notice('API key cleared');
   }
 
   private validateApiKeyFormat(apiKey: string): boolean {
     if (!apiKey) {
-      new Notice('API key cannot be empty');
       return false;
     }
 
     if (!/^gsk_[a-zA-Z0-9]{32,}$/.test(apiKey)) {
-      new Notice('Invalid API key format');
       return false;
     }
 

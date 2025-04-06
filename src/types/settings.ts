@@ -9,17 +9,8 @@ import { GroqModel } from './models';
  */
 export type HistoryStorageMethod = 'memory' | 'localStorage' | 'indexedDB' | 'file';
 
-/**
- * Настройки плагина
- */
-export interface GroqChatSettings {
-  displayMode: 'tab' | 'sidepanel';
-  apiKey: string;
-  model: GroqModel;
-  temperature: number;
-  maxTokens: number;
-  historyStorageMethod: HistoryStorageMethod;
-  maxHistoryLength: number;
-  notePath: string;
-  storeHistory: boolean;
-}
+// Реэкспортируем основной интерфейс и настройки по умолчанию
+// Используем export type для интерфейса
+export type { GroqChatSettings } from '../settings/GroqChatSettings';
+// Оставляем export для объекта настроек
+export { DEFAULT_SETTINGS } from '../settings/GroqChatSettings';

@@ -10,7 +10,7 @@ export interface ModelParams {
   maxTokens: number;
   maxDuration?: number;
   maxFileSize?: number;
-  tokensPerMinute?: number;  // TPM
+  tokensPerMinute?: number; // TPM
   requestsPerMinute?: number; // RPM
 }
 
