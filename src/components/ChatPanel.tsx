@@ -36,6 +36,17 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
   const messageListRef = useRef<MessageListHandles>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Callback для передачи в ModelSelector
+  const fetchAvailableModels = useCallback(async () => {
+    // Проверяем наличие groqService перед вызовом
+    if (plugin.groqService) {
+      return plugin.groqService.getAvailableModels();
+    }
+    // Возвращаем пустой массив или выбрасываем ошибку, если сервис недоступен
+    console.warn('GroqService is not available when fetching models.');
+    return [];
+  }, [plugin.groqService]); // Зависимость от groqService
+
   // ResizeObserver
   useEffect(() => {
     const handleResize = () => {
@@ -152,7 +163,11 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
     <div className={`groq-container groq-chat groq-chat--${displayMode}`} ref={containerRef}>
       <div className="groq-chat__header">
         <div className="groq-chat__header-left">
-          <ModelSelector selectedModel={selectedModel} onSelectModel={handleModelChange} />
+          <ModelSelector
+            selectedModel={selectedModel}
+            onSelectModel={handleModelChange}
+            getAvailableModels={fetchAvailableModels}
+          />
         </div>
         <div className="groq-chat__header-right">
           <button

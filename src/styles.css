@@ -242,7 +242,7 @@
   margin: 0 0.1em; /* Небольшой отступ от окружающего текста */
   border-radius: 4px;
   font-size: 0.9em; /* Чуть меньше основного текста */
-  /*word-break: break-all; !* Разрывать длинные строки кода, если нужно *!*/
+  word-break: break-all; /* Разрывать длинные строки кода, если нужно *!*/
 	display: inline;
   white-space: pre-wrap; /* Перенос длинных строк */
 
@@ -404,20 +404,34 @@
 }
 
 /* Кнопки-иконки (без текста) */
+/* Предполагается использование как модификатор: class="groq-button groq-icon-button" */
 .groq-icon-button {
-  padding: calc(var(--spacing-unit) * 0.75); /* Делаем квадратными */
-  background: none; /* Прозрачный фон по умолчанию */
-  border: none;
-  color: var(--text-muted);
+  /* --- Общие свойства наследуются от .groq-button --- */
+  /* display, align-items, justify-content, border-radius, cursor, font-size, line-height, text-decoration, transition, white-space, user-select */
+
+  /* --- Переопределения для иконки --- */
+  padding: calc(var(--spacing-unit) * 0.75); /* Делаем квадратными, переопределяет padding .groq-button */
+  background: none; /* Прозрачный фон, переопределяет background-color .groq-button */
+  border: none; /* Убираем границу, переопределяет border .groq-button */
+  color: var(--text-muted); /* Другой цвет текста, переопределяет color .groq-button */
+  /* font-weight наследуется от .groq-button */
 }
+
 .groq-icon-button:hover {
-  color: var(--text-normal);
-  background-color: var(--background-modifier-hover);
+  /* --- Переопределения для hover иконки --- */
+  color: var(--text-normal); /* Отличается от .groq-button:hover */
+  background-color: var(--background-modifier-hover); /* Отличается от .groq-button:hover */
+  border-color: transparent; /* Убедимся, что граница не появляется при hover */
 }
+
 .groq-icon-button:disabled {
-  background: none;
-  color: var(--text-muted);
-  opacity: 0.5;
+  /* --- Общие свойства disabled наследуются от .groq-button:disabled --- */
+  /* opacity, cursor */
+
+  /* --- Переопределения для disabled иконки --- */
+  background: none; /* Сохраняем прозрачный фон */
+  color: var(--text-muted); /* Сохраняем цвет текста */
+  /* opacity наследуется от .groq-button:disabled */
 }
 /* Кнопки копирования */
 .groq-copy-button,

@@ -17,7 +17,7 @@ type CodeProps = {
 const CodeBlock = React.memo(({ language, code }: { language: string; code: string }) => {
   const [isCopied, setIsCopied] = React.useState(false);
   const [copyError, setCopyError] = React.useState(false);
-  const timeoutId = React.useRef<NodeJS.Timeout>();
+  const timeoutId = React.useRef<NodeJS.Timeout | null>(null);
 
   const handleCopy = () => {
     setCopyError(false);

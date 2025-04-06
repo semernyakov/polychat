@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "obsidian dev",
-    "dev": "node esbuild.config.mjs && obsidian dev",
+    "dev": "node esbuild.config.mjs && obsidian dev && cp dist/main.js .",
     "clean": "rm -rf dist",
     "build": "npm run clean && tsc --noEmit --skipLibCheck && node esbuild.config.mjs production",
     "lint": "eslint . --ext .ts,.tsx --fix",

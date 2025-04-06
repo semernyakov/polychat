@@ -1,6 +1,3 @@
-// import { GroqModel } from './models';
-// import { GroqChatSettings } from './settings';
-
 export type MessageRole = 'user' | 'assistant' | 'system';
 
 export interface Message {
