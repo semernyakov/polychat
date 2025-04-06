@@ -605,14 +605,6 @@ pre.groq-code-block--no-highlight code {
   /* Можно добавить специфичные отступы, если нужно */
 }
 
-.groq-dialog-actions .groq-button--primary {
-  /* Наследует .groq-button, .groq-button--primary */
-}
-
-.groq-dialog-secondary-button {
-  /* Наследует .groq-button */
-}
-
 /* Кнопки копирования кода (иконки) */
 .groq-code-copy {
   /* Наследует .groq-icon-button */
@@ -694,9 +686,6 @@ pre.groq-code-block--no-highlight code {
   font-family: var(--font-monospace);
 }
 
-.groq-message-input__counter {
-  /* Стили счетчика символов */
-}
 .groq-message-input__counter[style*='--text-error'] {
   /* Стиль для превышения лимита */
   font-weight: bold;
@@ -882,10 +871,6 @@ pre.groq-code-block--no-highlight code {
 .groq-support-button {
   /* Стилизуется через .groq-button и .groq-button--primary */
   gap: calc(var(--spacing-unit) * 0.75);
-}
-
-.groq-dialog-secondary-button {
-  /* Стилизуется через .groq-button */
 }
 
 /* --- Вспомогательные классы --- */
