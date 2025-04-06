@@ -112,7 +112,7 @@ export const MessageList = React.memo(
               if (height === 0 || width === 0) {
                 return null;
               }
-              
+
               return (
                 <List
                   ref={listRef}

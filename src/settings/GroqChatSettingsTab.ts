@@ -1,11 +1,10 @@
 import { App, PluginSettingTab, Setting } from 'obsidian';
+import { GroqPluginInterface } from '../types/plugin';
 import { AuthService } from '../services/authService';
-import { GroqModel, getModelInfo } from '../types/models';
+import { MODEL_INFO, GroqModel, getModelInfo } from '../types/models';
 import { HistoryStorageMethod } from '../types/settings';
 import { Notice } from 'obsidian';
 import { isValidFileName } from '../utils/validation';
-import { GroqPluginInterface } from '../types/plugin';
-import { GroqService } from '../services/groqService';
 
 export class GroqChatSettingsTab extends PluginSettingTab {
   constructor(
@@ -167,14 +166,18 @@ export class GroqChatSettingsTab extends PluginSettingTab {
           });
       })
       .addText(text => {
-        text.setPlaceholder('20')
-            .setValue(this.plugin.settings.maxHistoryLength.toString())
-            .onChange(async (value) => {
-                const num = parseInt(value);
-                this.plugin.settings.maxHistoryLength = (!isNaN(num) && num >= 0) ? num : 0;
-                await this.plugin.saveSettings();
-            });
-        text.inputEl.insertAdjacentHTML('afterend', '<span style="font-size: var(--font-ui-smaller); margin-left: 5px;">(0 = не хранить)</span>');
+        text
+          .setPlaceholder('20')
+          .setValue(this.plugin.settings.maxHistoryLength.toString())
+          .onChange(async value => {
+            const num = parseInt(value);
+            this.plugin.settings.maxHistoryLength = !isNaN(num) && num >= 0 ? num : 0;
+            await this.plugin.saveSettings();
+          });
+        text.inputEl.insertAdjacentHTML(
+          'afterend',
+          '<span style="font-size: var(--font-ui-smaller); margin-left: 5px;">(0 = не хранить)</span>',
+        );
         text.inputEl.type = 'number';
         text.inputEl.min = '0';
       });

@@ -373,16 +373,17 @@
 /* Стили для блока БЕЗ ПОДСВЕТКИ (применяются к <pre>) */
 /* Добавляем стили, ранее бывшие на .groq-code-container */
 .groq-code-container pre.groq-code-block--no-highlight,
-pre.groq-code-block--no-highlight { /* Селектор на случай отсутствия .groq-code-container */
+pre.groq-code-block--no-highlight {
+  /* Селектор на случай отсутствия .groq-code-container */
   /* Наследует базовые стили .groq-code-block (padding, font, color, user-select, etc.) */
-  
+
   /* Возвращаем стили контейнера */
   margin: var(--spacing-unit) 0 !important; /* Вертикальный отступ */
   border-radius: var(--border-radius) !important; /* Скругление */
   background-color: #1e1e1e !important; /* Фон как у контейнера */
   border: 1px solid var(--background-modifier-border) !important; /* Рамка */
   overflow: auto !important; /* Управляем переполнением (x и y) */
-  
+
   /* Возможно, нужны специфичные паддинги, если они отличаются от подсвеченного */
   /* padding-top: calc(var(--spacing-unit) * 0.75) !important; */
   /* padding-bottom: calc(var(--spacing-unit) * 0.75) !important; */
@@ -390,10 +391,10 @@ pre.groq-code-block--no-highlight { /* Селектор на случай отс
 
 /* Стили для <code> внутри блока без подсветки */
 .groq-code-container pre.groq-code-block--no-highlight code,
-pre.groq-code-block--no-highlight code { 
+pre.groq-code-block--no-highlight code {
   /* Убираем стили, которые могли бы конфликтовать */
-  display: block; 
-  padding: 0; 
+  display: block;
+  padding: 0;
   margin: 0;
   background: none;
   border: none;

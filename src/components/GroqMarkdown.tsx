@@ -89,7 +89,11 @@ const CodeBlock = React.memo(({ language, code }: { language: string; code: stri
 // Добавляем displayName для компонента CodeBlock, чтобы его можно было идентифицировать
 CodeBlock.displayName = 'CodeBlock';
 
-const CodeRenderer: React.FC<CodeProps> = ({ inline /* Проп inline может быть ненадежным */, className = '', children }) => {
+const CodeRenderer: React.FC<CodeProps> = ({
+  inline /* Проп inline может быть ненадежным */,
+  className = '',
+  children,
+}) => {
   // Проверяем, есть ли класс языка (признак блочного кода)
   const match = /language-(\w+)/.exec(className);
   const code = String(children).replace(/\n$/, '');
@@ -133,24 +137,20 @@ const customComponents = {
       typeof firstMeaningfulChild === 'object' &&
       firstMeaningfulChild.props &&
       firstMeaningfulChild.type &&
-      (
-        (typeof firstMeaningfulChild.type === 'object' &&
-          (firstMeaningfulChild.type.displayName === 'CodeBlock' ||
-            (firstMeaningfulChild.type as any)?.type?.displayName === 'CodeBlock')) ||
+      ((typeof firstMeaningfulChild.type === 'object' &&
+        (firstMeaningfulChild.type.displayName === 'CodeBlock' ||
+          (firstMeaningfulChild.type as any)?.type?.displayName === 'CodeBlock')) ||
         (firstMeaningfulChild.type === 'div' &&
           firstMeaningfulChild.props.className?.includes('groq-code-container')) ||
         firstMeaningfulChild.type === 'figure' || // Проверка на figure
         (typeof firstMeaningfulChild.type === 'string' &&
-          ['pre', 'ul', 'ol', 'table', 'blockquote', 'hr'].includes(
-            firstMeaningfulChild.type,
-          ))
-      );
+          ['pre', 'ul', 'ol', 'table', 'blockquote', 'hr'].includes(firstMeaningfulChild.type)));
 
     if (containsSingleBlock) {
       // Если содержит один блок (figure, pre, и т.д.), рендерим только его
       return React.cloneElement(firstMeaningfulChild as React.ReactElement, props);
     } else {
-       // Иначе рендерим обычный параграф <p>
+      // Иначе рендерим обычный параграф <p>
       const processedChildren = React.Children.map(children, child => {
         if (React.isValidElement(child) && child.type === 'code') {
           const codeChild = child as React.ReactElement<{

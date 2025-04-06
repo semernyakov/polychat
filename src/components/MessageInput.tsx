@@ -72,7 +72,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
         <textarea
           ref={textareaRef}
           value={value}
-          onChange={(_e) => onChange(_e.target.value)}
+          onChange={e => onChange(e.target.value)}
           onKeyDown={handleKeyDown}
           onCompositionStart={() => setIsComposing(true)}
           onCompositionEnd={() => setIsComposing(false)}

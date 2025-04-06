@@ -105,7 +105,7 @@ export class HistoryService {
     } catch (error) {
       console.error('Error saving to localStorage', error);
       if (error instanceof Error && error.name === 'QuotaExceededError') {
-          new Notice('Failed to save history: LocalStorage quota exceeded.');
+        new Notice('Failed to save history: LocalStorage quota exceeded.');
       }
     }
   }
@@ -116,97 +116,98 @@ export class HistoryService {
       return new Promise((resolve, reject) => {
         const transaction = db.transaction(IDB_STORE_NAME, 'readonly');
         const store = transaction.objectStore(IDB_STORE_NAME);
-        const request = store.getAll(); 
+        const request = store.getAll();
 
-        request.onsuccess = (event) => {
+        request.onsuccess = event => {
           resolve((event.target as IDBRequest<Message[]>).result);
         };
 
-        request.onerror = (event) => {
+        request.onerror = event => {
           console.error('IndexedDB getAll error:', (event.target as IDBRequest).error);
           reject((event.target as IDBRequest).error);
         };
       });
     } catch (error) {
-        console.error('Failed to get history from IndexedDB', error);
-        return [];
+      console.error('Failed to get history from IndexedDB', error);
+      return [];
     }
   }
 
   private async saveToIndexedDB(history: Message[]): Promise<void> {
-      try {
-          const db = await this.openHistoryDB();
-          return new Promise((resolve, reject) => {
-            const transaction = db.transaction(IDB_STORE_NAME, 'readwrite');
-            const store = transaction.objectStore(IDB_STORE_NAME);
-            
-            const clearRequest = store.clear(); 
+    try {
+      const db = await this.openHistoryDB();
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction(IDB_STORE_NAME, 'readwrite');
+        const store = transaction.objectStore(IDB_STORE_NAME);
 
-            clearRequest.onsuccess = () => {
-              const putPromises = history.map(msg => {
-                  return new Promise<void>((res, rej) => {
-                      const req = store.put(msg);
-                      req.onsuccess = () => res();
-                      req.onerror = (event) => rej((event.target as IDBRequest).error);
-                  });
-              });
-              
-              Promise.all(putPromises).then(() => {
-                console.log('IndexedDB save successful');
-                resolve();
-              }).catch(err => {
-                  console.error('IndexedDB put error:', err);
-                  reject(err);
-              });
-            };
-            
-            clearRequest.onerror = (event) => {
-                console.error('IndexedDB clear error:', (event.target as IDBRequest).error);
-                reject((event.target as IDBRequest).error);
-            };
-            
-            transaction.onerror = (event) => {
-                 console.error('IndexedDB transaction error:', (event.target as IDBTransaction).error);
-                 reject((event.target as IDBTransaction).error);
-            };
-            
-            transaction.oncomplete = () => {
-            };
+        const clearRequest = store.clear();
+
+        clearRequest.onsuccess = () => {
+          const putPromises = history.map(msg => {
+            return new Promise<void>((res, rej) => {
+              const req = store.put(msg);
+              req.onsuccess = () => res();
+              req.onerror = event => rej((event.target as IDBRequest).error);
+            });
           });
-      } catch(error) {
-          console.error('Failed to save history to IndexedDB', error);
-          throw error;
-      }
-  }
-  
-  private async clearIndexedDB(): Promise<void> {
-      try {
-        const db = await this.openHistoryDB();
-        return new Promise((resolve, reject) => {
-            const transaction = db.transaction(IDB_STORE_NAME, 'readwrite');
-            const store = transaction.objectStore(IDB_STORE_NAME);
-            const request = store.clear();
 
-            request.onsuccess = () => {
-                console.log('IndexedDB cleared successfully');
-                resolve();
-            };
-            request.onerror = (event) => {
-                console.error('IndexedDB clear error:', (event.target as IDBRequest).error);
-                reject((event.target as IDBRequest).error);
-            };
-        });
-      } catch (error) {
-          console.error('Failed to clear IndexedDB', error);
-          throw error;
-      }
+          Promise.all(putPromises)
+            .then(() => {
+              console.log('IndexedDB save successful');
+              resolve();
+            })
+            .catch(err => {
+              console.error('IndexedDB put error:', err);
+              reject(err);
+            });
+        };
+
+        clearRequest.onerror = event => {
+          console.error('IndexedDB clear error:', (event.target as IDBRequest).error);
+          reject((event.target as IDBRequest).error);
+        };
+
+        transaction.onerror = event => {
+          console.error('IndexedDB transaction error:', (event.target as IDBTransaction).error);
+          reject((event.target as IDBTransaction).error);
+        };
+
+        transaction.oncomplete = () => {};
+      });
+    } catch (error) {
+      console.error('Failed to save history to IndexedDB', error);
+      throw error;
+    }
+  }
+
+  private async clearIndexedDB(): Promise<void> {
+    try {
+      const db = await this.openHistoryDB();
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction(IDB_STORE_NAME, 'readwrite');
+        const store = transaction.objectStore(IDB_STORE_NAME);
+        const request = store.clear();
+
+        request.onsuccess = () => {
+          console.log('IndexedDB cleared successfully');
+          resolve();
+        };
+        request.onerror = event => {
+          console.error('IndexedDB clear error:', (event.target as IDBRequest).error);
+          reject((event.target as IDBRequest).error);
+        };
+      });
+    } catch (error) {
+      console.error('Failed to clear IndexedDB', error);
+      throw error;
+    }
   }
 
   private async getFromFile(): Promise<Message[]> {
     try {
       const path = this.plugin.settings.notePath;
       if (!path) return [];
-      
+
       const file = this.plugin.app.vault.getAbstractFileByPath(path);
       if (file instanceof TFile) {
         const content = await this.plugin.app.vault.read(file);
@@ -225,18 +226,18 @@ export class HistoryService {
       console.warn('History file path is not set. Cannot save history to file.');
       return;
     }
-    
+
     try {
       const content = JSON.stringify(history, null, 2);
       const file = this.plugin.app.vault.getAbstractFileByPath(path);
-      
+
       if (file instanceof TFile) {
         await this.plugin.app.vault.modify(file, content);
       } else {
         const dir = path.substring(0, path.lastIndexOf('/'));
         if (dir && !(await this.plugin.app.vault.adapter.exists(dir))) {
-            await this.plugin.app.vault.createFolder(dir);
-            console.log(`Created directory: ${dir}`);
+          await this.plugin.app.vault.createFolder(dir);
+          console.log(`Created directory: ${dir}`);
         }
         await this.plugin.app.vault.create(path, content);
       }
@@ -246,17 +247,17 @@ export class HistoryService {
   }
 
   private async clearFile(): Promise<void> {
-      const path = this.plugin.settings.notePath;
-      if (!path) return;
-      
-      try {
-        const file = this.plugin.app.vault.getAbstractFileByPath(path);
-        if (file instanceof TFile) {
-          await this.plugin.app.vault.modify(file, '[]');
-        }
-      } catch (error) {
-        console.error('Error clearing history file', error);
+    const path = this.plugin.settings.notePath;
+    if (!path) return;
+
+    try {
+      const file = this.plugin.app.vault.getAbstractFileByPath(path);
+      if (file instanceof TFile) {
+        await this.plugin.app.vault.modify(file, '[]');
       }
+    } catch (error) {
+      console.error('Error clearing history file', error);
+    }
   }
 
   private async clearByMethod(method: HistoryStorageMethod): Promise<void> {
@@ -286,29 +287,31 @@ export class HistoryService {
   private openHistoryDB(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(IDB_NAME, IDB_VERSION);
-      
+
       request.onupgradeneeded = (event: IDBVersionChangeEvent) => {
         console.log('IndexedDB upgrade needed');
         const db = (event.target as IDBOpenDBRequest).result;
         if (!db.objectStoreNames.contains(IDB_STORE_NAME)) {
           console.log(`Creating object store: ${IDB_STORE_NAME}`);
-          db.createObjectStore(IDB_STORE_NAME, { autoIncrement: true }); 
+          db.createObjectStore(IDB_STORE_NAME, { autoIncrement: true });
         }
       };
 
-      request.onsuccess = (event) => {
+      request.onsuccess = event => {
         console.log('IndexedDB opened successfully');
         resolve((event.target as IDBOpenDBRequest).result);
       };
 
-      request.onerror = (event) => {
+      request.onerror = event => {
         console.error('IndexedDB error:', (event.target as IDBOpenDBRequest).error);
         reject((event.target as IDBOpenDBRequest).error);
       };
-      
+
       request.onblocked = () => {
-          console.warn('IndexedDB open blocked, please close other tabs/instances using the database.');
-          reject(new Error('IndexedDB open blocked'));
+        console.warn(
+          'IndexedDB open blocked, please close other tabs/instances using the database.',
+        );
+        reject(new Error('IndexedDB open blocked'));
       };
     });
   }

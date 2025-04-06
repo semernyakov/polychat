@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import '../styles.css'; // Используем единый style.css
-import { GroqModel, MODEL_INFO, getModelInfo } from '../types/models'; // Убедитесь, что типы существуют
+import { GroqModel, MODEL_INFO } from '../types/models'; // Удаляем getModelInfo
 import { GroqPluginInterface } from '../types/plugin';
 import { toast } from 'react-toastify'; // Импортируем toast
 
 interface ModelSelectorProps {
   plugin: GroqPluginInterface;
-  model: GroqModel; // Этот параметр может быть не нужен, если мы читаем из plugin.settings
-  onChange: (model: GroqModel) => void;
+  selectedModel: GroqModel; // Этот параметр может быть не нужен, если мы читаем из plugin.settings
+  onSelectModel: (model: GroqModel) => void;
   getAvailableModels: () => Promise<GroqModel[]>; // Добавляем prop для получения доступных моделей
 }
 
 export const ModelSelector: React.FC<ModelSelectorProps> = ({
-  plugin,
-  model,
-  onChange,
+  plugin: _plugin,
+  selectedModel,
+  onSelectModel,
   getAvailableModels, // Получаем функцию как prop
 }) => {
   const [availableModels, setAvailableModels] = useState<GroqModel[]>([]);
@@ -45,6 +45,11 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
   // Получаем все модели из MODEL_INFO для итерации
   const allModelInfos = Object.values(MODEL_INFO);
 
+  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedValue = event.target.value as GroqModel;
+    onSelectModel(selectedValue);
+  };
+
   return (
     <div className="groq-model-selector">
       {/* Скрываем label визуально, но оставляем для доступности */}
@@ -53,10 +58,10 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
       </label>
       <select
         id="model-select"
-        value={model}
-        onChange={e => onChange(e.target.value as GroqModel)}
+        value={selectedModel}
+        onChange={handleChange}
         className="groq-select"
-        aria-label="Выберите модель Groq" // Добавляем aria-label
+        aria-label="Выберите модель Groq"
       >
         {allModelInfos.map(modelInfo => {
           const isAvailable = availableModels.includes(modelInfo.id);

@@ -41,20 +41,18 @@ export const MessageItem: React.FC<{ message: Message }> = React.memo(({ message
         </div>
         {message.role === 'assistant' && (
           <div className="groq-message__actions">
-            <button 
+            <button
               onClick={toggleRawView}
               className="groq-icon-button"
-              title={showRaw ? "Показать форматирование" : "Показать исходный код"}
+              title={showRaw ? 'Показать форматирование' : 'Показать исходный код'}
             >
               <FiCode size={14} />
             </button>
-            <button 
-              onClick={handleCopy} 
-              className="groq-icon-button" 
-              title="Копировать сообщение"
-            >
+            <button onClick={handleCopy} className="groq-icon-button" title="Копировать сообщение">
               {copyError ? (
-                <span style={{ color: 'red' }} title="Ошибка копирования">!</span>
+                <span style={{ color: 'red' }} title="Ошибка копирования">
+                  !
+                </span>
               ) : isCopied ? (
                 <FiCheck size={14} color="#4CAF50" />
               ) : (
@@ -66,7 +64,9 @@ export const MessageItem: React.FC<{ message: Message }> = React.memo(({ message
       </div>
       <div className={`groq-message__content ${showRaw ? 'groq-message__content--raw' : ''}`}>
         {showRaw ? (
-          <pre><code>{message.content || ''}</code></pre>
+          <pre>
+            <code>{message.content || ''}</code>
+          </pre>
         ) : (
           <GroqMarkdown content={message.content || ''} />
         )}
