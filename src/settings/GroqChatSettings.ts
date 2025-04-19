@@ -13,6 +13,7 @@ export interface GroqChatSettings {
   maxHistoryLength: number;
   notePath: string;
   displayMode: 'tab' | 'sidepanel'; // Новое поле
+  language: 'ru' | 'en'; // Язык интерфейса
 }
 
 /**
@@ -27,4 +28,5 @@ export const DEFAULT_SETTINGS: Readonly<GroqChatSettings> = Object.freeze({
   maxHistoryLength: 20,
   notePath: 'groq-chat-history.md',
   displayMode: 'tab', // Значение по умолчанию
+  language: 'en', // По умолчанию английский
 });

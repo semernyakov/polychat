@@ -4,7 +4,6 @@ import { DEFAULT_SETTINGS } from '../settings/GroqChatSettings';
 export function getDefaultSettings(): GroqChatSettings {
   return {
     ...DEFAULT_SETTINGS,
-    storeHistory: DEFAULT_SETTINGS.storeHistory,
   };
 }
 

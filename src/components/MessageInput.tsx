@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FiSend } from 'react-icons/fi';
+import { t, Locale } from '../localization';
+import { usePluginSettings } from '../utils/usePluginSettings';
 import '../styles.css'; // Используем единый стиль
 
 interface MessageInputProps {
@@ -21,6 +23,8 @@ export const MessageInput: React.FC<MessageInputProps> = ({
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isComposing, setIsComposing] = useState(false); // Для поддержки IME
+  const settings = usePluginSettings();
+  const locale: Locale = settings?.language || 'en';
 
   // Автоматическое изменение высоты textarea
   useEffect(() => {
@@ -76,34 +80,31 @@ export const MessageInput: React.FC<MessageInputProps> = ({
           onKeyDown={handleKeyDown}
           onCompositionStart={() => setIsComposing(true)}
           onCompositionEnd={() => setIsComposing(false)}
-          placeholder="Введите сообщение..."
+          placeholder={t('inputPlaceholder', locale)}
           disabled={disabled}
           rows={1}
           className="groq-chat-input__textarea"
-          aria-label="Поле ввода сообщения"
+          aria-label={t('inputAriaLabel', locale)}
         />
         <button
           onClick={handleSendClick}
           disabled={isSendDisabled}
           className="groq-button groq-button--primary groq-chat-input__send-button"
-          aria-label="Отправить сообщение"
-          title="Отправить (Ctrl+Enter)"
+          aria-label={t('sendMessage', locale)}
+          title={t('sendTitle', locale)}
         >
           <FiSend size={18} />
         </button>
       </div>
       <div className="groq-chat-input__footer">
-        <span className="groq-message-input__hint">
-          <kbd>Ctrl</kbd>+<kbd>Enter</kbd> — отправить, <kbd>Shift</kbd>+<kbd>Enter</kbd> — новая
-          строка
-        </span>
+        <span className="groq-message-input__hint" dangerouslySetInnerHTML={{ __html: t('inputHint', locale) }} />
         {maxTokens !== undefined && (
           <span
             className="groq-message-input__counter"
+            title={t('inputCounterTitle', locale)}
             style={{ color: isOverLimit ? 'var(--text-error)' : 'inherit' }}
-            title="Текущее кол-во символов / Макс. кол-во токенов для модели (приблизительное сравнение)"
           >
-            {currentLength.toLocaleString()}/{maxTokens.toLocaleString()} (символы/токены)
+            {currentLength.toLocaleString()}/{maxTokens.toLocaleString()} {t('symbolsTokens', locale)}
           </span>
         )}
       </div>

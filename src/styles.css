@@ -1063,3 +1063,7 @@ pre.groq-code-block--no-highlight code {
   color: var(--text-normal);
   border: 1px solid var(--border-color);
 }
+
+button.mod-cta {
+	margin-right: 10px;
+}

@@ -5,6 +5,7 @@ import { MODEL_INFO, GroqModel, getModelInfo } from '../types/models';
 import { HistoryStorageMethod } from '../types/settings';
 import { Notice } from 'obsidian';
 import { isValidFileName } from '../utils/validation';
+import { t, Locale } from '../localization';
 
 export class GroqChatSettingsTab extends PluginSettingTab {
   constructor(
@@ -16,58 +17,60 @@ export class GroqChatSettingsTab extends PluginSettingTab {
   }
 
   display(): void {
+    const locale = (this.plugin.settings.language || 'ru') as Locale;
     this.containerEl.empty();
-    this.renderHeader();
-    this.renderSettingsControls();
-    this.renderActionButtons();
+    this.renderHeader(locale);
+    this.renderSettingsControls(locale);
+    this.renderActionButtons(locale);
   }
 
-  private renderHeader(): void {
-    this.containerEl.createEl('h2', { text: 'Groq Chat Settings' });
+  private renderHeader(locale: Locale): void {
+    this.containerEl.createEl('h2', { text: t('chatTitle', locale) });
     this.containerEl.createEl('p', {
-      text: 'Настройте параметры для работы с Groq API',
+      text: locale === 'ru' ? 'Настройте параметры для работы с Groq API' : 'Configure Groq API parameters',
     }).style.marginBottom = '1.5rem';
   }
 
-  private renderSettingsControls(): void {
-    this.addApiKeySetting();
-    this.addModelSetting();
-    this.addTemperatureSetting();
-    this.addMaxTokensSetting();
-    this.addHistorySettings();
-    this.addDisplayModeSetting();
+  private renderSettingsControls(locale: Locale): void {
+    this.addLanguageSetting(locale);
+    this.addApiKeySetting(locale);
+    this.addModelSetting(locale);
+    this.addTemperatureSetting(locale);
+    this.addMaxTokensSetting(locale);
+    this.addHistorySettings(locale);
+    this.addDisplayModeSetting(locale);
   }
 
-  private renderActionButtons(): void {
+  private renderActionButtons(locale: Locale): void {
     const container = this.containerEl.createDiv({
       cls: 'groq-settings-actions',
     });
 
     container.createEl('button', {
-      text: 'Сохранить настройки',
+      text: t('save', locale),
       cls: 'mod-cta',
     }).onclick = async () => {
       await this.plugin.saveSettings();
-      new Notice('Настройки успешно сохранены');
+      new Notice(locale === 'ru' ? 'Настройки успешно сохранены' : 'Settings saved successfully');
     };
 
     container.createEl('button', {
-      text: 'Сбросить настройки',
+      text: t('cancel', locale),
     }).onclick = async () => {
       await this.plugin.resetSettings();
       this.display();
-      new Notice('Настройки сброшены');
+      new Notice(locale === 'ru' ? 'Настройки сброшены' : 'Settings reset');
     };
   }
 
-  private addDisplayModeSetting(): void {
+  private addDisplayModeSetting(locale: Locale): void {
     new Setting(this.containerEl)
-      .setName('Режим отображения')
-      .setDesc('Как открывать чат по умолчанию')
+      .setName(t('displayMode', locale))
+      .setDesc(locale === 'ru' ? 'Как открывать чат по умолчанию' : 'How to open chat by default')
       .addDropdown(dropdown => {
         dropdown
-          .addOption('tab', 'Во вкладке')
-          .addOption('sidepanel', 'В боковой панели')
+          .addOption('tab', locale === 'ru' ? 'Во вкладке' : 'In tab')
+          .addOption('sidepanel', locale === 'ru' ? 'В боковой панели' : 'In side panel')
           .setValue(this.plugin.settings.displayMode)
           .onChange(async value => {
             this.plugin.settings.displayMode = value as 'tab' | 'sidepanel';
@@ -76,13 +79,13 @@ export class GroqChatSettingsTab extends PluginSettingTab {
       });
   }
 
-  private addApiKeySetting(): void {
+  private addApiKeySetting(locale: Locale): void {
     new Setting(this.containerEl)
-      .setName('API Key')
-      .setDesc('Ваш ключ для доступа к Groq API')
+      .setName(t('apiKey', locale))
+      .setDesc(locale === 'ru' ? 'Ваш ключ для доступа к Groq API' : 'Your key for accessing Groq API')
       .addText(text =>
         text
-          .setPlaceholder('Введите API ключ')
+          .setPlaceholder(t('apiKeyPlaceholder', locale))
           .setValue(this.plugin.settings.apiKey)
           .onChange(async value => {
             this.plugin.settings.apiKey = value.trim();
@@ -91,19 +94,19 @@ export class GroqChatSettingsTab extends PluginSettingTab {
       )
       .addButton(btn =>
         btn
-          .setButtonText('Проверить')
+          .setButtonText(t('checkApiKey', locale))
           .setCta()
           .onClick(async () => {
             const isValid = await this.authService.validateApiKey(this.plugin.settings.apiKey);
-            new Notice(isValid ? '✅ Ключ действителен' : '❌ Неверный ключ');
+            new Notice(isValid ? t('validApiKey', locale) : t('invalidApiKey', locale));
           }),
       );
   }
 
-  private addModelSetting(): void {
+  private addModelSetting(locale: Locale): void {
     new Setting(this.containerEl)
-      .setName('Модель')
-      .setDesc('Выберите модель для генерации ответов')
+      .setName(t('model', locale))
+      .setDesc(locale === 'ru' ? 'Выберите модель для генерации ответов' : 'Select model for generating responses')
       .addDropdown(dropdown => {
         Object.values(GroqModel).forEach(model =>
           dropdown.addOption(model, getModelInfo(model).name),
@@ -116,10 +119,10 @@ export class GroqChatSettingsTab extends PluginSettingTab {
       });
   }
 
-  private addTemperatureSetting(): void {
+  private addTemperatureSetting(locale: Locale): void {
     new Setting(this.containerEl)
-      .setName('Температура')
-      .setDesc('Контролирует случайность ответов (0-2)')
+      .setName(t('temperature', locale))
+      .setDesc(locale === 'ru' ? 'Контролирует случайность ответов (0-2)' : 'Controls randomness of responses (0-2)')
       .addSlider(slider =>
         slider
           .setLimits(0, 2, 0.1)
@@ -132,13 +135,13 @@ export class GroqChatSettingsTab extends PluginSettingTab {
       );
   }
 
-  private addMaxTokensSetting(): void {
+  private addMaxTokensSetting(locale: Locale): void {
     new Setting(this.containerEl)
-      .setName('Макс. токенов')
-      .setDesc('Максимальное количество токенов в ответе')
+      .setName(t('maxTokens', locale))
+      .setDesc(locale === 'ru' ? 'Максимальное количество токенов в ответе' : 'Maximum number of tokens in response')
       .addText(text =>
         text
-          .setPlaceholder('Введите число')
+          .setPlaceholder(t('maxTokensPlaceholder', locale))
           .setValue(this.plugin.settings.maxTokens.toString())
           .onChange(async value => {
             const num = Math.max(1, Math.min(32768, parseInt(value) || 4096));
@@ -148,16 +151,16 @@ export class GroqChatSettingsTab extends PluginSettingTab {
       );
   }
 
-  private addHistorySettings(): void {
+  private addHistorySettings(locale: Locale): void {
     new Setting(this.containerEl)
-      .setName('Хранение истории')
-      .setDesc('Выберите способ хранения и максимальную длину истории')
+      .setName(t('history', locale))
+      .setDesc(locale === 'ru' ? 'Выберите способ хранения и максимальную длину истории' : 'Select storage method and maximum history length')
       .addDropdown(dropdown => {
         dropdown
-          .addOption('memory', 'В памяти')
-          .addOption('localStorage', 'Local Storage')
-          .addOption('indexedDB', 'IndexedDB')
-          .addOption('file', 'В файле')
+          .addOption('memory', locale === 'ru' ? 'В памяти' : 'In memory')
+          .addOption('localStorage', locale === 'ru' ? 'Local Storage' : 'Local Storage')
+          .addOption('indexedDB', locale === 'ru' ? 'IndexedDB' : 'IndexedDB')
+          .addOption('file', locale === 'ru' ? 'В файле' : 'In file')
           .setValue(this.plugin.settings.historyStorageMethod)
           .onChange(async value => {
             this.plugin.settings.historyStorageMethod = value as HistoryStorageMethod;
@@ -167,7 +170,7 @@ export class GroqChatSettingsTab extends PluginSettingTab {
       })
       .addText(text => {
         text
-          .setPlaceholder('20')
+          .setPlaceholder(t('historyLengthPlaceholder', locale))
           .setValue(this.plugin.settings.maxHistoryLength.toString())
           .onChange(async value => {
             const num = parseInt(value);
@@ -176,7 +179,7 @@ export class GroqChatSettingsTab extends PluginSettingTab {
           });
         text.inputEl.insertAdjacentHTML(
           'afterend',
-          '<span style="font-size: var(--font-ui-smaller); margin-left: 5px;">(0 = не хранить)</span>',
+          `<span style="font-size: var(--font-ui-smaller); margin-left: 5px;">(${locale === 'ru' ? '0 = не хранить' : '0 = do not store'})</span>`,
         );
         text.inputEl.type = 'number';
         text.inputEl.min = '0';
@@ -184,11 +187,11 @@ export class GroqChatSettingsTab extends PluginSettingTab {
 
     if (this.plugin.settings.historyStorageMethod === 'file') {
       new Setting(this.containerEl)
-        .setName('Файл истории')
-        .setDesc('Путь к файлу для хранения истории (если выбран метод "В файле")')
+        .setName(t('historyFile', locale))
+        .setDesc(locale === 'ru' ? 'Путь к файлу для хранения истории (если выбран метод "В файле")' : 'Path to file for storing history (if "In file" method is selected)')
         .addText(text =>
           text
-            .setPlaceholder('groq-chat-history.md')
+            .setPlaceholder(t('historyFilePlaceholder', locale))
             .setValue(this.plugin.settings.notePath)
             .onChange(async value => {
               const trimmedValue = value.trim();
@@ -196,10 +199,27 @@ export class GroqChatSettingsTab extends PluginSettingTab {
                 this.plugin.settings.notePath = trimmedValue;
                 await this.plugin.saveSettings();
               } else {
-                new Notice('Некорректное имя/путь файла');
+                new Notice(locale === 'ru' ? 'Некорректное имя/путь файла' : 'Invalid file name/path');
               }
             }),
         );
     }
+  }
+
+  private addLanguageSetting(locale: Locale): void {
+    new Setting(this.containerEl)
+      .setName(t('language', locale))
+      .setDesc(locale === 'ru' ? 'Выберите язык интерфейса' : 'Select UI language')
+      .addDropdown(dropdown => {
+        dropdown
+          .addOption('ru', 'Русский')
+          .addOption('en', 'English')
+          .setValue(this.plugin.settings.language)
+          .onChange(async value => {
+            this.plugin.settings.language = value as 'ru' | 'en';
+            await this.plugin.saveSettings();
+            this.display(); // перерисовать настройки
+          });
+      });
   }
 }
