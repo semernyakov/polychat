@@ -1,8 +1,9 @@
 import React, { createContext, useState } from 'react';
-import { GroqChatSettings, DEFAULT_SETTINGS } from '../_settings/GroqChatSettings';
+import { GroqChatSettings, DEFAULT_SETTINGS } from '../settings/GroqChatSettings';
+import { Locale } from '../localization';
 
 interface PluginSettingsContextType extends GroqChatSettings {
-  setSettings: (_settings: Partial<GroqChatSettings>) => void;
+  setSettings: (settings: Partial<GroqChatSettings>) => void;
 }
 
 export const PluginSettingsContext = createContext<PluginSettingsContextType | undefined>(
@@ -16,7 +17,7 @@ export function PluginSettingsProvider({
   children: React.ReactNode;
   initialSettings?: Partial<GroqChatSettings>;
 }) {
-  const [_settings, setSettingsState] = useState<GroqChatSettings>({
+  const [settings, setSettingsState] = useState<GroqChatSettings>({
     ...DEFAULT_SETTINGS,
     ...initialSettings,
   });
@@ -26,7 +27,7 @@ export function PluginSettingsProvider({
   };
 
   return (
-    <PluginSettingsContext.Provider value={{ ..._settings, setSettings }}>
+    <PluginSettingsContext.Provider value={{ ...settings, setSettings }}>
       {children}
     </PluginSettingsContext.Provider>
   );

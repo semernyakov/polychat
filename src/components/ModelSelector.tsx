@@ -15,7 +15,7 @@ interface DynamicModelInfo {
 export interface ModelSelectorProps {
   plugin: GroqPluginInterface;
   selectedModel: string;
-  onSelectModel: (_modelId: string) => void;
+  onSelectModel: (modelId: string) => void;
   getAvailableModels: () => Promise<{ id: string; name: string; description?: string }[]>;
   availableModels?: any[];
 }
