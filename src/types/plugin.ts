@@ -1,5 +1,6 @@
 import type { App, Plugin } from 'obsidian';
 import type { GroqChatSettings } from './settings';
+import type { Message } from './types';
 
 import type { AuthService } from '../services/authService';
 import type { GroqService } from '../services/groqService';

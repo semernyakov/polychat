@@ -21,10 +21,7 @@ export interface GroqModelInfo {
   releaseStatus?: string;
 }
 
-import { Locale } from '../localization';
-
 export interface GroqChatSettings {
-  language: Locale;
   apiKey: string;
   model: string;
   temperature: number;

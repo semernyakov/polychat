@@ -1,6 +1,5 @@
 import React, { createContext, useState } from 'react';
 import { GroqChatSettings, DEFAULT_SETTINGS } from '../settings/GroqChatSettings';
-import { Locale } from '../localization';
 
 interface PluginSettingsContextType extends GroqChatSettings {
   setSettings: (settings: Partial<GroqChatSettings>) => void;

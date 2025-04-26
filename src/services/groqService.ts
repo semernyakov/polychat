@@ -229,7 +229,7 @@ export class GroqService implements GroqServiceMethods {
   }
 
   private getModelMaxTokens(modelId: string): number {
-    const model = this.plugin.settings.groqAvailableModels?.find((m: any) => m.id === modelId);
+    const model = this.plugin.settings.groqAvailableModels?.find(m => m.id === modelId);
     return model?.maxTokens || 4096;
   }
 }

@@ -29,7 +29,7 @@ interface ChatPanelProps {
   plugin: GroqPluginInterface;
   displayMode: 'tab' | 'sidepanel';
   initialMessages?: Message[];
-  onDisplayModeChange: (_mode: 'tab' | 'sidepanel') => void;
+  onDisplayModeChange: (mode: 'tab' | 'sidepanel') => void;
 }
 
 interface LocalDynamicModelInfo {
@@ -141,7 +141,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
     const containerRef = useRef<HTMLDivElement>(null);
     const settings = usePluginSettings();
     // Язык по умолчанию — en
-    const locale: Locale = (settings as any)?.language ?? 'en';
+    const locale: Locale = settings?.language ?? 'en';
 
     const { messages, setMessages, isHistoryLoading, clearHistory } = useMessages(
       initialMessages,
@@ -327,7 +327,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
             />
             <button
               onClick={toggleDisplayMode}
-              className="groq-icon-button groq-display-_mode-button"
+              className="groq-icon-button groq-display-mode-button"
               title={displayMode === 'tab' ? t('showInSidepanel') : t('showInTab')}
               aria-label={displayMode === 'tab' ? t('showInSidepanel') : t('showInTab')}
             >
@@ -371,7 +371,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
           </div>
         </div>
 
-        <div className="groq-chatcontent">
+        <div className="groq-chat__content">
           <div className="groq-chat__messages-container">
             {rateLimits && (rateLimits.requestsPerDay || rateLimits.tokensPerMinute) && (
               <section className="groq-rate-limits">
