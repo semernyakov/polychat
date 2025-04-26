@@ -141,7 +141,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
     const containerRef = useRef<HTMLDivElement>(null);
     const settings = usePluginSettings();
     // Язык по умолчанию — en
-    const locale: Locale = settings?.language ?? 'en';
+    const locale: Locale = (settings as any)?.language ?? 'en';
 
     const { messages, setMessages, isHistoryLoading, clearHistory } = useMessages(
       initialMessages,

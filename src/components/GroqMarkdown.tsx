@@ -17,11 +17,10 @@ type CodeProps = {
   children?: React.ReactNode;
 };
 
-const CodeBlock = React.memo(({ language, code }: { language: string; code: string }) => {
+const CodeBlock = React.memo(({ language, code, lang, locale }: { language: string; code: string; lang: string; locale: Locale }) => {
   const [isCopied, setIsCopied] = React.useState(false);
   const [copyError, setCopyError] = React.useState(false);
   const timeoutId = React.useRef<NodeJS.Timeout | null>(null);
-  const { language: Locale = (usePluginSettings()?.language ?? 'en') as Locale } = usePluginSettings() || {};
 
   const handleCopy = () => {
     setCopyError(false);
@@ -49,7 +48,7 @@ const CodeBlock = React.memo(({ language, code }: { language: string; code: stri
   return (
     <div className="groq-code-container">
       <div className="groq-code-header">
-        <span className="groq-code-language">{language || 'code'}</span>
+        <span className="groq-code-language">{lang || 'code'}</span>
         <button
           onClick={handleCopy}
           className="groq-icon-button groq-code-copy"
@@ -85,12 +84,14 @@ const CodeBlock = React.memo(({ language, code }: { language: string; code: stri
 CodeBlock.displayName = 'CodeBlock';
 
 const CodeRenderer: React.FC<CodeProps> = ({ inline, className = '', children }) => {
+  const lang = usePluginSettings()?.language ?? 'en';
+  const locale = lang as Locale;
   const match = /language-(\w+)/.exec(className);
   const code = String(children).replace(/\n$/, '');
 
   if (match) {
     const lang = match[1];
-    return <CodeBlock language={lang} code={code} />;
+    return <CodeBlock language={lang} code={code} lang={lang} locale={locale} />;
   } else if (!inline && children && children.toString().includes('\n')) {
     return (
       <pre className={`groq-code-block groq-code-block--no-highlight ${className || ''}`}>
@@ -168,7 +169,8 @@ const customComponents = {
 };
 
 export const GroqMarkdown: React.FC<{ content: string }> = ({ content }) => {
-  const language = (usePluginSettings()?.language ?? 'en') as Locale;
+  const lang = usePluginSettings()?.language ?? 'en';
+  const locale = lang as Locale;
   const components = useMemo(
     () => ({
       ...customComponents,
@@ -177,7 +179,7 @@ export const GroqMarkdown: React.FC<{ content: string }> = ({ content }) => {
         if (isAbsolute) {
           return (
             <span className="groq-image-notice">
-              {t('imageNotice', language)}{' '}
+              {t('imageNotice', locale)}{' '}
               <a href={src} target="_blank" rel="noopener noreferrer">
                 [Link]
               </a>
@@ -192,7 +194,7 @@ export const GroqMarkdown: React.FC<{ content: string }> = ({ content }) => {
         );
       },
     }),
-    [language],
+    [lang, locale],
   );
 
   return (

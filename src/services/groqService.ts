@@ -133,7 +133,7 @@ export class GroqService implements GroqServiceMethods {
     try {
       const resp = await this.retryRequest(() =>
         fetch('https://api.groq.com/openai/v1/models', {
-          headers: { Authorization: `Bearer ${this._plugin.settings.apiKey}` },
+          headers: { Authorization: `Bearer ${this.plugin.settings.apiKey}` },
         }),
       );
       if (!resp.ok) throw new Error(`API error: ${resp.status}`);
@@ -229,7 +229,7 @@ export class GroqService implements GroqServiceMethods {
   }
 
   private getModelMaxTokens(modelId: string): number {
-    const model = this._plugin.settings.groqAvailableModels?.find(m => m.id === modelId);
+    const model = this.plugin.settings.groqAvailableModels?.find((m: any) => m.id === modelId);
     return model?.maxTokens || 4096;
   }
 }
