@@ -1,10 +1,40 @@
 import { Groq } from 'groq-sdk';
 import { GroqPluginInterface } from '../types/plugin';
-import { GroqModel } from '../types/models';
 import { Message } from '../types/types';
+import type { GroqModelInfo } from '../settings/GroqChatSettings';
+import { Notice } from 'obsidian';
 
-export class GroqService {
+// Тип для лимитов
+export type RateLimitsType = {
+  requestsPerDay?: number;
+  tokensPerMinute?: number;
+  remainingRequests?: number;
+  remainingTokens?: number;
+  resetRequests?: string;
+  resetTokens?: string;
+};
+
+interface GroqServiceMethods {
+  updateApiKey: (apiKey: string) => void;
+  validateApiKey: (apiKey: string) => Promise<boolean>;
+  sendMessage: (content: string, model: string) => Promise<Message>;
+  getAvailableModels: () => Promise<{ id: string; name: string; description?: string }[]>;
+  getAvailableModelsWithLimits: (forceRefresh?: boolean) => Promise<{
+    models: GroqModelInfo[];
+    rateLimits: RateLimitsType;
+  }>;
+  handleApiError: (error: unknown) => Error;
+}
+
+export class GroqService implements GroqServiceMethods {
   private client: Groq;
+  public rateLimits: RateLimitsType = {};
+  private modelCache: {
+    models: GroqModelInfo[];
+    rateLimits: RateLimitsType;
+    timestamp: number;
+  } | null = null;
+  private readonly CACHE_TTL = 60 * 60 * 1000; // 1 час
 
   constructor(private readonly plugin: GroqPluginInterface) {
     this.client = new Groq({
@@ -13,29 +43,27 @@ export class GroqService {
     });
   }
 
-  /**
-   * Обновляет внутренний клиент Groq новым API ключом.
-   * @param apiKey Новый API ключ. Пустая строка для сброса.
-   */
   public updateApiKey(apiKey: string): void {
-    console.log('GroqService: Обновление API ключа...'); // Добавим лог для отладки
     this.client = new Groq({
       apiKey: apiKey,
       dangerouslyAllowBrowser: true,
     });
-    console.log('GroqService: API ключ обновлен.');
+    this.modelCache = null; // Сброс кэша при смене ключа
   }
 
-  async validateApiKey(apiKey: string): Promise<boolean> {
+  public async validateApiKey(apiKey: string): Promise<boolean> {
     if (!apiKey) return false;
-
     try {
+      const { models } = await this.getAvailableModelsWithLimits();
+      const testModel = models[0]?.id || 'llama3-8b-8192';
       const tempClient = new Groq({ apiKey, dangerouslyAllowBrowser: true });
-      await tempClient.chat.completions.create({
-        model: GroqModel.LLAMA3_8B, // Используем более легкую модель для проверки
-        messages: [{ role: 'user', content: 'test' }],
-        max_tokens: 1,
-      });
+      await this.retryRequest(() =>
+        tempClient.chat.completions.create({
+          model: testModel,
+          messages: [{ role: 'user', content: 'test' }],
+          max_tokens: 1,
+        }),
+      );
       return true;
     } catch (error) {
       console.error('API key validation failed:', error);
@@ -43,23 +71,26 @@ export class GroqService {
     }
   }
 
-  async sendMessage(content: string, model: GroqModel): Promise<Message> {
-    if (!content.trim()) {
-      throw new Error('Message content cannot be empty');
+  public async sendMessage(content: string, model: string): Promise<Message> {
+    if (!content.trim()) throw new Error('Сообщение не может быть пустым');
+    if (!model || !this.plugin.settings.groqAvailableModels?.some(m => m.id === model)) {
+      throw new Error(`Модель "${model}" не доступна`);
     }
-
     try {
-      const response = await this.client.chat.completions.create({
-        model,
-        messages: [{ role: 'user', content }],
-        temperature: this.plugin.settings.temperature,
-        max_tokens: this.plugin.settings.maxTokens,
-      });
-
-      if (!response.choices[0]?.message?.content) {
-        throw new Error('Empty response from API');
+      // Проверка лимитов перед запросом
+      if (this.rateLimits.remainingRequests === 0 || this.rateLimits.remainingTokens === 0) {
+        new Notice('Превышен лимит запросов или токенов. Попробуйте позже.');
+        throw new Error('Лимиты запросов исчерпаны');
       }
-
+      const response = await this.retryRequest(() =>
+        this.client.chat.completions.create({
+          model,
+          messages: [{ role: 'user', content }],
+          temperature: this.plugin.settings.temperature,
+          max_tokens: Math.min(this.plugin.settings.maxTokens, this.getModelMaxTokens(model)),
+        }),
+      );
+      if (!response.choices[0]?.message?.content) throw new Error('Empty response from API');
       return {
         id: response.id,
         role: 'assistant',
@@ -78,23 +109,135 @@ export class GroqService {
     }
   }
 
-  async getAvailableModels(): Promise<GroqModel[]> {
+  public async getAvailableModels(): Promise<{ id: string; name: string; description?: string }[]> {
+    const { models } = await this.getAvailableModelsWithLimits();
+    return models.map(model => ({
+      id: model.id,
+      name: model.name,
+      description: model.description,
+    }));
+  }
+
+  public async getAvailableModelsWithLimits(forceRefresh = false): Promise<{
+    models: GroqModelInfo[];
+    rateLimits: RateLimitsType;
+  }> {
+    // Проверка кэша
+    if (
+      !forceRefresh &&
+      this.modelCache &&
+      Date.now() - this.modelCache.timestamp < this.CACHE_TTL
+    ) {
+      return { models: this.modelCache.models, rateLimits: this.modelCache.rateLimits };
+    }
     try {
-      const response = await this.client.models.list();
-      return response.data.map(model => model.id as GroqModel);
+      const resp = await this.retryRequest(() =>
+        fetch('https://api.groq.com/openai/v1/models', {
+          headers: { Authorization: `Bearer ${this.plugin.settings.apiKey}` },
+        }),
+      );
+      if (!resp.ok) throw new Error(`API error: ${resp.status}`);
+      const data = await resp.json();
+      const rl: RateLimitsType = {
+        requestsPerDay: resp.headers.get('x-ratelimit-limit-requests')
+          ? parseInt(resp.headers.get('x-ratelimit-limit-requests')!) || undefined
+          : undefined,
+        tokensPerMinute: resp.headers.get('x-ratelimit-limit-tokens')
+          ? parseInt(resp.headers.get('x-ratelimit-limit-tokens')!) || undefined
+          : undefined,
+        remainingRequests: resp.headers.get('x-ratelimit-remaining-requests')
+          ? parseInt(resp.headers.get('x-ratelimit-remaining-requests')!) || undefined
+          : undefined,
+        remainingTokens: resp.headers.get('x-ratelimit-remaining-tokens')
+          ? parseInt(resp.headers.get('x-ratelimit-remaining-tokens')!) || undefined
+          : undefined,
+        resetRequests: resp.headers.get('x-ratelimit-reset-requests') || undefined,
+        resetTokens: resp.headers.get('x-ratelimit-reset-tokens') || undefined,
+      };
+      this.rateLimits = rl;
+      const filtered = (data.data || []).filter((m: any) => {
+        const name = (m.name || m.id || '').toLowerCase();
+        return !/speech\s*to\s*text|text\s*to\s*speech|audio|image|vision|multimodal/.test(name);
+      });
+      const sorted = filtered.sort((a: any, b: any) => {
+        const idA = (a.id || '').toLowerCase();
+        const idB = (b.id || '').toLowerCase();
+        return idA.localeCompare(idB);
+      });
+      const models: GroqModelInfo[] = sorted.map((m: any) => ({
+        id: m.id,
+        name: m.name || m.id,
+        description: m.description ?? '—',
+        created: 'created' in m ? m.created : undefined,
+        owned_by: 'owned_by' in m ? m.owned_by : undefined,
+        object: 'object' in m ? m.object : undefined,
+        isActive: 'isActive' in m ? m.isActive : true,
+        category: 'category' in m ? m.category : undefined,
+        developer: 'developer' in m ? m.developer : undefined,
+        maxTokens: 'maxTokens' in m ? m.maxTokens : 'max_tokens' in m ? m.max_tokens : undefined,
+        tokensPerMinute:
+          'tokensPerMinute' in m
+            ? m.tokensPerMinute
+            : 'tokens_per_minute' in m
+              ? m.tokens_per_minute
+              : undefined,
+        releaseStatus:
+          'releaseStatus' in m
+            ? m.releaseStatus
+            : 'release_status' in m
+              ? m.release_status
+              : undefined,
+      }));
+      // Сохранение в кэш
+      this.modelCache = { models, rateLimits: rl, timestamp: Date.now() };
+      return { models, rateLimits: rl };
     } catch (error) {
       console.error('Error fetching available models:', error);
-      return [];
+      return { models: [], rateLimits: {} };
     }
   }
 
-  private handleApiError(error: unknown): Error {
+  public handleApiError(error: unknown): Error {
     if (error instanceof Error) {
       if (error.message.includes('401')) {
-        return new Error('Invalid API key. Please check your settings.');
+        return new Error('Неверный API ключ. Проверьте настройки.');
+      }
+      if (error.message.includes('429')) {
+        return new Error('Превышен лимит запросов. Попробуйте позже.');
+      }
+      if (error.message.includes('503')) {
+        return new Error('Сервис временно недоступен.');
+      }
+      if (error.message.includes('Failed to fetch')) {
+        return new Error('Проблемы с интернет-соединением.');
       }
       return error;
     }
-    return new Error('Unknown API error');
+    return new Error('Неизвестная ошибка API');
+  }
+
+  private async retryRequest<T>(fn: () => Promise<T>, retries = 3, delay = 1000): Promise<T> {
+    for (let i = 0; i < retries; i++) {
+      try {
+        return await fn();
+      } catch (error) {
+        if (
+          i === retries - 1 ||
+          !(
+            error instanceof Error &&
+            (error.message.includes('429') || error.message.includes('503'))
+          )
+        ) {
+          throw error;
+        }
+        await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
+      }
+    }
+    throw new Error('Не удалось выполнить запрос после повторных попыток');
+  }
+
+  private getModelMaxTokens(modelId: string): number {
+    const model = this.plugin.settings.groqAvailableModels?.find(m => m.id === modelId);
+    return model?.maxTokens || 4096;
   }
 }

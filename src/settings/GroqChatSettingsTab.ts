@@ -1,17 +1,16 @@
 import { App, PluginSettingTab, Setting } from 'obsidian';
 import { GroqPluginInterface } from '../types/plugin';
-import { AuthService } from '../services/authService';
-import { MODEL_INFO, GroqModel, getModelInfo } from '../types/models';
 import { HistoryStorageMethod } from '../types/settings';
 import { Notice } from 'obsidian';
 import { isValidFileName } from '../utils/validation';
 import { t, Locale } from '../localization';
+import type { RateLimitsType } from '../services/groqService';
+import type { GroqChatSettings } from './GroqChatSettings';
 
 export class GroqChatSettingsTab extends PluginSettingTab {
   constructor(
     app: App,
     private readonly plugin: GroqPluginInterface,
-    private readonly authService: AuthService,
   ) {
     super(app, plugin);
   }
@@ -19,110 +18,74 @@ export class GroqChatSettingsTab extends PluginSettingTab {
   display(): void {
     const locale = (this.plugin.settings.language || 'ru') as Locale;
     this.containerEl.empty();
-    this.renderHeader(locale);
-    this.renderSettingsControls(locale);
-    this.renderActionButtons(locale);
-  }
-
-  private renderHeader(locale: Locale): void {
-    this.containerEl.createEl('h2', { text: t('chatTitle', locale) });
-    this.containerEl.createEl('p', {
-      text: locale === 'ru' ? 'Настройте параметры для работы с Groq API' : 'Configure Groq API parameters',
-    }).style.marginBottom = '1.5rem';
-  }
-
-  private renderSettingsControls(locale: Locale): void {
-    this.addLanguageSetting(locale);
+    // --- API ---
+    this.containerEl.createEl('h3', { text: locale === 'ru' ? 'Настройки API' : 'API Settings' });
     this.addApiKeySetting(locale);
+    // --- Модель ---
+    this.containerEl.createEl('h3', { text: locale === 'ru' ? 'Модель' : 'Model' });
     this.addModelSetting(locale);
-    this.addTemperatureSetting(locale);
-    this.addMaxTokensSetting(locale);
+    // --- Список моделей (отдельная строка) ---
+    this.addModelListBlock(locale);
+    // --- История ---
+    this.containerEl.createEl('h3', { text: locale === 'ru' ? 'История' : 'History' });
     this.addHistorySettings(locale);
-    this.addDisplayModeSetting(locale);
-  }
+    // --- Интерфейс ---
+    this.containerEl.createEl('h3', { text: locale === 'ru' ? 'Интерфейс' : 'Interface' });
+    // this.addDisplayModeSetting(locale); // Метод отсутствует
+    // --- Температура и макс. токены в сетке ---
+    const flexGrid = document.createElement('div');
+    flexGrid.style.display = 'flex';
+    flexGrid.style.gap = '16px';
+    flexGrid.style.alignItems = 'flex-end';
+    const tempDiv = document.createElement('div');
+    tempDiv.style.flex = '1';
+    tempDiv.appendChild(this.createTemperatureSetting(locale));
+    const tokensDiv = document.createElement('div');
+    tokensDiv.style.flex = '1';
+    tokensDiv.appendChild(this.createMaxTokensSetting(locale));
+    flexGrid.appendChild(tempDiv);
+    flexGrid.appendChild(tokensDiv);
+    this.containerEl.appendChild(flexGrid);
+    this.addLanguageSetting(locale);
 
-  private renderActionButtons(locale: Locale): void {
-    const container = this.containerEl.createDiv({
-      cls: 'groq-settings-actions',
-    });
-
-    container.createEl('button', {
-      text: t('save', locale),
-      cls: 'mod-cta',
-    }).onclick = async () => {
+    // --- Кнопки "Сохранить все настройки" и "Сбросить настройки по умолчанию" ---
+    const actionsBlock = document.createElement('div');
+    actionsBlock.style.margin = '32px 0 0 0';
+    actionsBlock.style.display = 'flex';
+    actionsBlock.style.gap = '16px';
+    actionsBlock.style.justifyContent = 'flex-end';
+    const btnSave = document.createElement('button');
+    btnSave.textContent = locale === 'ru' ? 'Сохранить все настройки' : 'Save all settings';
+    btnSave.className = 'mod-cta';
+    btnSave.onclick = async () => {
       await this.plugin.saveSettings();
-      new Notice(locale === 'ru' ? 'Настройки успешно сохранены' : 'Settings saved successfully');
+      new Notice(locale === 'ru' ? 'Настройки сохранены' : 'Settings saved');
     };
-
-    container.createEl('button', {
-      text: t('cancel', locale),
-    }).onclick = async () => {
-      await this.plugin.resetSettings();
-      this.display();
-      new Notice(locale === 'ru' ? 'Настройки сброшены' : 'Settings reset');
+    const btnReset = document.createElement('button');
+    btnReset.textContent = locale === 'ru' ? 'Сбросить настройки по умолчанию' : 'Reset to default';
+    btnReset.onclick = async () => {
+      if (typeof this.plugin.resetSettingsToDefault === 'function') {
+        await this.plugin.resetSettingsToDefault();
+        new Notice(locale === 'ru' ? 'Настройки сброшены' : 'Settings reset');
+        this.display();
+      } else {
+        new Notice(locale === 'ru' ? 'Метод сброса не реализован' : 'Reset method not implemented');
+      }
     };
+    actionsBlock.appendChild(btnSave);
+    actionsBlock.appendChild(btnReset);
+    this.containerEl.appendChild(actionsBlock);
   }
 
-  private addDisplayModeSetting(locale: Locale): void {
-    new Setting(this.containerEl)
-      .setName(t('displayMode', locale))
-      .setDesc(locale === 'ru' ? 'Как открывать чат по умолчанию' : 'How to open chat by default')
-      .addDropdown(dropdown => {
-        dropdown
-          .addOption('tab', locale === 'ru' ? 'Во вкладке' : 'In tab')
-          .addOption('sidepanel', locale === 'ru' ? 'В боковой панели' : 'In side panel')
-          .setValue(this.plugin.settings.displayMode)
-          .onChange(async value => {
-            this.plugin.settings.displayMode = value as 'tab' | 'sidepanel';
-            await this.plugin.saveSettings();
-          });
-      });
-  }
-
-  private addApiKeySetting(locale: Locale): void {
-    new Setting(this.containerEl)
-      .setName(t('apiKey', locale))
-      .setDesc(locale === 'ru' ? 'Ваш ключ для доступа к Groq API' : 'Your key for accessing Groq API')
-      .addText(text =>
-        text
-          .setPlaceholder(t('apiKeyPlaceholder', locale))
-          .setValue(this.plugin.settings.apiKey)
-          .onChange(async value => {
-            this.plugin.settings.apiKey = value.trim();
-            await this.plugin.saveSettings();
-          }),
-      )
-      .addButton(btn =>
-        btn
-          .setButtonText(t('checkApiKey', locale))
-          .setCta()
-          .onClick(async () => {
-            const isValid = await this.authService.validateApiKey(this.plugin.settings.apiKey);
-            new Notice(isValid ? t('validApiKey', locale) : t('invalidApiKey', locale));
-          }),
-      );
-  }
-
-  private addModelSetting(locale: Locale): void {
-    new Setting(this.containerEl)
-      .setName(t('model', locale))
-      .setDesc(locale === 'ru' ? 'Выберите модель для генерации ответов' : 'Select model for generating responses')
-      .addDropdown(dropdown => {
-        Object.values(GroqModel).forEach(model =>
-          dropdown.addOption(model, getModelInfo(model).name),
-        );
-
-        dropdown.setValue(this.plugin.settings.model).onChange(async value => {
-          this.plugin.settings.model = value as GroqModel;
-          await this.plugin.saveSettings();
-        });
-      });
-  }
-
-  private addTemperatureSetting(locale: Locale): void {
-    new Setting(this.containerEl)
+  private createTemperatureSetting(locale: Locale): HTMLElement {
+    const wrapper = document.createElement('div');
+    new Setting(wrapper)
       .setName(t('temperature', locale))
-      .setDesc(locale === 'ru' ? 'Контролирует случайность ответов (0-2)' : 'Controls randomness of responses (0-2)')
+      .setDesc(
+        (locale === 'ru'
+          ? 'Контролирует случайность ответов (0-2)'
+          : 'Controls randomness of responses (0-2)') + ' ',
+      )
       .addSlider(slider =>
         slider
           .setLimits(0, 2, 0.1)
@@ -131,30 +94,301 @@ export class GroqChatSettingsTab extends PluginSettingTab {
           .onChange(async value => {
             this.plugin.settings.temperature = value;
             await this.plugin.saveSettings();
+            this.showSavedIcon(slider.sliderEl);
           }),
+      )
+      .settingEl.setAttribute(
+        'title',
+        locale === 'ru'
+          ? 'Чем выше, тем более креативные ответы'
+          : 'Higher = more creative responses',
       );
+    return wrapper;
   }
 
-  private addMaxTokensSetting(locale: Locale): void {
-    new Setting(this.containerEl)
+  private createMaxTokensSetting(locale: Locale): HTMLElement {
+    const wrapper = document.createElement('div');
+    new Setting(wrapper)
       .setName(t('maxTokens', locale))
-      .setDesc(locale === 'ru' ? 'Максимальное количество токенов в ответе' : 'Maximum number of tokens in response')
+      .setDesc(
+        (locale === 'ru'
+          ? 'Максимальное количество токенов в ответе'
+          : 'Maximum number of tokens in response') +
+          (locale === 'ru' ? ' (например: 2048)' : ' (e.g. 2048)'),
+      )
       .addText(text =>
         text
-          .setPlaceholder(t('maxTokensPlaceholder', locale))
+          .setPlaceholder(locale === 'ru' ? 'Например: 2048' : 'e.g. 2048')
           .setValue(this.plugin.settings.maxTokens.toString())
           .onChange(async value => {
             const num = Math.max(1, Math.min(32768, parseInt(value) || 4096));
             this.plugin.settings.maxTokens = num;
             await this.plugin.saveSettings();
+            this.showSavedIcon(text.inputEl);
           }),
       );
+    return wrapper;
+  }
+
+  private showSavedIcon(targetEl: HTMLElement) {
+    const icon = document.createElement('span');
+    icon.textContent = '✓';
+    icon.style.color = '#3cb371';
+    icon.style.marginLeft = '8px';
+    icon.style.fontWeight = 'bold';
+    icon.style.fontSize = '16px';
+    icon.style.transition = 'opacity 0.5s';
+    targetEl.parentElement?.appendChild(icon);
+    setTimeout(() => {
+      icon.style.opacity = '0';
+      setTimeout(() => icon.remove(), 500);
+    }, 1200);
+  }
+
+  private addApiKeySetting(locale: Locale): void {
+    new Setting(this.containerEl)
+      .setName(t('apiKey', locale))
+      .setDesc(
+        locale === 'ru' ? 'Ваш ключ для доступа к Groq API' : 'Your key for accessing Groq API',
+      )
+      .addText(text =>
+        text
+          .setPlaceholder(t('apiKeyPlaceholder', locale))
+          .setValue(this.plugin.settings.apiKey)
+          .onChange(async value => {
+            this.plugin.settings.apiKey = value.trim();
+            await this.plugin.saveSettings();
+            this.showSavedIcon(text.inputEl);
+          }),
+      )
+      .addButton(btn =>
+        btn
+          .setButtonText(t('checkApiKey', locale))
+          .setCta()
+          .onClick(async () => {
+            const isValid = await this.plugin.authService.validateApiKey(this.plugin.settings.apiKey);
+            new Notice(isValid ? t('validApiKey', locale) : t('invalidApiKey', locale));
+          }),
+      );
+  }
+
+  private async fetchGroqModels(apiKey: string): Promise<any[]> {
+    try {
+      const resp = await fetch('https://api.groq.com/openai/v1/models', {
+        headers: { Authorization: `Bearer ${apiKey}` },
+      });
+      if (!resp.ok) throw new Error('API error');
+      const data = await resp.json();
+      return data.data || [];
+    } catch (error) {
+      return [];
+    }
+  }
+
+  private addModelSetting(locale: Locale): void {
+    const setting = new Setting(this.containerEl)
+      .setName(t('model', locale))
+      .setDesc(
+        locale === 'ru'
+          ? 'Выберите модель для генерации ответов'
+          : 'Select model for generating responses',
+      );
+
+    // Dropdown для выбора модели
+    let dropdownEl: HTMLSelectElement | null = null;
+    const updateDropdown = () => {
+      if (!dropdownEl) return;
+      const settings = this.plugin.settings as GroqChatSettings;
+      const models: { id: string; name: string; description?: string; isActive?: boolean }[] = (
+        settings.groqAvailableModels || []
+      ).filter(m => m.isActive !== false);
+      dropdownEl.innerHTML = '';
+      if (models.length === 0) {
+        const opt = document.createElement('option');
+        opt.value = 'none';
+        opt.textContent = t('noModelsFound', locale);
+        if (dropdownEl) dropdownEl.appendChild(opt);
+      } else {
+        models.forEach(model => {
+          const opt = document.createElement('option');
+          opt.value = model.id;
+          opt.textContent = model.name;
+          if (dropdownEl) dropdownEl.appendChild(opt);
+        });
+      }
+      // Если текущая выбранная модель неактивна — выбрать первую активную
+      if (settings.model && !models.some(m => m.id === settings.model)) {
+        settings.model = models[0]?.id || 'none';
+      }
+      dropdownEl.value = settings.model || (models[0]?.id ?? 'none');
+    };
+    const dropdown = setting.addDropdown(dropdown => {
+      dropdownEl = dropdown.selectEl;
+      updateDropdown();
+      dropdown
+        .setValue(
+          (this.plugin.settings as GroqChatSettings).model ||
+            (dropdownEl.options[0]?.value ?? 'none'),
+        )
+        .onChange(async value => {
+          (this.plugin.settings as GroqChatSettings).model = value;
+          await this.plugin.saveSettings();
+          this.showSavedIcon(dropdownEl!);
+        });
+    });
+
+    // Кнопка обновления моделей
+    setting.addExtraButton(btn => {
+      btn
+        .setIcon('refresh-cw')
+        .setTooltip(t('refreshModels', locale))
+        .onClick(async () => {
+          btn.setDisabled(true);
+          btn.extraSettingsEl.classList.add('mod-spinner');
+          const apiModels = await this.fetchGroqModels(this.plugin.settings.apiKey);
+          if (apiModels.length > 0) {
+            const settings = this.plugin.settings as GroqChatSettings;
+            settings.groqAvailableModels = apiModels.map((m: any) => ({
+              id: m.id,
+              name: m.name || m.id,
+              description: m.description || '',
+              isActive: true,
+            }));
+            await this.plugin.saveSettings();
+            new Notice(t('modelsUpdated', locale));
+            updateDropdown();
+          } else {
+            new Notice(t('modelsUpdateError', locale));
+          }
+          btn.setDisabled(false);
+          btn.extraSettingsEl.classList.remove('mod-spinner');
+        });
+    });
+
+    // Синхронизация при изменении активности моделей
+    // Переопределим метод addModelListBlock, чтобы после изменений обновлять dropdown
+    const origAddModelListBlock = this.addModelListBlock.bind(this);
+    this.addModelListBlock = (loc: Locale) => {
+      origAddModelListBlock(loc);
+      updateDropdown();
+    };
+  }
+
+  // --- Список моделей (таблица, отдельная строка) ---
+  private addModelListBlock(locale: Locale) {
+    // Создаём или находим отдельный контейнер для таблицы моделей
+    let modelsBlock = this.containerEl.querySelector('.groq-models-block') as HTMLDivElement | null;
+    if (!modelsBlock) {
+      modelsBlock = document.createElement('div');
+      modelsBlock.className = 'groq-models-block';
+      this.containerEl.appendChild(modelsBlock);
+    }
+    modelsBlock.innerHTML = '';
+    // Расширенный тип модели для таблицы
+    type DisplayModel = {
+      id: string;
+      name: string;
+      description?: string;
+      created?: number;
+      owned_by?: string;
+      object?: string;
+      isActive?: boolean;
+      category?: string;
+      developer?: { name: string; url?: string };
+      maxTokens?: number;
+      tokensPerMinute?: number;
+      releaseStatus?: string;
+    };
+    const settings = this.plugin.settings as GroqChatSettings;
+    let models: DisplayModel[] = (settings.groqAvailableModels || []) as DisplayModel[];
+    // Нормализация: гарантировать наличие isActive у каждой модели
+    models = models.map(m => ({
+      ...m,
+      isActive: typeof m.isActive === 'boolean' ? m.isActive : true,
+    }));
+    const rateLimits: RateLimitsType = settings.groqRateLimits || {};
+    // --- Кнопки "Выбрать все" и "Отменить все" ---
+    const selectAllBlock = document.createElement('div');
+    selectAllBlock.style.margin = '8px 0 8px 0';
+    selectAllBlock.style.display = 'flex';
+    selectAllBlock.style.gap = '8px';
+    const btnSelectAll = document.createElement('button');
+    btnSelectAll.textContent = locale === 'ru' ? 'Выбрать все' : 'Select all';
+    btnSelectAll.className = 'mod-cta';
+    const btnDeselectAll = document.createElement('button');
+    btnDeselectAll.textContent = locale === 'ru' ? 'Отменить все' : 'Deselect all';
+    // --- Таблица ---
+    const modelsTable = document.createElement('table');
+    modelsTable.className = 'groq-models-table';
+    modelsTable.style.width = '100%';
+    modelsTable.style.borderCollapse = 'collapse';
+    modelsTable.style.fontSize = '13px';
+    modelsTable.style.margin = '24px 0 24px 0';
+    modelsTable.innerHTML = `
+      <thead><tr style='background:#f0f0f0;'>
+        <th style='text-align:left;padding:4px 8px;'>${t('model', locale)}</th>
+        <th style='text-align:left;padding:4px 8px;'>${t('active', locale)}</th>
+      </tr></thead>
+      <tbody></tbody>
+    `;
+    const tbody = modelsTable.querySelector('tbody') as HTMLTableSectionElement;
+    // Сохраняем ссылки на чекбоксы для массовых операций
+    const checkboxes: HTMLInputElement[] = [];
+    models.forEach((model, idx) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style='padding:4px 8px;'>${model.name.replace(' (недоступна)', '')}</td>
+        <td style='padding:4px 8px;'></td>
+      `;
+      // Toggle для "Активна"
+      const toggleTd = tr.children[1] as HTMLTableCellElement;
+      const toggle = document.createElement('input');
+      toggle.type = 'checkbox';
+      toggle.checked = (model as any).isActive !== false;
+      toggle.style.transform = 'scale(1.2)';
+      toggle.title =
+        locale === 'ru' ? 'Включить/выключить модель для чата' : 'Enable/disable model for chat';
+      toggle.addEventListener('change', async () => {
+        (models[idx] as any).isActive = toggle.checked;
+        settings.groqAvailableModels = [...models];
+        await this.plugin.saveSettings();
+        this.showSavedIcon(toggle);
+      });
+      toggleTd.appendChild(toggle);
+      checkboxes.push(toggle);
+      tbody.appendChild(tr);
+    });
+    // Логика кнопок массового выбора
+    btnSelectAll.onclick = async () => {
+      checkboxes.forEach((cb, idx) => {
+        cb.checked = true;
+        (models[idx] as any).isActive = true;
+      });
+      settings.groqAvailableModels = [...models];
+      await this.plugin.saveSettings();
+    };
+    btnDeselectAll.onclick = async () => {
+      checkboxes.forEach((cb, idx) => {
+        cb.checked = false;
+        (models[idx] as any).isActive = false;
+      });
+      settings.groqAvailableModels = [...models];
+      await this.plugin.saveSettings();
+    };
+    selectAllBlock.appendChild(btnSelectAll);
+    selectAllBlock.appendChild(btnDeselectAll);
+    modelsBlock.appendChild(selectAllBlock);
+    modelsBlock.appendChild(modelsTable);
   }
 
   private addHistorySettings(locale: Locale): void {
     new Setting(this.containerEl)
       .setName(t('history', locale))
-      .setDesc(locale === 'ru' ? 'Выберите способ хранения и максимальную длину истории' : 'Select storage method and maximum history length')
+      .setDesc(
+        locale === 'ru'
+          ? 'Выберите способ хранения и максимальную длину истории'
+          : 'Select storage method and maximum history length',
+      )
       .addDropdown(dropdown => {
         dropdown
           .addOption('memory', locale === 'ru' ? 'В памяти' : 'In memory')
@@ -179,16 +413,21 @@ export class GroqChatSettingsTab extends PluginSettingTab {
           });
         text.inputEl.insertAdjacentHTML(
           'afterend',
-          `<span style="font-size: var(--font-ui-smaller); margin-left: 5px;">(${locale === 'ru' ? '0 = не хранить' : '0 = do not store'})</span>`,
+          `<span style="font-size: var(--font-ui-smaller, 0.85em); margin-left: 5px;">(${locale === 'ru' ? '0 = не хранить' : '0 = do not store'})</span>`,
         );
         text.inputEl.type = 'number';
         text.inputEl.min = '0';
-      });
+      })
+      .settingEl.setAttribute('title', locale === 'ru' ? 'Настройки истории' : 'History settings');
 
     if (this.plugin.settings.historyStorageMethod === 'file') {
       new Setting(this.containerEl)
         .setName(t('historyFile', locale))
-        .setDesc(locale === 'ru' ? 'Путь к файлу для хранения истории (если выбран метод "В файле")' : 'Path to file for storing history (if "In file" method is selected)')
+        .setDesc(
+          locale === 'ru'
+            ? 'Путь к файлу для хранения истории (если выбран метод "В файле")'
+            : 'Path to file for storing history (if "In file" method is selected)',
+        )
         .addText(text =>
           text
             .setPlaceholder(t('historyFilePlaceholder', locale))
@@ -198,10 +437,17 @@ export class GroqChatSettingsTab extends PluginSettingTab {
               if (isValidFileName(trimmedValue)) {
                 this.plugin.settings.notePath = trimmedValue;
                 await this.plugin.saveSettings();
+                this.showSavedIcon(text.inputEl);
               } else {
-                new Notice(locale === 'ru' ? 'Некорректное имя/путь файла' : 'Invalid file name/path');
+                new Notice(
+                  locale === 'ru' ? 'Некорректное имя/путь файла' : 'Invalid file name/path',
+                );
               }
             }),
+        )
+        .settingEl.insertAdjacentHTML(
+          'beforeend',
+          `<p style="font-size: var(--font-ui-smaller, 0.85em); margin-top: 5px;">${locale === 'ru' ? 'Пример: notes/history.md' : 'Example: notes/history.md'}</p>`,
         );
     }
   }

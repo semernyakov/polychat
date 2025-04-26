@@ -1,9 +1,7 @@
-// ChatPanel.tsx
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { GroqPluginInterface } from '../types/plugin';
 import { Message } from '../types/types';
 import { MessageUtils } from '../utils/messageUtils';
-import { GroqModel, getModelInfo } from '../types/models';
 import { MessageList, MessageListHandles } from './MessageList';
 import { ModelSelector } from './ModelSelector';
 import { MessageInput } from './MessageInput';
@@ -24,6 +22,8 @@ import { ModelInfoDialog } from './ModelInfoDialog';
 import { PluginSettingsProvider } from '../context/PluginSettingsContext';
 import { t, Locale } from '../localization';
 import { usePluginSettings } from '../utils/usePluginSettings';
+// import { DEFAULT_MODEL } from '../types/models'; // Удалено, если не используется
+import { GroqModel, ModelCategory, ModelReleaseStatus } from '../types/types';
 
 interface ChatPanelProps {
   plugin: GroqPluginInterface;
@@ -32,38 +32,129 @@ interface ChatPanelProps {
   onDisplayModeChange: (mode: 'tab' | 'sidepanel') => void;
 }
 
-export const ChatPanel: React.FC<ChatPanelProps> = (props) => {
-  const ChatPanelInner = () => {
-    const {
-      plugin,
-      displayMode,
-      initialMessages = [],
-      onDisplayModeChange,
-    } = props;
-    const [messages, setMessages] = useState<Message[]>(initialMessages);
+interface LocalDynamicModelInfo {
+  id: string;
+  name: string;
+  description?: string;
+  category?: string;
+  developer?: { name: string; url?: string };
+  releaseStatus?: string;
+  maxTokens?: number;
+  tokensPerMinute?: number;
+  requestsPerMinute?: number;
+  maxDuration?: number;
+  maxFileSize?: number;
+}
+
+interface ModelInfo {
+  id: GroqModel;
+  name: string;
+  description: string;
+  category: ModelCategory;
+  developer: { name: string; url?: string };
+  releaseStatus: ModelReleaseStatus;
+  maxTokens: number;
+  tokensPerMinute?: number;
+  maxDuration?: number;
+  maxFileSize?: number;
+}
+
+
+// Хук для управления сообщениями
+const useMessages = (initialMessages: Message[], historyService: any) => {
+  const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const [isHistoryLoading, setIsHistoryLoading] = useState(false);
+  const [hasLoadedHistory, setHasLoadedHistory] = useState(false);
+
+  useEffect(() => {
+    if (initialMessages.length > 0) {
+      if (JSON.stringify(messages) !== JSON.stringify(initialMessages)) {
+        setMessages(initialMessages);
+      }
+      setHasLoadedHistory(true);
+      setIsHistoryLoading(false);
+    } else if (!hasLoadedHistory) {
+      const loadHistory = async () => {
+        setIsHistoryLoading(true);
+        try {
+          const history = await historyService.getHistory();
+          setMessages(history);
+          setHasLoadedHistory(true);
+        } catch {
+          // no-op
+        } finally {
+          setIsHistoryLoading(false);
+        }
+      };
+      loadHistory();
+    }
+  }, [historyService, hasLoadedHistory, initialMessages]);
+
+  const clearHistory = async () => {
+    try {
+      await historyService.clearHistory();
+      setMessages([]);
+      setHasLoadedHistory(true);
+      toast.success(t('historyCleared'));
+    } catch (error) {
+      console.error('Error clearing history:', error);
+      toast.error(t('historyClearError'));
+    }
+  };
+
+  return { messages, setMessages, isHistoryLoading, clearHistory };
+};
+
+export const ChatPanel: React.FC<ChatPanelProps> = props => {
+  const ChatPanelInner: React.FC = () => {
+    const { plugin, displayMode, initialMessages = [], onDisplayModeChange } = props;
     const [inputValue, setInputValue] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [isHistoryLoading, setIsHistoryLoading] = useState(false);
-    const [hasLoadedHistory, setHasLoadedHistory] = useState(false);
-    const [selectedModel, setSelectedModel] = useState<GroqModel>(plugin.settings.model);
+    const [selectedModel, setSelectedModel] = useState<string>(GroqModel.LLAMA3_70B);
     const [isSupportOpen, setIsSupportOpen] = useState(false);
     const [isModelInfoOpen, setIsModelInfoOpen] = useState(false);
+    const [rateLimits, setRateLimits] = useState<any>(null);
     const messageListRef = useRef<MessageListHandles>(null);
     const containerRef = useRef<HTMLDivElement>(null);
-    const [availableModels, setAvailableModels] = useState<GroqModel[]>([]);
     const settings = usePluginSettings();
-    const locale: Locale = settings?.language || 'en';
+    // Язык по умолчанию — en
+    const locale: Locale = settings?.language ?? 'en';
 
-    const fetchAvailableModels = useCallback(async (): Promise<GroqModel[]> => {
-      try {
-        const models = await plugin.groqService.getAvailableModels();
-        setAvailableModels(models);
-        return models;
-      } catch (error) {
-        console.error('Failed to fetch available models:', error);
-        setAvailableModels([]);
-        return [];
-      }
+    const { messages, setMessages, isHistoryLoading, clearHistory } = useMessages(
+      initialMessages,
+      plugin.historyService,
+    );
+
+    // Динамическая тема
+    useEffect(() => {
+      const updateTheme = () => {
+        const root = document.documentElement;
+        const obsidianTheme = document.body.classList.contains('theme-light') ? 'light' : 'dark';
+        root.setAttribute('data-groq-theme', obsidianTheme);
+      };
+      updateTheme();
+      const observer = new MutationObserver(updateTheme);
+      observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+      return () => observer.disconnect();
+    }, []);
+
+    // Только активные модели
+    const initialModels: LocalDynamicModelInfo[] = (plugin.settings.groqAvailableModels || [])
+      .filter((m: any) => m.isActive !== false)
+      .map((m: any) => ({
+        id: m.id,
+        name: typeof m.name === 'string' ? m.name : m.id,
+        description: m.description ?? '',
+      }));
+    const [availableModels, setAvailableModels] = useState<LocalDynamicModelInfo[]>(initialModels);
+
+    const fetchAvailableModels = useCallback(async (): Promise<LocalDynamicModelInfo[]> => {
+      if (!plugin.groqService.getAvailableModelsWithLimits) return [];
+      const { models, rateLimits } = await plugin.groqService.getAvailableModelsWithLimits();
+      setRateLimits(rateLimits || {});
+      const filtered = models.filter((m: any) => m.isActive !== false);
+      setAvailableModels(filtered);
+      return filtered;
     }, [plugin.groqService]);
 
     useEffect(() => {
@@ -88,32 +179,6 @@ export const ChatPanel: React.FC<ChatPanelProps> = (props) => {
       };
     }, []);
 
-    useEffect(() => {
-      if (initialMessages.length > 0) {
-        if (JSON.stringify(messages) !== JSON.stringify(initialMessages)) {
-          setMessages(initialMessages);
-        }
-        setHasLoadedHistory(true);
-        setIsHistoryLoading(false);
-      } else if (!hasLoadedHistory) {
-        const loadHistory = async () => {
-          setIsHistoryLoading(true);
-          try {
-            const history = await plugin.historyService.getHistory();
-            setMessages(history);
-            setHasLoadedHistory(true);
-          } catch (error) {
-            console.error('Ошибка загрузки истории:', error);
-            toast.error('Не удалось загрузить историю сообщений.');
-            setHasLoadedHistory(true);
-          } finally {
-            setIsHistoryLoading(false);
-          }
-        };
-        loadHistory();
-      }
-    }, [plugin.historyService, hasLoadedHistory, initialMessages]);
-
     const handleScrollToTop = useCallback(() => {
       messageListRef.current?.scrollToTop();
     }, []);
@@ -132,8 +197,8 @@ export const ChatPanel: React.FC<ChatPanelProps> = (props) => {
 
       try {
         await plugin.historyService.addMessage(userMessage).catch(err => {
-          console.error('Ошибка сохранения user message:', err);
-          toast.warn('Не удалось сохранить ваше сообщение в истории.');
+          console.error('Error saving user message:', err);
+          toast.warn(t('messageSaveError'));
         });
 
         const assistantMessage = await plugin.groqService.sendMessage(trimmedValue, selectedModel);
@@ -141,35 +206,23 @@ export const ChatPanel: React.FC<ChatPanelProps> = (props) => {
         setMessages(prev => [...prev, userMessage, assistantMessage]);
 
         await plugin.historyService.addMessage(assistantMessage).catch(err => {
-          console.error('Ошибка сохранения assistant message:', err);
-          toast.warn('Не удалось сохранить ответ ассистента в истории.');
+          console.error('Error saving assistant message:', err);
+          toast.warn(t('assistantMessageSaveError'));
         });
       } catch (error) {
-        console.error('Ошибка отправки сообщения:', error);
+        console.error('Error sending message:', error);
         const errorMsg = error instanceof Error ? error.message : String(error);
-        toast.error(`Ошибка: ${errorMsg}`);
-        const errorMessage = MessageUtils.create('assistant', `Произошла ошибка: ${errorMsg}`);
-        setMessages(prev => [...prev, errorMessage]);
+        toast.error(`${t('error')}: ${errorMsg}`);
+        const errorMessage = MessageUtils.create('assistant', `${t('error')}: ${errorMsg}`);
+        setMessages(prev => [...prev, userMessage, errorMessage]);
       } finally {
         setIsLoading(false);
       }
     }, [inputValue, isLoading, plugin, selectedModel]);
 
-    const handleClearHistory = async () => {
-      try {
-        await plugin.historyService.clearHistory();
-        setMessages([]);
-        setHasLoadedHistory(true);
-        toast.success('История очищена');
-      } catch (error) {
-        console.error('Ошибка очистки истории:', error);
-        toast.error('Не удалось очистить историю.');
-      }
-    };
-
-    const handleModelChange = (model: GroqModel) => {
-      setSelectedModel(model);
-      plugin.settings.model = model;
+    const handleModelChange = (modelId: string) => {
+      setSelectedModel(modelId);
+      plugin.settings.model = modelId;
       plugin.saveSettings();
     };
 
@@ -178,10 +231,30 @@ export const ChatPanel: React.FC<ChatPanelProps> = (props) => {
       onDisplayModeChange(newMode);
     };
 
-    const selectedModelInfo = getModelInfo(selectedModel);
+    const toModelInfo = (model: LocalDynamicModelInfo): ModelInfo => ({
+      id: (Object.values(GroqModel).includes(model.id as GroqModel)
+        ? model.id
+        : GroqModel.LLAMA3_70B) as GroqModel,
+      name: model.name,
+      description: model.description || '',
+      category: (model.category as ModelCategory) || 'text',
+      developer: model.developer || { name: '' },
+      releaseStatus: (model.releaseStatus as ModelReleaseStatus) || 'main',
+      maxTokens: model.maxTokens || 4096,
+      tokensPerMinute: model.tokensPerMinute,
+      maxDuration: model.maxDuration,
+      maxFileSize: model.maxFileSize,
+    });
+
+    const selectedModelInfo = toModelInfo(
+      availableModels.find(m => m.id === selectedModel) ||
+        availableModels[0] || { id: '', name: '', description: '' },
+    );
 
     if (!plugin.settings.apiKey) {
-      return <div className="groq-api-key-warning">...</div>;
+      return (
+        <div className="groq-api-key-warning">{t('apiKeyMissing') || 'API key is missing'}</div>
+      );
     }
 
     return (
@@ -199,28 +272,32 @@ export const ChatPanel: React.FC<ChatPanelProps> = (props) => {
             <button
               onClick={() => setIsModelInfoOpen(true)}
               className="groq-icon-button groq-model-info-button"
-              title={t('modelInfo', locale)}
+              title={t('modelInfo')}
+              aria-label={t('modelInfo')}
             >
               <FiInfo size={16} />
             </button>
             <button
               onClick={toggleDisplayMode}
               className="groq-icon-button groq-display-mode-button"
-              title={displayMode === 'tab' ? t('showInSidepanel', locale) : t('showInTab', locale)}
+              title={displayMode === 'tab' ? t('showInSidepanel') : t('showInTab')}
+              aria-label={displayMode === 'tab' ? t('showInSidepanel') : t('showInTab')}
             >
               {displayMode === 'tab' ? <FiSidebar size={16} /> : <FiSquare size={16} />}
             </button>
             <button
               onClick={() => setIsSupportOpen(true)}
               className="groq-icon-button groq-support-header-button"
-              title={t('supportDevHeader', locale)}
+              title={t('supportDevHeader')}
+              aria-label={t('supportDevHeader')}
             >
               <FiHeart size={16} />
             </button>
             <button
               onClick={handleScrollToTop}
               className="groq-icon-button groq-scroll-button"
-              title={t('scrollToTop', locale)}
+              title={t('scrollToTop')}
+              aria-label={t('scrollToTop')}
               disabled={messages.length === 0}
             >
               <FiChevronUp size={16} />
@@ -228,15 +305,17 @@ export const ChatPanel: React.FC<ChatPanelProps> = (props) => {
             <button
               onClick={handleScrollToBottom}
               className="groq-icon-button groq-scroll-button"
-              title={t('scrollToBottom', locale)}
+              title={t('scrollToBottom')}
+              aria-label={t('scrollToBottom')}
               disabled={messages.length === 0}
             >
               <FiChevronDown size={16} />
             </button>
             <button
-              onClick={handleClearHistory}
+              onClick={clearHistory}
               className="groq-icon-button groq-clear-button"
-              title={t('clearHistory', locale)}
+              title={t('clearHistory')}
+              aria-label={t('clearHistory')}
               disabled={messages.length === 0 || isLoading}
             >
               <FiTrash2 size={16} />
@@ -246,11 +325,47 @@ export const ChatPanel: React.FC<ChatPanelProps> = (props) => {
 
         <div className="groq-chat__content">
           <div className="groq-chat__messages-container">
-            <MessageList ref={messageListRef} messages={messages} isLoading={isLoading} />
+            {rateLimits && (rateLimits.requestsPerDay || rateLimits.tokensPerMinute) && (
+              <section className="groq-rate-limits">
+                <b>{t('rateLimits')}:</b>
+                {rateLimits.requestsPerDay !== undefined && (
+                  <div>
+                    {t('requestsPerDay')}:{' '}
+                    <b>
+                      {rateLimits.remainingRequests ?? '—'} / {rateLimits.requestsPerDay}
+                    </b>
+                    {rateLimits.resetRequests && (
+                      <span>
+                        ({t('reset')}: {rateLimits.resetRequests})
+                      </span>
+                    )}
+                  </div>
+                )}
+                {rateLimits.tokensPerMinute !== undefined && (
+                  <div>
+                    {t('tokensPerMinute')}:{' '}
+                    <b>
+                      {rateLimits.remainingTokens ?? '—'} / {rateLimits.tokensPerMinute}
+                    </b>
+                    {rateLimits.resetTokens && (
+                      <span>
+                        ({t('reset')}: {rateLimits.resetTokens})
+                      </span>
+                    )}
+                  </div>
+                )}
+              </section>
+            )}
+            <MessageList
+              ref={messageListRef}
+              messages={messages}
+              isLoading={isLoading}
+              language={locale}
+            />
             {isHistoryLoading && (
               <div className="groq-chat__loading-history">
                 <div className="groq-spinner"></div>
-                <span>Загрузка истории...</span>
+                <span>{t('loadingHistory')}</span>
               </div>
             )}
           </div>
@@ -271,7 +386,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = (props) => {
           isOpen={isModelInfoOpen}
           onClose={() => setIsModelInfoOpen(false)}
           modelInfo={selectedModelInfo}
-          isAvailable={availableModels.includes(selectedModel)}
+          isAvailable={availableModels.some(m => m.id === selectedModelInfo.id)}
         />
 
         <ToastContainer position="bottom-right" autoClose={3000} theme="dark" />

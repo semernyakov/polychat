@@ -40,8 +40,6 @@
     "builtin-modules": "5.0.0",
     "esbuild": "^0.25.2",
     "esbuild-copy-static-files": "^0.1.0",
-    "esbuild-plugin-postcss": "^0.1.4",
-    "esbuild-plugin-postcss2": "^0.1.2",
     "eslint": "^9.24.0",
     "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-react-hooks": "^5.2.0",
@@ -73,7 +71,6 @@
     "react-virtualized-auto-sizer": "^1.0.26",
     "react-window": "^1.8.11",
     "rehype-raw": "^7.0.0",
-    "remark-gfm": "^4.0.1",
-    "winston": "^3.17.0"
+    "remark-gfm": "^4.0.1"
   }
 }

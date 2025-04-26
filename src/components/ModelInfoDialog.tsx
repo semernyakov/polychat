@@ -1,6 +1,6 @@
 import React from 'react';
 import { FiX } from 'react-icons/fi';
-import { ModelInfo } from '../types/models';
+import { ModelInfo } from '../types/types';
 import '../styles.css';
 
 interface ModelInfoDialogProps {
@@ -42,7 +42,7 @@ export const ModelInfoDialog: React.FC<ModelInfoDialogProps> = ({
             <div className="groq-model-info__details">
               <div className="groq-model-info__detail">
                 <span className="groq-model-info__label">Разработчик:</span>
-                <span className="groq-model-info__value">{modelInfo.developer.name}</span>
+                <span className="groq-model-info__value">{modelInfo.developer?.name || '—'}</span>
               </div>
 
               <div className="groq-model-info__detail">
@@ -52,46 +52,37 @@ export const ModelInfoDialog: React.FC<ModelInfoDialogProps> = ({
                     ? 'Текст'
                     : modelInfo.category === 'audio'
                       ? 'Аудио'
-                      : 'Видео'}
+                      : modelInfo.category === 'vision'
+                        ? 'Вижн'
+                        : modelInfo.category === 'code'
+                          ? 'Код'
+                          : modelInfo.category === 'image'
+                            ? 'Изображения'
+                            : modelInfo.category || '—'}
                 </span>
               </div>
 
               <div className="groq-model-info__detail">
                 <span className="groq-model-info__label">Макс. токенов:</span>
-                <span className="groq-model-info__value">
-                  {modelInfo.maxTokens.toLocaleString()}
-                </span>
+                <span className="groq-model-info__value">{modelInfo.maxTokens ?? '—'}</span>
               </div>
 
-              {modelInfo.tokensPerMinute && (
+              {modelInfo.tokensPerMinute !== undefined && (
                 <div className="groq-model-info__detail">
                   <span className="groq-model-info__label">Токенов в минуту:</span>
-                  <span className="groq-model-info__value">
-                    {modelInfo.tokensPerMinute.toLocaleString()}
-                  </span>
+                  <span className="groq-model-info__value">{modelInfo.tokensPerMinute}</span>
                 </div>
               )}
-
-              {modelInfo.requestsPerMinute && (
+              {modelInfo.maxDuration !== undefined && (
                 <div className="groq-model-info__detail">
-                  <span className="groq-model-info__label">Запросов в минуту:</span>
-                  <span className="groq-model-info__value">
-                    {modelInfo.requestsPerMinute.toLocaleString()}
-                  </span>
+                  <span className="groq-model-info__label">Макс. длительность (сек):</span>
+                  <span className="groq-model-info__value">{modelInfo.maxDuration}</span>
                 </div>
               )}
-
-              {modelInfo.maxDuration && (
+              {modelInfo.maxFileSize !== undefined && (
                 <div className="groq-model-info__detail">
-                  <span className="groq-model-info__label">Макс. длительность:</span>
-                  <span className="groq-model-info__value">{modelInfo.maxDuration} сек</span>
-                </div>
-              )}
-
-              {modelInfo.maxFileSize && (
-                <div className="groq-model-info__detail">
-                  <span className="groq-model-info__label">Макс. размер файла:</span>
-                  <span className="groq-model-info__value">{modelInfo.maxFileSize} МБ</span>
+                  <span className="groq-model-info__label">Макс. размер файла (МБ):</span>
+                  <span className="groq-model-info__value">{modelInfo.maxFileSize}</span>
                 </div>
               )}
             </div>

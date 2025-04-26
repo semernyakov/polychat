@@ -2,13 +2,13 @@ import React, { useState, useRef, useEffect } from 'react';
 import { FiSend } from 'react-icons/fi';
 import { t, Locale } from '../localization';
 import { usePluginSettings } from '../utils/usePluginSettings';
-import '../styles.css'; // Используем единый стиль
+import '../styles.css';
 
 interface MessageInputProps {
   value: string;
   onChange: (value: string) => void;
   onSend: () => void;
-  onKeyDown?: (e: React.KeyboardEvent) => void;
+  onKeyDown?: (event: React.KeyboardEvent) => void;
   disabled?: boolean;
   maxTokens?: number;
 }
@@ -22,39 +22,33 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   maxTokens,
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [isComposing, setIsComposing] = useState(false); // Для поддержки IME
+  const [isComposing, setIsComposing] = useState(false);
   const settings = usePluginSettings();
-  const locale: Locale = settings?.language || 'en';
+  const locale: Locale = settings?.language ?? 'en';
 
-  // Автоматическое изменение высоты textarea
   useEffect(() => {
     const textarea = textareaRef.current;
     if (textarea) {
-      textarea.style.height = 'auto'; // Сброс высоты
-      textarea.style.height = `${textarea.scrollHeight}px`; // Установка новой
+      textarea.style.height = 'auto';
+      textarea.style.height = `${textarea.scrollHeight}px`;
     }
   }, [value]);
 
-  // Обработчик клавиш
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (isComposing) return;
 
-    // Shift+Enter = перенос строки (по умолчанию)
     if (event.key === 'Enter' && event.shiftKey) {
       return;
     }
 
-    // Ctrl+Enter или Cmd+Enter = отправка
     if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
       event.preventDefault();
-
       const trimmedValue = value.trim();
       if (!disabled && trimmedValue) {
         onSend();
       }
     }
 
-    // Дополнительно вызываем внешний обработчик
     if (onKeyDown) {
       onKeyDown(event);
     }
@@ -68,7 +62,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
 
   const currentLength = value.length;
   const isOverLimit = !!(maxTokens && currentLength > maxTokens);
-  const isSendDisabled = Boolean(disabled || !value.trim() || isOverLimit);
+  const isSendDisabled = disabled || !value.trim() || isOverLimit;
 
   return (
     <div className="groq-chat-input">
@@ -76,8 +70,8 @@ export const MessageInput: React.FC<MessageInputProps> = ({
         <textarea
           ref={textareaRef}
           value={value}
-          onChange={e => onChange(e.target.value)}
-          onKeyDown={handleKeyDown}
+          onChange={(e) => onChange(e.target.value)}
+          onKeyDown={(e) => handleKeyDown(e)}
           onCompositionStart={() => setIsComposing(true)}
           onCompositionEnd={() => setIsComposing(false)}
           placeholder={t('inputPlaceholder', locale)}
@@ -85,6 +79,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
           rows={1}
           className="groq-chat-input__textarea"
           aria-label={t('inputAriaLabel', locale)}
+          aria-describedby="input-hint input-counter"
         />
         <button
           onClick={handleSendClick}
@@ -97,14 +92,15 @@ export const MessageInput: React.FC<MessageInputProps> = ({
         </button>
       </div>
       <div className="groq-chat-input__footer">
-        <span className="groq-message-input__hint" dangerouslySetInnerHTML={{ __html: t('inputHint', locale) }} />
+        <span id="input-hint" className="groq-message-input__hint">
+          <kbd>Ctrl</kbd>+<kbd>Enter</kbd> — send, <kbd>Shift</kbd>+<kbd>Enter</kbd> — new line
+        </span>
         {maxTokens !== undefined && (
           <span
-            className="groq-message-input__counter"
-            title={t('inputCounterTitle', locale)}
-            style={{ color: isOverLimit ? 'var(--text-error)' : 'inherit' }}
+            id="input-counter"
+            className={`groq-message-input__counter ${isOverLimit ? 'groq-message-input__counter--error' : ''}`}
           >
-            {currentLength.toLocaleString()}/{maxTokens.toLocaleString()} {t('symbolsTokens', locale)}
+            {currentLength}/{maxTokens}
           </span>
         )}
       </div>

@@ -1,23 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import '../styles.css'; // Используем единый style.css
-import { GroqModel, MODEL_INFO } from '../types/models'; // Удаляем getModelInfo
 import { GroqPluginInterface } from '../types/plugin';
 import { toast } from 'react-toastify'; // Импортируем toast
 
+// Используем DynamicModelInfo для моделей
+interface DynamicModelInfo {
+  id: string;
+  name: string;
+  description?: string;
+}
+
 interface ModelSelectorProps {
   plugin: GroqPluginInterface;
-  selectedModel: GroqModel; // Этот параметр может быть не нужен, если мы читаем из plugin.settings
-  onSelectModel: (model: GroqModel) => void;
-  getAvailableModels: () => Promise<GroqModel[]>; // Добавляем prop для получения доступных моделей
+  selectedModel: string;
+  onSelectModel: (modelId: string) => void;
+  getAvailableModels: () => Promise<{ id: string; name: string; description?: string }[]>;
 }
 
 export const ModelSelector: React.FC<ModelSelectorProps> = ({
   plugin: _plugin,
   selectedModel,
   onSelectModel,
-  getAvailableModels, // Получаем функцию как prop
+  getAvailableModels,
 }) => {
-  const [availableModels, setAvailableModels] = useState<GroqModel[]>([]);
+  const [availableModels, setAvailableModels] = useState<DynamicModelInfo[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -25,7 +31,21 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
       setIsLoading(true);
       try {
         const models = await getAvailableModels();
-        setAvailableModels(models);
+        // Фильтруем только активные
+        const activeModels = Array.isArray(_plugin.settings.groqAvailableModels)
+          ? models.filter(m =>
+              _plugin.settings.groqAvailableModels?.find(
+                s => s.id === m.id && s.isActive !== false,
+              ),
+            )
+          : models;
+        setAvailableModels(
+          activeModels.map((m: any) => ({
+            id: m.id,
+            name: typeof m.name === 'string' ? m.name : m.id,
+            description: m.description ?? '',
+          })),
+        );
       } catch (error) {
         console.error('Failed to fetch available models:', error);
         setAvailableModels([]);
@@ -36,26 +56,21 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
     };
 
     fetchAvailableModels();
-  }, [getAvailableModels]); // Зависимость от getAvailableModels
+  }, [getAvailableModels, _plugin.settings.groqAvailableModels]); // Добавляем зависимость
 
   if (isLoading) {
     return <div className="groq-model-selector">Загрузка моделей...</div>;
   }
 
-  // Получаем все модели из MODEL_INFO для итерации
-  const allModelInfos = Object.values(MODEL_INFO);
-
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedValue = event.target.value as GroqModel;
+    const selectedValue = event.target.value as string;
     onSelectModel(selectedValue);
   };
 
   return (
     <div className="groq-model-selector">
       {/* Скрываем label визуально, но оставляем для доступности */}
-      <label htmlFor="model-select" className="groq-visually-hidden">
-        Выберите модель Groq:
-      </label>
+      {/*<label htmlFor="model-select" className="groq-visually-hidden"></label>*/}
       <select
         id="model-select"
         value={selectedModel}
@@ -63,16 +78,11 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
         className="groq-select"
         aria-label="Выберите модель Groq"
       >
-        {allModelInfos.map(modelInfo => {
-          const isAvailable = availableModels.includes(modelInfo.id);
-          const displayName = `${modelInfo.name}${!isAvailable ? ' (недоступна)' : ''}`;
+        {availableModels.map(modelInfo => {
+          const displayName = `${modelInfo.name}`;
 
           return (
-            <option
-              key={modelInfo.id}
-              value={modelInfo.id}
-              disabled={!isAvailable} // Блокируем выбор недоступной модели
-            >
+            <option key={modelInfo.id} value={modelInfo.id}>
               {displayName}
             </option>
           );

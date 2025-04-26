@@ -16,6 +16,7 @@ export default class GroqChatPlugin extends Plugin implements GroqPluginInterfac
   groqService!: GroqService;
   historyService!: HistoryService;
   private currentLeaf: WorkspaceLeaf | null = null;
+  private settingsTab: GroqChatSettingsTab | null = null;
 
   async onload() {
     await this.loadSettings();
@@ -27,12 +28,13 @@ export default class GroqChatPlugin extends Plugin implements GroqPluginInterfac
 
     this.addCommands();
     this.addRibbonIcon('message-square', 'Groq Chat', () => this.activateView());
-    this.addSettingTab(new GroqChatSettingsTab(this.app, this, this.authService));
+    this.settingsTab = new GroqChatSettingsTab(this.app, this);
+    this.addSettingTab(this.settingsTab);
   }
 
   private initializeServices(): void {
     this.groqService = new GroqService(this);
-    this.authService = new AuthService(this, this.groqService);
+    this.authService = new AuthService();
     this.historyService = new HistoryService(this);
   }
 
@@ -89,10 +91,29 @@ export default class GroqChatPlugin extends Plugin implements GroqPluginInterfac
 
   async saveSettings() {
     await this.saveData(this.settings);
+    this.notifyChatSettingsChanged();
   }
 
-  async resetSettings() {
+  // Уведомление основного чата об изменении настроек
+  public notifyChatSettingsChanged() {
+    if (this.currentLeaf?.view instanceof GroqChatView) {
+      this.currentLeaf.view.onSettingsChanged(this.settings);
+    }
+  }
+
+  // Для совместимости с интерфейсом GroqPluginInterface
+  public async resetSettings() {
+    await this.resetSettingsToDefault();
+  }
+
+  // Сброс настроек к значениям по умолчанию
+  public async resetSettingsToDefault() {
     this.settings = { ...this.defaultSettings };
     await this.saveSettings();
+    // Обновить UI, если открыт settings tab
+    if (this.settingsTab && typeof this.settingsTab.display === 'function') {
+      this.settingsTab.display();
+    }
+    this.notifyChatSettingsChanged();
   }
 }

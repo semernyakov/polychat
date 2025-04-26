@@ -10,8 +10,11 @@ const LOCAL_STORAGE_KEY = 'groq-chat-history';
 
 export class HistoryService {
   private memoryHistory: Message[] = [];
+  private plugin: GroqPluginInterface;
 
-  constructor(private readonly plugin: GroqPluginInterface) {}
+  constructor(plugin: GroqPluginInterface) {
+    this.plugin = plugin;
+  }
 
   async getHistory(): Promise<Message[]> {
     try {

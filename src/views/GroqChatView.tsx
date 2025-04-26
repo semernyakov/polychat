@@ -13,13 +13,15 @@ interface GroqChatViewState {
 export class GroqChatView extends ItemView {
   private root: ReturnType<typeof createRoot> | null = null;
   private messages: Message[] = [];
+  private plugin: GroqPluginInterface;
 
   constructor(
     leaf: WorkspaceLeaf,
-    private readonly plugin: GroqPluginInterface,
+    plugin: GroqPluginInterface,
     state?: GroqChatViewState,
   ) {
     super(leaf);
+    this.plugin = plugin;
     this.messages = state?.messages || [];
   }
 
@@ -61,5 +63,12 @@ export class GroqChatView extends ItemView {
         onDisplayModeChange={mode => this.plugin.changeDisplayMode(mode)}
       />,
     );
+  }
+
+  // Метод для синхронизации настроек с основного окна
+  public onSettingsChanged(newSettings: any) {
+    // Обновить ссылку на актуальные настройки
+    (this.plugin as any).settings = newSettings;
+    this.renderView();
   }
 }

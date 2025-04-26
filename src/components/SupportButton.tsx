@@ -1,6 +1,7 @@
 import React from 'react';
 import '../styles.css'; // Добавьте эту строку для импорта стилей
 import { t } from '../localization';
+import type { Locale } from '../localization';
 import { usePluginSettings } from '../utils/usePluginSettings';
 
 interface SupportButtonProps {
@@ -13,7 +14,7 @@ export const SupportButton: React.FC<SupportButtonProps> = ({
   supportLink = 'https://yoomoney.ru/fundraise/194GT5A5R07.250321',
 }) => {
   const settings = usePluginSettings();
-  const language = settings?.language || 'en';
+  const language = (settings?.language ?? 'en') as Locale;
   const handleClick = () => {
     onClick?.();
     window.open(supportLink, '_blank');

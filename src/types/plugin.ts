@@ -1,7 +1,10 @@
-import { App, Plugin } from 'obsidian';
-import { GroqChatSettings } from './settings';
-import { Message } from './types';
-import { GroqModel } from './models';
+import type { App, Plugin } from 'obsidian';
+import type { GroqChatSettings } from './settings';
+import type { Message } from './types';
+
+import type { AuthService } from '../services/authService';
+import type { GroqService } from '../services/groqService';
+import type { HistoryService } from '../services/historyService';
 
 export interface GroqPluginInterface extends Plugin {
   readonly app: App;
@@ -11,21 +14,11 @@ export interface GroqPluginInterface extends Plugin {
   saveSettings(): Promise<void>;
   loadSettings(): Promise<void>;
   resetSettings(): Promise<void>;
+  resetSettingsToDefault(): Promise<void>;
 
   changeDisplayMode(mode: 'tab' | 'sidepanel'): Promise<void>;
 
-  readonly groqService: {
-    sendMessage(content: string, model: GroqModel): Promise<Message>;
-    getAvailableModels(): Promise<GroqModel[]>;
-  };
-
-  readonly historyService: {
-    getHistory(): Promise<Message[]>;
-    addMessage(message: Message): Promise<void>;
-    clearHistory(): Promise<void>;
-  };
-
-  readonly authService: {
-    setApiKey(apiKey: string): Promise<void>;
-  };
+  readonly groqService: GroqService;
+  readonly historyService: HistoryService;
+  readonly authService: AuthService;
 }
