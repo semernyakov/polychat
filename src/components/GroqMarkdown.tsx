@@ -21,7 +21,7 @@ const CodeBlock = React.memo(({ language, code }: { language: string; code: stri
   const [isCopied, setIsCopied] = React.useState(false);
   const [copyError, setCopyError] = React.useState(false);
   const timeoutId = React.useRef<NodeJS.Timeout | null>(null);
-  const { language: locale = 'en' } = usePluginSettings() || {};
+  const { language: Locale = 'en' as Locale } = usePluginSettings() || {};
 
   const handleCopy = () => {
     setCopyError(false);
