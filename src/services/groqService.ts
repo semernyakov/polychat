@@ -85,7 +85,12 @@ export class GroqService implements GroqServiceMethods {
       const response = await this.retryRequest(() =>
         this.client.chat.completions.create({
           model,
-          messages: [{ role: 'user', content }],
+          messages: [
+            {
+              role: 'user',
+              content: content
+            }
+          ],
           temperature: this.plugin.settings.temperature,
           max_tokens: Math.min(this.plugin.settings.maxTokens, this.getModelMaxTokens(model)),
         }),
