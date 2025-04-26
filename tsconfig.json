@@ -1,6 +1,0 @@
-{
-  "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
-    "jsx": "react-jsx" // Изменено на "react-jsx" для поддержки новых возможностей React 17+
-  }
-}
