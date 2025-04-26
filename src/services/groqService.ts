@@ -19,7 +19,7 @@ interface GroqServiceMethods {
   validateApiKey: (apiKey: string) => Promise<boolean>;
   sendMessage: (content: string, model: string) => Promise<Message>;
   getAvailableModels: () => Promise<{ id: string; name: string; description?: string }[]>;
-  getAvailableModelsWithLimits: (_forceRefresh?: boolean) => Promise<{
+  getAvailableModelsWithLimits: (forceRefresh?: boolean) => Promise<{
     models: GroqModelInfo[];
     rateLimits: RateLimitsType;
   }>;
@@ -36,9 +36,9 @@ export class GroqService implements GroqServiceMethods {
   } | null = null;
   private readonly CACHE_TTL = 60 * 60 * 1000; // 1 час
 
-  constructor(private readonly _plugin: GroqPluginInterface) {
+  constructor(private readonly plugin: GroqPluginInterface) {
     this.client = new Groq({
-      apiKey: this._plugin.settings.apiKey,
+      apiKey: this.plugin.settings.apiKey,
       dangerouslyAllowBrowser: true,
     });
   }
@@ -73,7 +73,7 @@ export class GroqService implements GroqServiceMethods {
 
   public async sendMessage(content: string, model: string): Promise<Message> {
     if (!content.trim()) throw new Error('Сообщение не может быть пустым');
-    if (!model || !this._plugin.settings.groqAvailableModels?.some(m => m.id === model)) {
+    if (!model || !this.plugin.settings.groqAvailableModels?.some(m => m.id === model)) {
       throw new Error(`Модель "${model}" не доступна`);
     }
     try {
@@ -86,8 +86,8 @@ export class GroqService implements GroqServiceMethods {
         this.client.chat.completions.create({
           model,
           messages: [{ role: 'user', content }],
-          temperature: this._plugin.settings.temperature,
-          max_tokens: Math.min(this._plugin.settings.maxTokens, this.getModelMaxTokens(model)),
+          temperature: this.plugin.settings.temperature,
+          max_tokens: Math.min(this.plugin.settings.maxTokens, this.getModelMaxTokens(model)),
         }),
       );
       if (!response.choices[0]?.message?.content) throw new Error('Empty response from API');
@@ -118,13 +118,13 @@ export class GroqService implements GroqServiceMethods {
     }));
   }
 
-  public async getAvailableModelsWithLimits(_forceRefresh = false): Promise<{
+  public async getAvailableModelsWithLimits(forceRefresh = false): Promise<{
     models: GroqModelInfo[];
     rateLimits: RateLimitsType;
   }> {
     // Проверка кэша
     if (
-      !_forceRefresh &&
+      !forceRefresh &&
       this.modelCache &&
       Date.now() - this.modelCache.timestamp < this.CACHE_TTL
     ) {
