@@ -15,12 +15,12 @@ export type RateLimitsType = {
 };
 
 interface GroqServiceMethods {
-  updateApiKey: (apiKey: string) => void;
-  validateApiKey: (apiKey: string) => Promise<boolean>;
-  sendMessage: (content: string, model: string) => Promise<Message>;
+  updateApiKey: (_apiKey: string) => void;
+  validateApiKey: (_apiKey: string) => Promise<boolean>;
+  sendMessage: (_content: string, _model: string) => Promise<Message>;
   getAvailableModels: () => Promise<{ id: string; name: string; description?: string }[]>;
-  getAvailableModelsWithLimits: (forceRefresh?: boolean) => Promise<{
-    models: GroqModelInfo[];
+  getAvailableModelsWithLimits: (_forceRefresh?: boolean) => Promise<{
+    _models: GroqModelInfo[];
     rateLimits: RateLimitsType;
   }>;
   handleApiError: (error: unknown) => Error;
@@ -29,8 +29,8 @@ interface GroqServiceMethods {
 export class GroqService implements GroqServiceMethods {
   private client: Groq;
   public rateLimits: RateLimitsType = {};
-  private modelCache: {
-    models: GroqModelInfo[];
+  private _modelCache: {
+    _models: GroqModelInfo[];
     rateLimits: RateLimitsType;
     timestamp: number;
   } | null = null;
@@ -38,29 +38,29 @@ export class GroqService implements GroqServiceMethods {
 
   constructor(private readonly plugin: GroqPluginInterface) {
     this.client = new Groq({
-      apiKey: this.plugin.settings.apiKey,
+      _apiKey: this.plugin.settings._apiKey,
       dangerouslyAllowBrowser: true,
     });
   }
 
-  public updateApiKey(apiKey: string): void {
+  public updateApiKey(_apiKey: string): void {
     this.client = new Groq({
-      apiKey: apiKey,
+      _apiKey: _apiKey,
       dangerouslyAllowBrowser: true,
     });
-    this.modelCache = null; // Сброс кэша при смене ключа
+    this._modelCache = null; // Сброс кэша при смене ключа
   }
 
-  public async validateApiKey(apiKey: string): Promise<boolean> {
-    if (!apiKey) return false;
+  public async validateApiKey(_apiKey: string): Promise<boolean> {
+    if (!_apiKey) return false;
     try {
-      const { models } = await this.getAvailableModelsWithLimits();
-      const testModel = models[0]?.id || 'llama3-8b-8192';
-      const tempClient = new Groq({ apiKey, dangerouslyAllowBrowser: true });
+      const { _models } = await this.getAvailableModelsWithLimits();
+      const testModel = _models[0]?.id || 'llama3-8b-8192';
+      const tempClient = new Groq({ _apiKey, dangerouslyAllowBrowser: true });
       await this.retryRequest(() =>
         tempClient.chat.completions.create({
-          model: testModel,
-          messages: [{ role: 'user', content: 'test' }],
+          _model: testModel,
+          messages: [{ role: 'user', _content: 'test' }],
           max_tokens: 1,
         }),
       );
@@ -71,10 +71,10 @@ export class GroqService implements GroqServiceMethods {
     }
   }
 
-  public async sendMessage(content: string, model: string): Promise<Message> {
-    if (!content.trim()) throw new Error('Сообщение не может быть пустым');
-    if (!model || !this.plugin.settings.groqAvailableModels?.some(m => m.id === model)) {
-      throw new Error(`Модель "${model}" не доступна`);
+  public async sendMessage(_content: string, _model: string): Promise<Message> {
+    if (!_content.trim()) throw new Error('Сообщение не может быть пустым');
+    if (!_model || !this.plugin.settings.groqAvailableModels?.some(m => m.id === _model)) {
+      throw new Error(`Модель "${_model}" не доступна`);
     }
     try {
       // Проверка лимитов перед запросом
@@ -84,17 +84,17 @@ export class GroqService implements GroqServiceMethods {
       }
       const response = await this.retryRequest(() =>
         this.client.chat.completions.create({
-          model,
-          messages: [{ role: 'user', content }],
+          _model,
+          messages: [{ role: 'user', _content }],
           temperature: this.plugin.settings.temperature,
-          max_tokens: Math.min(this.plugin.settings.maxTokens, this.getModelMaxTokens(model)),
+          max_tokens: Math.min(this.plugin.settings.maxTokens, this.getModelMaxTokens(_model)),
         }),
       );
-      if (!response.choices[0]?.message?.content) throw new Error('Empty response from API');
+      if (!response.choices[0]?.message?._content) throw new Error('Empty response from API');
       return {
         id: response.id,
         role: 'assistant',
-        content: response.choices[0].message.content,
+        _content: response.choices[0].message._content,
         timestamp: Date.now(),
         usage: response.usage
           ? {
@@ -110,30 +110,30 @@ export class GroqService implements GroqServiceMethods {
   }
 
   public async getAvailableModels(): Promise<{ id: string; name: string; description?: string }[]> {
-    const { models } = await this.getAvailableModelsWithLimits();
-    return models.map(model => ({
-      id: model.id,
-      name: model.name,
-      description: model.description,
+    const { _models } = await this.getAvailableModelsWithLimits();
+    return _models.map(_model => ({
+      id: _model.id,
+      name: _model.name,
+      description: _model.description,
     }));
   }
 
-  public async getAvailableModelsWithLimits(forceRefresh = false): Promise<{
-    models: GroqModelInfo[];
+  public async getAvailableModelsWithLimits(_forceRefresh = false): Promise<{
+    _models: GroqModelInfo[];
     rateLimits: RateLimitsType;
   }> {
     // Проверка кэша
     if (
-      !forceRefresh &&
-      this.modelCache &&
-      Date.now() - this.modelCache.timestamp < this.CACHE_TTL
+      !_forceRefresh &&
+      this._modelCache &&
+      Date.now() - this._modelCache.timestamp < this.CACHE_TTL
     ) {
-      return { models: this.modelCache.models, rateLimits: this.modelCache.rateLimits };
+      return { _models: this._modelCache._models, rateLimits: this._modelCache.rateLimits };
     }
     try {
       const resp = await this.retryRequest(() =>
-        fetch('https://api.groq.com/openai/v1/models', {
-          headers: { Authorization: `Bearer ${this.plugin.settings.apiKey}` },
+        fetch('https://api.groq.com/openai/v1/_models', {
+          headers: { Authorization: `Bearer ${this.plugin.settings._apiKey}` },
         }),
       );
       if (!resp.ok) throw new Error(`API error: ${resp.status}`);
@@ -164,7 +164,7 @@ export class GroqService implements GroqServiceMethods {
         const idB = (b.id || '').toLowerCase();
         return idA.localeCompare(idB);
       });
-      const models = sorted.map((m: any) => ({
+      const _models = sorted.map((m: any) => ({
         id: m.id,
         name: m.name || m.id,
         description: m.description || '',
@@ -176,16 +176,16 @@ export class GroqService implements GroqServiceMethods {
       // ВРЕМЕННО: логируем все поля моделей для отладки
       if (Array.isArray(data.data)) {
         console.log('[GroqService] Получено моделей:', data.data.length);
-        data.data.forEach((model: any, idx: number) => {
-          console.log(`[GroqService] Модель #${idx + 1}:`, model);
+        data.data.forEach((_model: any, idx: number) => {
+          console.log(`[GroqService] Модель #${idx + 1}:`, _model);
         });
       }
       // Сохранение в кэш
-      this.modelCache = { models, rateLimits: rl, timestamp: Date.now() };
-      return { models, rateLimits: rl };
+      this._modelCache = { _models, rateLimits: rl, timestamp: Date.now() };
+      return { _models, rateLimits: rl };
     } catch (error) {
-      console.error('Error fetching available models:', error);
-      return { models: [], rateLimits: {} };
+      console.error('Error fetching available _models:', error);
+      return { _models: [], rateLimits: {} };
     }
   }
 
@@ -228,8 +228,8 @@ export class GroqService implements GroqServiceMethods {
     throw new Error('Не удалось выполнить запрос после повторных попыток');
   }
 
-  private getModelMaxTokens(modelId: string): number {
-    const model = this.plugin.settings.groqAvailableModels?.find(m => m.id === modelId);
-    return model?.maxTokens || 4096;
+  private getModelMaxTokens(_modelId: string): number {
+    const _model = this.plugin.settings.groqAvailableModels?.find(m => m.id === _modelId);
+    return _model?.maxTokens || 4096;
   }
 }

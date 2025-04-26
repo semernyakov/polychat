@@ -5,16 +5,16 @@ import { usePluginSettings } from '../utils/usePluginSettings';
 import '../styles.css';
 
 interface MessageInputProps {
-  value: string;
-  onChange: (value: string) => void;
+  _value: string;
+  onChange: (_value: string) => void;
   onSend: () => void;
-  onKeyDown?: (event: React.KeyboardEvent) => void;
+  onKeyDown?: (_event: React.KeyboardEvent) => void;
   disabled?: boolean;
   maxTokens?: number;
 }
 
 export const MessageInput: React.FC<MessageInputProps> = ({
-  value,
+  _value,
   onChange,
   onSend,
   onKeyDown,
@@ -32,45 +32,45 @@ export const MessageInput: React.FC<MessageInputProps> = ({
       textarea.style.height = 'auto';
       textarea.style.height = `${textarea.scrollHeight}px`;
     }
-  }, [value]);
+  }, [_value]);
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = (_event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (isComposing) return;
 
-    if (event.key === 'Enter' && event.shiftKey) {
+    if (_event.key === 'Enter' && _event.shiftKey) {
       return;
     }
 
-    if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
-      event.preventDefault();
-      const trimmedValue = value.trim();
+    if (_event.key === 'Enter' && (_event.ctrlKey || _event.metaKey)) {
+      _event.pr_eventDefault();
+      const trimmedValue = _value.trim();
       if (!disabled && trimmedValue) {
         onSend();
       }
     }
 
     if (onKeyDown) {
-      onKeyDown(event);
+      onKeyDown(_event);
     }
   };
 
   const handleSendClick = () => {
-    if (!disabled && value.trim()) {
+    if (!disabled && _value.trim()) {
       onSend();
     }
   };
 
-  const currentLength = value.length;
+  const currentLength = _value.length;
   const isOverLimit = !!(maxTokens && currentLength > maxTokens);
-  const isSendDisabled = disabled || !value.trim() || isOverLimit;
+  const isSendDisabled = disabled || !_value.trim() || isOverLimit;
 
   return (
     <div className="groq-chat-input">
       <div className="groq-chat-input__main">
         <textarea
           ref={textareaRef}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
+          _value={_value}
+          onChange={(e) => onChange(e.target._value)}
           onKeyDown={(e) => handleKeyDown(e)}
           onCompositionStart={() => setIsComposing(true)}
           onCompositionEnd={() => setIsComposing(false)}

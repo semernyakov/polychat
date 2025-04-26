@@ -22,14 +22,14 @@ import { ModelInfoDialog } from './ModelInfoDialog';
 import { PluginSettingsProvider } from '../context/PluginSettingsContext';
 import { t, Locale } from '../localization';
 import { usePluginSettings } from '../utils/usePluginSettings';
-// import { DEFAULT_MODEL } from '../types/models'; // Удалено, если не используется
+// import { DEFAULT_MODEL } from '../types/_models'; // Удалено, если не используется
 import { GroqModel, ModelCategory, ModelReleaseStatus } from '../types/types';
 
 interface ChatPanelProps {
   plugin: GroqPluginInterface;
   displayMode: 'tab' | 'sidepanel';
   initialMessages?: Message[];
-  onDisplayModeChange: (mode: 'tab' | 'sidepanel') => void;
+  onDisplayModeChange: (_mode: 'tab' | 'sidepanel') => void;
 }
 
 interface LocalDynamicModelInfo {
@@ -118,9 +118,9 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
 
     // Выбираем модель из настроек, если она валидна, иначе первую активную
     const getInitialModel = () => {
-      const modelFromSettings = plugin.settings.model;
-      if (modelFromSettings && initialModels.find(m => m.id === modelFromSettings)) {
-        return modelFromSettings;
+      const _modelFromSettings = plugin.settings._model;
+      if (_modelFromSettings && initialModels.find(m => m.id === _modelFromSettings)) {
+        return _modelFromSettings;
       }
       return initialModels[0]?.id || GroqModel.LLAMA3_70B;
     };
@@ -163,9 +163,9 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
 
     const fetchAvailableModels = useCallback(async (): Promise<LocalDynamicModelInfo[]> => {
       if (!plugin.groqService.getAvailableModelsWithLimits) return [];
-      const { models, rateLimits } = await plugin.groqService.getAvailableModelsWithLimits();
+      const { _models, rateLimits } = await plugin.groqService.getAvailableModelsWithLimits();
       setRateLimits(rateLimits || {});
-      const filtered = models.filter((m: any) => m.isActive !== false);
+      const filtered = _models.filter((m: any) => m.isActive !== false);
       setAvailableModels(filtered.map((m: any) => ({ ...m })));
       return filtered;
     }, [plugin.groqService]);
@@ -226,10 +226,10 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
         console.error('Error sending message:', error);
         // Обработка ошибки terms acceptance
         if (
-          error?.code === 'model_terms_required' ||
+          error?.code === '_model_terms_required' ||
           error?.message?.includes('requires terms acceptance')
         ) {
-          const link = `https://console.groq.com/playground?model=${selectedModel}`;
+          const link = `https://console.groq.com/playground?_model=${selectedModel}`;
           toast.error(
             t('termsRequired', locale) +
               `\n${error?.message || ''}\n` +
@@ -255,9 +255,9 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
       }
     }, [inputValue, isLoading, plugin, selectedModel]);
 
-    const handleModelChange = (modelId: string) => {
-      setSelectedModel(modelId);
-      plugin.settings.model = modelId;
+    const handleModelChange = (_modelId: string) => {
+      setSelectedModel(_modelId);
+      plugin.settings._model = _modelId;
       plugin.saveSettings();
     };
 
@@ -266,19 +266,19 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
       onDisplayModeChange(newMode);
     };
 
-    const toModelInfo = (model: LocalDynamicModelInfo): ModelInfo => ({
-      id: (Object.values(GroqModel).includes(model.id as GroqModel)
-        ? model.id
+    const toModelInfo = (_model: LocalDynamicModelInfo): ModelInfo => ({
+      id: (Object.values(GroqModel).includes(_model.id as GroqModel)
+        ? _model.id
         : GroqModel.LLAMA3_70B) as GroqModel,
-      name: model.name,
-      description: model.description || '',
-      category: (model.category as ModelCategory) || 'text',
-      developer: model.developer || { name: '' },
-      releaseStatus: (model.releaseStatus as ModelReleaseStatus) || 'main',
-      maxTokens: model.maxTokens || 4096,
-      tokensPerMinute: model.tokensPerMinute,
-      maxDuration: model.maxDuration,
-      maxFileSize: model.maxFileSize,
+      name: _model.name,
+      description: _model.description || '',
+      category: (_model.category as ModelCategory) || 'text',
+      developer: _model.developer || { name: '' },
+      releaseStatus: (_model.releaseStatus as ModelReleaseStatus) || 'main',
+      maxTokens: _model.maxTokens || 4096,
+      tokensPerMinute: _model.tokensPerMinute,
+      maxDuration: _model.maxDuration,
+      maxFileSize: _model.maxFileSize,
     });
 
     const selectedModelInfo = toModelInfo(
@@ -313,21 +313,21 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
           <div className="groq-chat__header-right">
             <button
               onClick={() => setIsModelInfoOpen(true)}
-              className="groq-icon-button groq-model-info-button"
-              title={t('modelInfo')}
-              aria-label={t('modelInfo')}
+              className="groq-icon-button groq-_model-info-button"
+              title={t('_modelInfo')}
+              aria-label={t('_modelInfo')}
             >
               <FiInfo size={16} />
             </button>
             <ModelInfoDialog
               isOpen={isModelInfoOpen}
               onClose={() => setIsModelInfoOpen(false)}
-              modelInfo={selectedModelInfo}
+              _modelInfo={selectedModelInfo}
               isAvailable={!!availableModels.find(m => m.id === selectedModel)}
             />
             <button
               onClick={toggleDisplayMode}
-              className="groq-icon-button groq-display-mode-button"
+              className="groq-icon-button groq-display-_mode-button"
               title={displayMode === 'tab' ? t('showInSidepanel') : t('showInTab')}
               aria-label={displayMode === 'tab' ? t('showInSidepanel') : t('showInTab')}
             >
@@ -434,7 +434,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
           key={selectedModel}
           isOpen={isModelInfoOpen}
           onClose={() => setIsModelInfoOpen(false)}
-          modelInfo={selectedModelInfo}
+          _modelInfo={selectedModelInfo}
           isAvailable={availableModels.some(m => m.id === selectedModelInfo.id)}
         />
 
