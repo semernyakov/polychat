@@ -155,11 +155,16 @@
 
 /* Сообщение пользователя */
 .groq-message--user {
-  background-color: var(--interactive-accent);
-  color: var(--text-on-accent);
-  border-color: var(--interactive-accent-hover);
+  background-color: var(--background-secondary-alt);
+  color: var(--text-normal);
+  border: var(--border-width) solid var(--background-modifier-border);
+  box-shadow: 0 1px 4px 0 rgba(0,0,0,0.03);
   margin-left: auto;
   margin-right: 0;
+  border-radius: 10px;
+  padding: 10px 14px;
+  max-width: 80%;
+  transition: background 0.2s, color 0.2s;
 }
 
 /* Сообщение ассистента */
@@ -598,7 +603,6 @@ pre.groq-code-block--no-highlight code {
   top: var(--size-4-2);
   right: var(--size-4-2);
 }
-
 
 /* Кнопки копирования кода (иконки) */
 .groq-code-copy {
@@ -1065,5 +1069,47 @@ pre.groq-code-block--no-highlight code {
 }
 
 button.mod-cta {
-	margin-right: 10px;
+  margin-right: 10px;
+}
+
+/* --- Минималистичный стиль для groq-models-table и groq-limits-block --- */
+.groq-models-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin: 24px 0 24px 0;
+  background: var(--background-secondary);
+  color: var(--text-normal);
+}
+.groq-models-table th,
+.groq-models-table td {
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+.groq-models-table th {
+  background: var(--background-secondary-alt);
+  font-weight: 500;
+}
+.groq-models-table tr:last-child td {
+  border-bottom: none;
+}
+.groq-models-table tr {
+  transition: background 0.2s;
+}
+.groq-models-table tr:hover {
+  background: var(--background-modifier-hover);
+}
+.groq-limits-block {
+  margin: 20px 0 16px 0;
+  background: var(--background-secondary);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text-normal);
+  border: 1px solid var(--background-modifier-border);
+}
+.groq-settings-separator {
+  border: none;
+  border-top: 1px solid var(--background-modifier-border);
+  margin: 16px 0;
 }
