@@ -17,6 +17,8 @@ A plugin for [Obsidian](https://obsidian.md) that integrates Groq's AI chat capa
 
 - Direct integration with Groq AI models
 - Real-time chat interface
+- Localized interface (English/Russian)
+- Accurate model info dialog (shows only relevant fields: name, description (if present), developer, max tokens, release status, release/actuality date)
 - Support for latest Groq models
 - Markdown formatting support
 - Code highlighting

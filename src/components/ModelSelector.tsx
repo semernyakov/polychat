@@ -10,11 +10,14 @@ interface DynamicModelInfo {
   description?: string;
 }
 
-interface ModelSelectorProps {
+
+
+export interface ModelSelectorProps {
   plugin: GroqPluginInterface;
   selectedModel: string;
   onSelectModel: (modelId: string) => void;
   getAvailableModels: () => Promise<{ id: string; name: string; description?: string }[]>;
+  availableModels?: any[];
 }
 
 export const ModelSelector: React.FC<ModelSelectorProps> = ({
@@ -22,11 +25,18 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
   selectedModel,
   onSelectModel,
   getAvailableModels,
+  availableModels: availableModelsProp,
 }) => {
+  // Если availableModels передан как проп, используем его, иначе локальный state
   const [availableModels, setAvailableModels] = useState<DynamicModelInfo[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    if (availableModelsProp) {
+      setIsLoading(false);
+      setAvailableModels(availableModelsProp);
+      return;
+    }
     const fetchAvailableModels = async () => {
       setIsLoading(true);
       try {
@@ -40,11 +50,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
             )
           : models;
         setAvailableModels(
-          activeModels.map((m: any) => ({
-            id: m.id,
-            name: typeof m.name === 'string' ? m.name : m.id,
-            description: m.description ?? '',
-          })),
+          activeModels.map((m: any) => ({ ...m })),
         );
       } catch (error) {
         console.error('Failed to fetch available models:', error);
@@ -56,7 +62,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
     };
 
     fetchAvailableModels();
-  }, [getAvailableModels, _plugin.settings.groqAvailableModels]); // Добавляем зависимость
+  }, [getAvailableModels, _plugin.settings.groqAvailableModels, availableModelsProp]); // Добавляем зависимость
 
   if (isLoading) {
     return <div className="groq-model-selector">Загрузка моделей...</div>;

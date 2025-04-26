@@ -164,30 +164,22 @@ export class GroqService implements GroqServiceMethods {
         const idB = (b.id || '').toLowerCase();
         return idA.localeCompare(idB);
       });
-      const models: GroqModelInfo[] = sorted.map((m: any) => ({
+      const models = sorted.map((m: any) => ({
         id: m.id,
         name: m.name || m.id,
-        description: m.description ?? '—',
-        created: 'created' in m ? m.created : undefined,
-        owned_by: 'owned_by' in m ? m.owned_by : undefined,
-        object: 'object' in m ? m.object : undefined,
-        isActive: 'isActive' in m ? m.isActive : true,
-        category: 'category' in m ? m.category : undefined,
-        developer: 'developer' in m ? m.developer : undefined,
-        maxTokens: 'maxTokens' in m ? m.maxTokens : 'max_tokens' in m ? m.max_tokens : undefined,
-        tokensPerMinute:
-          'tokensPerMinute' in m
-            ? m.tokensPerMinute
-            : 'tokens_per_minute' in m
-              ? m.tokens_per_minute
-              : undefined,
-        releaseStatus:
-          'releaseStatus' in m
-            ? m.releaseStatus
-            : 'release_status' in m
-              ? m.release_status
-              : undefined,
+        description: m.description || '',
+        developer: { name: m.owned_by || '—' },
+        maxTokens: typeof m.max_completion_tokens === 'number' ? m.max_completion_tokens : undefined,
+        active: typeof m.active === 'boolean' ? m.active : undefined,
+        releaseStatus: m.release_status || m.releaseStatus || undefined,
       }));
+      // ВРЕМЕННО: логируем все поля моделей для отладки
+      if (Array.isArray(data.data)) {
+        console.log('[GroqService] Получено моделей:', data.data.length);
+        data.data.forEach((model: any, idx: number) => {
+          console.log(`[GroqService] Модель #${idx + 1}:`, model);
+        });
+      }
       // Сохранение в кэш
       this.modelCache = { models, rateLimits: rl, timestamp: Date.now() };
       return { models, rateLimits: rl };

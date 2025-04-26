@@ -1,6 +1,7 @@
 import React from 'react';
 import { FiX } from 'react-icons/fi';
 import { ModelInfo } from '../types/types';
+import { t } from '../localization';
 import '../styles.css';
 
 interface ModelInfoDialogProps {
@@ -16,14 +17,41 @@ export const ModelInfoDialog: React.FC<ModelInfoDialogProps> = ({
   modelInfo,
   isAvailable,
 }) => {
+  // Добавим стили для визуальных отступов между параметрами
+  React.useEffect(() => {
+    const styleId = 'groq-model-info-spacing-style';
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement('style');
+      style.id = styleId;
+      style.innerHTML = `
+        .groq-model-info__detail {
+          margin-bottom: 10px;
+          display: flex;
+          gap: 8px;
+        }
+        .groq-model-info__label {
+          min-width: 140px;
+          font-weight: 500;
+        }
+        .groq-model-info__value {
+          flex: 1;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  }, []);
+  React.useEffect(() => {
+    // Логируем для отладки, чтобы убедиться, что данные приходят актуальные
+    console.log('[ModelInfoDialog] modelInfo:', modelInfo);
+  }, [modelInfo]);
   if (!isOpen) return null;
 
   return (
     <div className="groq-support-dialog-overlay">
       <div className="groq-support-dialog">
         <div className="groq-dialog-header">
-          <h3>Информация о модели</h3>
-          <button onClick={onClose} className="groq-dialog-close groq-icon-button" title="Закрыть">
+          <h3>{t('modelInfo')}</h3>
+          <button onClick={onClose} className="groq-dialog-close groq-icon-button" title={t('close')}>
             <FiX size={16} />
           </button>
         </div>
@@ -31,71 +59,53 @@ export const ModelInfoDialog: React.FC<ModelInfoDialogProps> = ({
         <div className="groq-dialog-content">
           <div className="groq-model-info">
             <div className="groq-model-info__header">
-              <h3>{modelInfo.name}</h3>
-              <span className={`groq-model-info__status ${modelInfo.releaseStatus}`}>
-                {modelInfo.releaseStatus === 'main' ? 'Основная' : 'Предварительная'}
-              </span>
+              <h3>{modelInfo.name || modelInfo.id}</h3>
             </div>
 
-            <p className="groq-model-info__description">{modelInfo.description}</p>
-
             <div className="groq-model-info__details">
+              {modelInfo.description && modelInfo.description.trim() !== '' && (
+                <div className="groq-model-info__detail">
+                  <span className="groq-model-info__label">{t('description')}:</span>
+                  <span className="groq-model-info__value">{modelInfo.description}</span>
+                </div>
+              )}
               <div className="groq-model-info__detail">
-                <span className="groq-model-info__label">Разработчик:</span>
+                <span className="groq-model-info__label">{t('developer')}:</span>
                 <span className="groq-model-info__value">{modelInfo.developer?.name || '—'}</span>
               </div>
-
-              <div className="groq-model-info__detail">
-                <span className="groq-model-info__label">Категория:</span>
-                <span className="groq-model-info__value">
-                  {modelInfo.category === 'text'
-                    ? 'Текст'
-                    : modelInfo.category === 'audio'
-                      ? 'Аудио'
-                      : modelInfo.category === 'vision'
-                        ? 'Вижн'
-                        : modelInfo.category === 'code'
-                          ? 'Код'
-                          : modelInfo.category === 'image'
-                            ? 'Изображения'
-                            : modelInfo.category || '—'}
-                </span>
-              </div>
-
-              <div className="groq-model-info__detail">
-                <span className="groq-model-info__label">Макс. токенов:</span>
-                <span className="groq-model-info__value">{modelInfo.maxTokens ?? '—'}</span>
-              </div>
-
-              {modelInfo.tokensPerMinute !== undefined && (
+              {typeof modelInfo.created === 'number' && (
                 <div className="groq-model-info__detail">
-                  <span className="groq-model-info__label">Токенов в минуту:</span>
-                  <span className="groq-model-info__value">{modelInfo.tokensPerMinute}</span>
+                  <span className="groq-model-info__label">{t('releaseDate')}:</span>
+                  <span className="groq-model-info__value">{new Date(modelInfo.created * 1000).toISOString().slice(0, 10)}</span>
                 </div>
               )}
-              {modelInfo.maxDuration !== undefined && (
+              {typeof modelInfo.updated === 'number' && (
                 <div className="groq-model-info__detail">
-                  <span className="groq-model-info__label">Макс. длительность (сек):</span>
-                  <span className="groq-model-info__value">{modelInfo.maxDuration}</span>
+                  <span className="groq-model-info__label">{t('actualDate')}:</span>
+                  <span className="groq-model-info__value">{new Date(modelInfo.updated * 1000).toISOString().slice(0, 10)}</span>
                 </div>
               )}
-              {modelInfo.maxFileSize !== undefined && (
+              <div className="groq-model-info__detail">
+                <span className="groq-model-info__label">{t('maxTokens')}:</span>
+                <span className="groq-model-info__value">{typeof modelInfo.maxTokens === 'number' ? modelInfo.maxTokens : '—'}</span>
+              </div>
+              {modelInfo.releaseStatus && (
                 <div className="groq-model-info__detail">
-                  <span className="groq-model-info__label">Макс. размер файла (МБ):</span>
-                  <span className="groq-model-info__value">{modelInfo.maxFileSize}</span>
+                  <span className="groq-model-info__label">{t('releaseStatus')}:</span>
+                  <span className="groq-model-info__value">{modelInfo.releaseStatus === 'main' ? 'Основная' : modelInfo.releaseStatus === 'preview' ? 'Предварительная' : modelInfo.releaseStatus}</span>
                 </div>
               )}
             </div>
 
             {!isAvailable && (
-              <div className="groq-model-info__warning">⚠️ Эта модель временно недоступна</div>
+              <div className="groq-model-info__warning">⚠️ {t('modelUnavailable')}</div>
             )}
           </div>
         </div>
 
         <div className="groq-dialog-actions">
           <button onClick={onClose} className="groq-button groq-dialog-secondary-button">
-            Закрыть
+            {t('close')}
           </button>
         </div>
       </div>

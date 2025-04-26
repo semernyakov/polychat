@@ -64,7 +64,10 @@ export interface ModelInfo extends ModelParams {
   description: string;
   category: ModelCategory;
   developer: ModelDeveloper;
-  releaseStatus: ModelReleaseStatus;
+  releaseStatus?: string;
+  active?: boolean;
+  created?: number;
+  updated?: number;
 }
 
 // Использовать этот тип для динамических моделей из API

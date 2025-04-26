@@ -110,7 +110,30 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
     const { plugin, displayMode, initialMessages = [], onDisplayModeChange } = props;
     const [inputValue, setInputValue] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [selectedModel, setSelectedModel] = useState<string>(GroqModel.LLAMA3_70B);
+    // Только активные модели
+    const initialModels: LocalDynamicModelInfo[] = (plugin.settings.groqAvailableModels || [])
+      .filter((m: any) => m.isActive !== false)
+      .map((m: any) => ({ ...m }));
+    const [availableModels, setAvailableModels] = useState<LocalDynamicModelInfo[]>(initialModels);
+
+    // Выбираем модель из настроек, если она валидна, иначе первую активную
+    const getInitialModel = () => {
+      const modelFromSettings = plugin.settings.model;
+      if (modelFromSettings && initialModels.find(m => m.id === modelFromSettings)) {
+        return modelFromSettings;
+      }
+      return initialModels[0]?.id || GroqModel.LLAMA3_70B;
+    };
+    const [selectedModel, setSelectedModel] = useState<string>(getInitialModel());
+
+
+    // Если выбранная модель исчезла из списка, сбрасываем на первую доступную
+    // Если выбранная модель исчезла из списка, сбрасываем на первую доступную
+    useEffect(() => {
+      if (availableModels.length > 0 && !availableModels.find(m => m.id === selectedModel)) {
+        setSelectedModel(availableModels[0].id);
+      }
+    }, [availableModels]);
     const [isSupportOpen, setIsSupportOpen] = useState(false);
     const [isModelInfoOpen, setIsModelInfoOpen] = useState(false);
     const [rateLimits, setRateLimits] = useState<any>(null);
@@ -138,22 +161,12 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
       return () => observer.disconnect();
     }, []);
 
-    // Только активные модели
-    const initialModels: LocalDynamicModelInfo[] = (plugin.settings.groqAvailableModels || [])
-      .filter((m: any) => m.isActive !== false)
-      .map((m: any) => ({
-        id: m.id,
-        name: typeof m.name === 'string' ? m.name : m.id,
-        description: m.description ?? '',
-      }));
-    const [availableModels, setAvailableModels] = useState<LocalDynamicModelInfo[]>(initialModels);
-
     const fetchAvailableModels = useCallback(async (): Promise<LocalDynamicModelInfo[]> => {
       if (!plugin.groqService.getAvailableModelsWithLimits) return [];
       const { models, rateLimits } = await plugin.groqService.getAvailableModelsWithLimits();
       setRateLimits(rateLimits || {});
       const filtered = models.filter((m: any) => m.isActive !== false);
-      setAvailableModels(filtered);
+      setAvailableModels(filtered.map((m: any) => ({ ...m })));
       return filtered;
     }, [plugin.groqService]);
 
@@ -209,12 +222,34 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
           console.error('Error saving assistant message:', err);
           toast.warn(t('assistantMessageSaveError'));
         });
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error sending message:', error);
+        // Обработка ошибки terms acceptance
+        if (
+          error?.code === 'model_terms_required' ||
+          error?.message?.includes('requires terms acceptance')
+        ) {
+          const link = `https://console.groq.com/playground?model=${selectedModel}`;
+          toast.error(
+            t('termsRequired', locale) +
+              `\n${error?.message || ''}\n` +
+              t('acceptTermsHere', locale) + `: ` + link,
+            { autoClose: false }
+          );
+          const errorMessage = MessageUtils.create(
+            'assistant',
+            `${t('termsRequired', locale)}\n${error?.message || ''}\n${t('acceptTermsHere', locale)}: ${link}`
+          );
+          setMessages(prev => [...prev, userMessage, errorMessage]);
+          setIsLoading(false);
+          return;
+        }
         const errorMsg = error instanceof Error ? error.message : String(error);
         toast.error(`${t('error')}: ${errorMsg}`);
         const errorMessage = MessageUtils.create('assistant', `${t('error')}: ${errorMsg}`);
         setMessages(prev => [...prev, userMessage, errorMessage]);
+        setIsLoading(false);
+        return;
       } finally {
         setIsLoading(false);
       }
@@ -251,6 +286,12 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
         availableModels[0] || { id: '', name: '', description: '' },
     );
 
+    React.useEffect(() => {
+      console.log('[DEBUG] selectedModel:', selectedModel);
+      console.log('[DEBUG] availableModels:', availableModels);
+      console.log('[DEBUG] selectedModelInfo:', selectedModelInfo);
+    }, [selectedModel, availableModels, selectedModelInfo]);
+
     if (!plugin.settings.apiKey) {
       return (
         <div className="groq-api-key-warning">{t('apiKeyMissing') || 'API key is missing'}</div>
@@ -261,11 +302,12 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
       <div className={`groq-container groq-chat groq-chat--${displayMode}`} ref={containerRef}>
         <div className="groq-chat__header">
           <div className="groq-chat__header-left">
-            <ModelSelector
+             <ModelSelector
               plugin={plugin}
               selectedModel={selectedModel}
               onSelectModel={handleModelChange}
               getAvailableModels={fetchAvailableModels}
+              availableModels={availableModels}
             />
           </div>
           <div className="groq-chat__header-right">
@@ -277,6 +319,12 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
             >
               <FiInfo size={16} />
             </button>
+            <ModelInfoDialog
+              isOpen={isModelInfoOpen}
+              onClose={() => setIsModelInfoOpen(false)}
+              modelInfo={selectedModelInfo}
+              isAvailable={!!availableModels.find(m => m.id === selectedModel)}
+            />
             <button
               onClick={toggleDisplayMode}
               className="groq-icon-button groq-display-mode-button"
@@ -383,6 +431,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
 
         <SupportDialog isOpen={isSupportOpen} onClose={() => setIsSupportOpen(false)} />
         <ModelInfoDialog
+          key={selectedModel}
           isOpen={isModelInfoOpen}
           onClose={() => setIsModelInfoOpen(false)}
           modelInfo={selectedModelInfo}

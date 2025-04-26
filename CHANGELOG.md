@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Localized interface (English/Russian) for all user-facing strings.
+- Model Info Dialog now shows only relevant fields: name, description (if present), developer, max tokens, release status, release/actuality date.
 - Raw/Markdown source view toggle for assistant messages.
 - Configurable default chat display mode (tab or side panel).
 - Added IndexedDB support for chat history storage.
@@ -22,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Model Info Dialog now correctly updates information when switching models (state management bug fixed).
 - Fixed React hydration errors related to HTML tag nesting (e.g., `<figure>` inside `<p>`).
 - Removed unused variables and empty CSS rules based on ESLint and CSSLint checks.
 
