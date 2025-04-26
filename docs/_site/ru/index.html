@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Groq Chat Plugin | Groq Chat Plugin for Obsidian with support for latest models</title>
+<meta name="generator" content="Jekyll v3.9.5" />
+<meta property="og:title" content="Groq Chat Plugin" />
+<meta property="og:locale" content="ru" />
+<meta name="description" content="Groq Chat Plugin for Obsidian with support for latest models" />
+<meta property="og:description" content="Groq Chat Plugin for Obsidian with support for latest models" />
+<link rel="canonical" href="https://semernyakov.github.io/groq-chat-plugin/ru/" />
+<meta property="og:url" content="https://semernyakov.github.io/groq-chat-plugin/ru/" />
+<meta property="og:site_name" content="Groq Chat Plugin" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Groq Chat Plugin" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","description":"Groq Chat Plugin for Obsidian with support for latest models","headline":"Groq Chat Plugin","url":"https://semernyakov.github.io/groq-chat-plugin/ru/"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="preload" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap" as="style" type="text/css" crossorigin>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="/groq-chat-plugin/assets/css/style.css?v=">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/groq-chat-plugin/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <a id="skip-to-content" href="#content">Skip to the content.</a>
+
+    <header class="page-header" role="banner">
+      <h1 class="project-name">Groq Chat Plugin</h1>
+      <h2 class="project-tagline">Groq Chat Plugin for Obsidian with support for latest models</h2>
+      
+        <a href="https://github.com/semernyakov/groq-chat-plugin" class="btn">View on GitHub</a>
+      
+      
+    </header>
+
+    <main id="content" class="main-content" role="main">
+      <h1 id="groq-chat-plugin-для-obsidian">Groq Chat Plugin для Obsidian</h1>
+
+<p><a href="https://github.com/semernyakov/groq-chat-plugin/releases/latest"><img src="https://img.shields.io/github/v/release/semernyakov/groq-chat-plugin?style=flat-square&amp;label=релиз" alt="Релиз" /></a>
+<a href="https://github.com/semernyakov/groq-chat-plugin/releases"><img src="https://img.shields.io/github/downloads/semernyakov/groq-chat-plugin/total?style=flat-square&amp;label=загрузки" alt="Загрузки" /></a>
+<a href="LICENSE"><img src="https://img.shields.io/github/license/semernyakov/groq-chat-plugin?style=flat-square&amp;label=лицензия" alt="Лицензия" /></a>
+<a href="https://github.com/semernyakov/groq-chat-plugin/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/semernyakov/groq-chat-plugin/ci.yml?branch=master&amp;style=flat-square&amp;label=тесты" alt="Тесты" /></a>
+<a href="https://codecov.io/gh/semernyakov/groq-chat-plugin"><img src="https://img.shields.io/codecov/c/github/semernyakov/groq-chat-plugin?style=flat-square&amp;label=покрытие" alt="Покрытие" /></a>
+<a href="https://www.npmjs.com/package/groq-chat-plugin"><img src="https://img.shields.io/npm/v/groq-chat-plugin?style=flat-square&amp;label=npm" alt="NPM" /></a></p>
+
+<p><a href="README.md">English version</a></p>
+
+<p>Плагин для <a href="https://obsidian.md">Obsidian</a>, который интегрирует возможности чата с AI от Groq прямо в ваши заметки.</p>
+
+<h2 id="возможности">Возможности</h2>
+
+<ul>
+  <li>Прямая интеграция с моделями Groq AI</li>
+  <li>Интерфейс чата в реальном времени</li>
+  <li>Поддержка последних моделей Groq</li>
+  <li>Поддержка форматирования Markdown</li>
+  <li>Подсветка кода</li>
+  <li>Поддержка мобильных устройств</li>
+  <li>Выбор пользовательских моделей</li>
+  <li>История чата</li>
+  <li>Контекстно-зависимые ответы</li>
+</ul>
+
+<h2 id="установка">Установка</h2>
+
+<ol>
+  <li>Откройте настройки Obsidian</li>
+  <li>Перейдите в раздел Community Plugins и отключите безопасный режим</li>
+  <li>Нажмите “Обзор” и найдите “Groq Chat”</li>
+  <li>Установите плагин</li>
+  <li>Включите плагин в разделе Community Plugins</li>
+</ol>
+
+<h2 id="настройка">Настройка</h2>
+
+<ol>
+  <li>Получите API ключ на <a href="https://console.groq.com">Groq Console</a></li>
+  <li>Откройте настройки плагина в Obsidian</li>
+  <li>Введите ваш API ключ</li>
+  <li>Настройте дополнительные параметры по необходимости</li>
+</ol>
+
+<h2 id="использование">Использование</h2>
+
+<ol>
+  <li>Откройте любую заметку</li>
+  <li>Нажмите на иконку Groq Chat в боковой панели</li>
+  <li>Начните общение с AI</li>
+  <li>Используйте команды с <code class="language-plaintext highlighter-rouge">/</code> для дополнительных функций</li>
+</ol>
+
+<h2 id="разработка">Разработка</h2>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Клонировать репозиторий</span>
+git clone https://github.com/semernyakov/groq-chat-plugin.git
+
+<span class="c"># Установить зависимости</span>
+npm <span class="nb">install</span>
+
+<span class="c"># Запустить сервер разработки</span>
+npm run dev
+
+<span class="c"># Собрать плагин</span>
+npm run build
+
+<span class="c"># Запустить тесты</span>
+npm run <span class="nb">test</span>
+
+<span class="c"># Проверить стиль кода</span>
+npm run lint
+</code></pre></div></div>
+
+<h2 id="участие-в-разработке">Участие в разработке</h2>
+
+<p>Мы приветствуем ваше участие! Пожалуйста, прочтите наше <a href="CONTRIBUTING.ru.md">Руководство по участию</a> для получения информации о кодексе поведения и процессе отправки pull request’ов.</p>
+
+<h2 id="безопасность">Безопасность</h2>
+
+<p>По вопросам безопасности, пожалуйста, ознакомьтесь с нашей <a href="SECURITY.ru.md">Политикой безопасности</a> и сообщайте об уязвимостях ответственно.</p>
+
+<h2 id="лицензия">Лицензия</h2>
+
+<p>Этот проект лицензирован под MIT License - см. файл <a href="LICENSE">LICENSE</a> для подробностей.</p>
+
+<h2 id="поддержка">Поддержка</h2>
+
+<p>Если вы находите этот плагин полезным, рассмотрите возможность:</p>
+<ul>
+  <li><a href="https://github.com/semernyakov/groq-chat-plugin">Поставить звезду репозиторию</a></li>
+  <li><a href="https://github.com/sponsors/semernyakov">Поддержать разработку</a></li>
+  <li><a href="https://github.com/semernyakov/groq-chat-plugin/issues">Сообщить о проблеме</a></li>
+</ul>
+
+<h2 id="история-изменений">История изменений</h2>
+
+<p>См. <a href="CHANGELOG.ru.md">CHANGELOG.ru.md</a> для всех изменений.</p>
+
+<h2 id="-описание">📝 Описание</h2>
+
+<p>Groq Chat Plugin - это мощный плагин для Obsidian, который интегрирует возможности Groq AI непосредственно в ваше рабочее пространство. Используйте передовые языковые модели для улучшения вашего рабочего процесса в Obsidian.</p>
+
+<h2 id="-основные-возможности">✨ Основные возможности</h2>
+
+<ul>
+  <li>🤖 Поддержка широкого спектра моделей:
+    <ul>
+      <li><strong>Production модели</strong> (рекомендуются для основного использования):
+        <ul>
+          <li>Llama 3 70B Versatile (128K контекст)</li>
+          <li>Llama 3 8B Instant (128K контекст)</li>
+          <li>Mixtral 8x7B (32K контекст)</li>
+          <li>Gemma 2 9B (8K контекст)</li>
+          <li>Llama Guard 3 8B (для безопасности)</li>
+          <li>Whisper Large V3 (для аудио)</li>
+        </ul>
+      </li>
+      <li><strong>Preview модели</strong> (для тестирования):
+        <ul>
+          <li>Llama 3 90B Vision (поддержка изображений)</li>
+          <li>Qwen 2.5 Coder 32B (для работы с кодом)</li>
+          <li>Mistral Saba 24B</li>
+          <li>DeepSeek модели</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>🔐 Безопасное хранение API ключей</li>
+  <li>💬 Интерактивный чат-интерфейс</li>
+  <li>📚 Сохранение истории диалогов</li>
+  <li>🎨 Настраиваемый интерфейс</li>
+  <li>🌓 Поддержка светлой и темной темы</li>
+  <li>⚡ Быстрый доступ через боковую панель</li>
+</ul>
+
+<h2 id="-установка">🚀 Установка</h2>
+
+<ol>
+  <li>Откройте Obsidian</li>
+  <li>Перейдите в Настройки → Сторонние плагины</li>
+  <li>Нажмите “Просмотреть” и найдите “Groq Chat”</li>
+  <li>Установите плагин</li>
+  <li>Включите плагин в списке установленных</li>
+</ol>
+
+<h2 id="️-настройка">⚙️ Настройка</h2>
+
+<h3 id="настройка-api-ключа">Настройка API ключа</h3>
+
+<ol>
+  <li>Получите API ключ на <a href="https://console.groq.com">console.groq.com</a></li>
+  <li>Введите ключ в настройках плагина</li>
+  <li>Сохраните настройки</li>
+</ol>
+
+<h3 id="настройка-моделей">Настройка моделей</h3>
+
+<h4 id="production-модели">Production модели</h4>
+
+<ul>
+  <li>
+    <p><strong>Llama 3 70B Versatile</strong></p>
+
+    <ul>
+      <li>Контекст: 128K токенов</li>
+      <li>Макс. токенов ответа: 32,768</li>
+      <li>Рекомендуется для: общих задач</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>Llama 3 8B Instant</strong></p>
+
+    <ul>
+      <li>Контекст: 128K токенов</li>
+      <li>Макс. токенов ответа: 8,192</li>
+      <li>Рекомендуется для: быстрых ответов</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>Mixtral 8x7B</strong></p>
+
+    <ul>
+      <li>Контекст: 32K токенов</li>
+      <li>Рекомендуется для: сложных вычислений</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>Gemma 2 9B</strong></p>
+
+    <ul>
+      <li>Контекст: 8K токенов</li>
+      <li>Рекомендуется для: эффективной работы</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>Whisper Large V3</strong></p>
+    <ul>
+      <li>Макс. размер файла: 25 MB</li>
+      <li>Рекомендуется для: транскрипции аудио</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="preview-модели">Preview модели</h4>
+
+<ul>
+  <li>
+    <p><strong>Llama 3 90B Vision</strong></p>
+
+    <ul>
+      <li>Поддержка изображений</li>
+      <li>Контекст: 128K токенов</li>
+      <li>Макс. токенов ответа: 8,192</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>Qwen 2.5 Coder 32B</strong></p>
+    <ul>
+      <li>Специализация: работа с кодом</li>
+      <li>Контекст: 128K токенов</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="-использование">💡 Использование</h2>
+
+<ol>
+  <li>
+    <p><strong>Открытие чата:</strong></p>
+
+    <ul>
+      <li>Нажмите на иконку чата в боковой панели</li>
+      <li>Используйте горячую клавишу (по умолчанию: Ctrl/Cmd + Shift + G)</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>Отправка сообщений:</strong></p>
+
+    <ul>
+      <li>Введите текст в поле ввода</li>
+      <li>Нажмите Enter или кнопку “Отправить”</li>
+      <li>Используйте Shift + Enter для переноса строки</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>Работа с моделями:</strong></p>
+
+    <ul>
+      <li>Выберите модель в зависимости от задачи</li>
+      <li>Учитывайте ограничения контекста</li>
+      <li>Следите за использованием токенов</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>Специальные возможности:</strong></p>
+    <ul>
+      <li>Загрузка аудио для транскрипции (Whisper)</li>
+      <li>Работа с изображениями (Vision модели)</li>
+      <li>Анализ и генерация кода (Coder модели)</li>
+    </ul>
+  </li>
+</ol>
+
+<h2 id="️-горячие-клавиши">⌨️ Горячие клавиши</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Действие</th>
+      <th>Windows/Linux</th>
+      <th>macOS</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Открыть чат</td>
+      <td>Ctrl + Shift + G</td>
+      <td>Cmd + Shift + G</td>
+    </tr>
+    <tr>
+      <td>Отправить сообщение</td>
+      <td>Enter</td>
+      <td>Enter</td>
+    </tr>
+    <tr>
+      <td>Новая строка</td>
+      <td>Shift + Enter</td>
+      <td>Shift + Enter</td>
+    </tr>
+    <tr>
+      <td>Очистить ввод</td>
+      <td>Esc</td>
+      <td>Esc</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="-настройка-интерфейса">🎨 Настройка интерфейса</h2>
+
+<ul>
+  <li>Размер шрифта</li>
+  <li>Отображение временных меток</li>
+  <li>Выбор темы (светлая/темная/системная)</li>
+  <li>Настройка максимальной длины истории</li>
+</ul>
+
+<h2 id="-безопасность">🔒 Безопасность</h2>
+
+<ul>
+  <li>Все токены хранятся локально в зашифрованном виде</li>
+  <li>Поддержка безопасной авторизации через OAuth 2.0</li>
+  <li>Шифрование данных при хранении</li>
+</ul>
+
+<h2 id="-устранение-неполадок">🐛 Устранение неполадок</h2>
+
+<h3 id="распространенные-проблемы">Распространенные проблемы:</h3>
+
+<ol>
+  <li>
+    <p><strong>Ошибка авторизации:</strong></p>
+
+    <ul>
+      <li>Проверьте правильность Client ID</li>
+      <li>Убедитесь, что redirect URI настроен корректно</li>
+      <li>Проверьте подключение к интернету</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>Ошибка API:</strong></p>
+
+    <ul>
+      <li>Проверьте статус сервиса Groq</li>
+      <li>Убедитесь в действительности токена</li>
+      <li>Проверьте лимиты использования</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>Проблемы с моделями:</strong></p>
+    <ul>
+      <li>Убедитесь, что выбрана подходящая модель</li>
+      <li>Проверьте ограничения контекста</li>
+      <li>Для preview моделей возможны перебои</li>
+    </ul>
+  </li>
+</ol>
+
+<h2 id="-вклад-в-развитие">🤝 Вклад в развитие</h2>
+
+<p>Мы приветствуем вклад в развитие проекта! Для участия:</p>
+
+<ol>
+  <li>Форкните репозиторий</li>
+  <li>Создайте ветку для вашей функции</li>
+  <li>Внесите изменения</li>
+  <li>Отправьте Pull Request</li>
+</ol>
+
+<p>Подробнее смотрите в <a href="CONTRIBUTING.md">CONTRIBUTING.md</a>.</p>
+
+<h2 id="-лицензия">📄 Лицензия</h2>
+
+<p>MIT License. См. файл <a href="LICENSE">LICENSE</a> для подробностей.</p>
+
+<h2 id="-благодарности">🙏 Благодарности</h2>
+
+<ul>
+  <li>Команде Obsidian за отличную платформу</li>
+  <li>Groq за предоставление API</li>
+  <li>Всем контрибьюторам за помощь в развитии</li>
+</ul>
+
+<h2 id="-поддержка">📞 Поддержка</h2>
+
+<ul>
+  <li><a href="https://github.com/semernyakov/groq-chat-plugin/issues">Создать Issue</a></li>
+  <li><a href="docs/PUBLISHING.ru.md">Документация</a></li>
+  <li><a href="https://github.com/semernyakov/groq-chat-plugin">Код проекта</a></li>
+</ul>
+
+<h2 id="-демо">🎮 Демо</h2>
+
+<p>Посмотреть демо можно <a href="https://semernyakov.github.io/groq-chat-plugin/demo">здесь</a></p>
+
+<hr />
+
+<p>Создано с ❤️ для сообщества Obsidian</p>
+
+
+
+      <footer class="site-footer">
+        
+          <span class="site-footer-owner"><a href="https://github.com/semernyakov/groq-chat-plugin">groq-chat-plugin</a> is maintained by <a href="https://github.com/semernyakov">semernyakov</a>.</span>
+        
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a>.</span>
+      </footer>
+    </main>
+  </body>
+</html>
