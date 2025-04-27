@@ -4,11 +4,11 @@
 [![Downloads](https://img.shields.io/github/downloads/semernyakov/groq-chat-plugin/total?style=flat-square)](https://github.com/semernyakov/groq-chat-plugin/releases)
 [![License](https://img.shields.io/github/license/semernyakov/groq-chat-plugin?style=flat-square)](LICENSE)
 [![Tests](https://img.shields.io/github/actions/workflow/status/semernyakov/groq-chat-plugin/ci.yml?branch=master&style=flat-square)](https://github.com/semernyakov/groq-chat-plugin/actions/workflows/ci.yml)
-[![Coverage](https://img.shields.io/codecov/c/github/semernyakov/groq-chat-plugin?style=flat-square)](https://codecov.io/gh/semernyakov/groq-chat-plugin)
 [![NPM](https://img.shields.io/npm/v/groq-chat-plugin?style=flat-square)](https://www.npmjs.com/package/groq-chat-plugin)
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa?style=flat-square)](code_of_conduct.md)
+<!-- [![Coverage](https://img.shields.io/codecov/c/github/semernyakov/groq-chat-plugin?style=flat-square)](https://codecov.io/gh/semernyakov/groq-chat-plugin) -->
 
-[Русская версия](README.ru.md)
-
+[Русская версия](README.ru.md) | [English version](README.md)
 [Documentation](https://semernyakov.github.io/groq-chat-plugin/)
 
 A plugin for [Obsidian](https://obsidian.md) that integrates Groq's AI chat capabilities directly into your notes.
@@ -16,28 +16,39 @@ A plugin for [Obsidian](https://obsidian.md) that integrates Groq's AI chat capa
 ## Features
 
 - Direct integration with Groq AI models
-- Real-time chat interface
+- Dynamic model list: models are updated in real-time, always fresh
+- Model Info Dialog: detailed info for each model (name, description, developer, max tokens, release status, etc.)
+- Support for text, vision (image), coder, and audio models
 - Localized interface (English/Russian)
-- Accurate model info dialog (shows only relevant fields: name, description (if present), developer, max tokens, release status, release/actuality date)
-- Support for latest Groq models
-- Markdown formatting support
-- Code highlighting
+- Markdown formatting and code highlighting
 - Mobile support
 - Custom model selection
-- Chat history
+- Chat history with IndexedDB/localStorage/file options
 - Context-aware responses
-- Raw/Markdown source view toggle for assistant messages.
-- Configurable default display mode (tab or side panel).
+- Raw/Markdown source view toggle for assistant messages
+- Configurable default display mode (tab or side panel)
+- Hotkeys and advanced settings
+- Secure API key storage
+- Open source and community-driven
+
+## Project Status
+
+This project is actively maintained and developed. New features are added regularly, including dynamic model updates, vision/coder/audio support, and improved UI/UX. Automated tests and advanced model integrations (audio/image) are planned. Feedback and contributions are welcome!
+
 
 ### Supported Models (Examples)
 
-- **Llama 3 70B:** Powerful general-purpose model by Meta (Context: 8192 tokens). Excellent for complex tasks requiring deep understanding and text generation.
-- **Llama 3 8B:** Fast and efficient model by Meta (Context: 8192 tokens). Good for everyday tasks, chatbots, and quick responses.
-- **Llama 3.1 8B Instant:** Improved fast 8B model by Meta (Context: 131072 tokens). Offers a significantly larger context window for handling long documents or conversations.
-- **Llama 3.3 70B Versatile:** Improved versatile 70B model by Meta (Context: 32768 tokens). Provides an increased context compared to the standard 70B model.
-- **Mixtral 8x7B:** Mixture-of-Experts model by Mistral AI (Context: 32768 tokens). Efficient for a wide range of tasks due to its architecture.
-- **Gemma2 9B IT:** Efficient instruct model by Google (Context: 8192 tokens). Optimized for following instructions and text generation.
-- **Whisper Large V3:** Audio transcription model by OpenAI (Note: Audio input not yet implemented in plugin).
+- **Llama 3.3 70B Versatile** (Meta): Universal model, 32K context, high quality for complex tasks.
+- **Llama 3.2 1B/3B/11B/90B Vision** (Meta): Vision models for multimodal tasks (text + images), up to 8K context.
+- **Llama 3.1 8B Instant** (Meta): Fast, 131K context, for long conversations.
+- **Mixtral 8x7B** (Mistral AI): Mixture-of-Experts, 32K context, efficient for broad tasks.
+- **Gemma2 9B IT** (Google): Instruction-tuned, 8K context, for following instructions.
+- **Qwen 2.5 32B/32B Coder** (Alibaba): Large context (131K), code generation and analysis.
+- **DeepSeek Llama 70B / Qwen 32B**: Preview models, 131K context, for experimentation.
+- **Llama Guard 3 8B**: Safety model for content moderation.
+- **Whisper Large V3** (OpenAI): Audio transcription (audio input not yet implemented).
+
+See plugin settings for the full up-to-date list (models are updated dynamically).
 
 ## Installation
 
@@ -56,10 +67,13 @@ A plugin for [Obsidian](https://obsidian.md) that integrates Groq's AI chat capa
 
 ## Usage
 
-1. Open any note
+1. Open any note in Obsidian
 2. Click the Groq Chat icon in the sidebar
-3. Start chatting with AI
-4. Use `/` commands for additional features
+3. Select the model you want (models update in real time)
+4. Start chatting with AI (text, code, or images)
+5. Use `/` commands for extra features (clear, settings, etc.)
+6. View model info any time via the Model Info Dialog
+
 
 ## Development
 
@@ -100,7 +114,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 If you find this plugin helpful, consider:
 
 - [Starring the repository](https://github.com/semernyakov/groq-chat-plugin)
-- [Sponsoring the development](https://github.com/sponsors/semernyakov)
+- [Sponsoring the development](https://yoomoney.ru/fundraise/194GT5A5R07.250321)
 - [Reporting issues](https://github.com/semernyakov/groq-chat-plugin/issues)
 
 ## Changelog

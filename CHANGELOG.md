@@ -1,15 +1,46 @@
 # Changelog
 
+## Highlights of v1.2.6
+- Dynamic model updates, always up-to-date
+- Support for new models (Vision, Coder, DeepSeek, and more)
+- Improved ModelInfo dialog
+- Vision/coder model support
+- Minimalist Code of Conduct and Contributing (bilingual)
+- YooMoney for supporting the author
+- Documentation streamlined and updated
+
+## Plans
+- Automated tests are planned to improve stability and quality
+- Support for models working with audio files and images (audio/vision) is planned
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.2.6] - 2025-04-27
+
+### Latest
 
 ### Added
 
 - Localized interface (English/Russian) for all user-facing strings.
+
+## [1.2.6] - 2025-04-26
+### Added
+- Dynamic model updates: models list and info now refresh in real-time without reloading the plugin.
+- General improvements and code optimizations for stability and performance.
+
+## [1.2.5] - 2025-04-26
+## [1.2.4] - 2025-03-18
+## [1.2.3] - 2025-03-18
+**Internal releases:**
+- Refactoring of codebase and project structure.
+- Documentation updates and localization improvements.
+- Improvements to release workflow and CI/CD processes.
+
+<!-- For details on earlier versions ([1.2.1-beta.2], [1.2.1-beta.1], [1.2.2], [1.2.1], [1.0.0]), see the previous changelog sections or request details. -->
+
 - Model Info Dialog now shows only relevant fields: name, description (if present), developer, max tokens, release status, release/actuality date.
 - Raw/Markdown source view toggle for assistant messages.
 - Configurable default chat display mode (tab or side panel).
@@ -21,6 +52,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - History storage configuration (`storeHistory` removed, use `maxHistoryLength=0` to disable).
 - Improved API key update logic in GroqService.
 - Minor UI/UX improvements in settings.
+- Updated badges in README files: all badges now use flat-square style, added Contributor Covenant badge with sharp corners, translated badge labels in Russian version.
+- Updated contact email to beatuminflow@gmail.com in all documentation.
+- Simplified and updated Code of Conduct (English and Russian).
+- All Russian documentation is now located exclusively in the `docs` directory.
+
+### Removed
+
+- Deleted outdated or duplicate documentation files: CONTRIBUTING.md, CONTRIBUTING.ru.md, LICENSE.ru, AUTHOR.md, SECURITY.ru.md, docs/CODE_OF_CONDUCT.ru.md.
+- Removed demo link from Russian README.
 
 ### Fixed
 
