@@ -6,9 +6,7 @@ We want a friendly, respectful, and inclusive community.
 
 **Be kind. No harassment or hate.**
 
-If you see a problem, contact the maintainer: 
-- [i.s.semernyakov@yandex.ru](mailto:i.s.semernyakov@yandex.ru)
-- [@semernyakov](https://t.me/semernyakov)
+If you see a problem, contact the maintainer [@semernyakov](https://t.me/semernyakov)
 
 By participating, you agree to follow this simple code:
 

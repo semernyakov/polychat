@@ -258,4 +258,5 @@ MIT License. См. файл [LICENSE](LICENSE) для подробностей.
 
 ---
 
-Создано с ❤️ для сообщества Obsidian
+Создано с ❤️ для сообщества Obsidian, [
+   поддержка автора](https://yoomoney.ru/fundraise/194GT5A5R07.250321)
