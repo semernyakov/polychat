@@ -27,7 +27,7 @@ export default class GroqChatPlugin extends Plugin implements GroqPluginInterfac
     });
 
     this.addCommands();
-    this.addRibbonIcon('message-square', 'Groq Chat', () => this.activateView());
+    this.addRibbonIcon('message-square', 'PolyChat', () => this.activateView());
     this.settingsTab = new GroqChatSettingsTab(this.app, this);
     this.addSettingTab(this.settingsTab);
   }

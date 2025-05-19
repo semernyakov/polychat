@@ -30,8 +30,8 @@ const SupportThanksBlock: React.FC = () => {
   return (
     <div style={style}>
       {locale === 'ru'
-        ? (<span>Спасибо за использование Groq Chat Plugin! <br/>Вы можете <a href="https://yoomoney.ru/fundraise/194GT5A5R07.250321" target="_blank" rel="noopener noreferrer">поддержать разработку на YooMoney</a> <br/>или <a href="https://github.com/semernyakov" target="_blank" rel="noopener noreferrer">оставить отзыв</a> или <a href="https://t.me/semernyakov" target="_blank" rel="noopener noreferrer">связаться со мной в Telegram</a> 💖</span>)
-        : (<span>Thank you for using Groq Chat Plugin! <br/>You can <a href="https://yoomoney.ru/fundraise/194GT5A5R07.250321" target="_blank" rel="noopener noreferrer">support the author on YooMoney</a> and also <a href="https://github.com/semernyakov" target="_blank" rel="noopener noreferrer">leave a review</a> or <a href="https://t.me/semernyakov" target="_blank" rel="noopener noreferrer">contact me in Telegram</a> 💖</span>)}
+        ? (<span>Спасибо за использование PolyChat Plugin! <br/>Вы можете <a href="https://yoomoney.ru/fundraise/194GT5A5R07.250321" target="_blank" rel="noopener noreferrer">поддержать разработку на YooMoney</a> <br/>или <a href="https://github.com/semernyakov" target="_blank" rel="noopener noreferrer">оставить отзыв</a> или <a href="https://t.me/semernyakov" target="_blank" rel="noopener noreferrer">связаться со мной в Telegram</a> 💖</span>)
+        : (<span>Thank you for using PolyChat Plugin! <br/>You can <a href="https://yoomoney.ru/fundraise/194GT5A5R07.250321" target="_blank" rel="noopener noreferrer">support the author on YooMoney</a> and also <a href="https://github.com/semernyakov" target="_blank" rel="noopener noreferrer">leave a review</a> or <a href="https://t.me/semernyakov" target="_blank" rel="noopener noreferrer">contact me in Telegram</a> 💖</span>)}
     </div>
   );
 };

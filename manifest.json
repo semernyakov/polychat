@@ -12,5 +12,5 @@
     "isDesktopOnly": false,
     "nodeIntegration": true,
     "license": "MIT",
-    "source": "https://github.com/semernyakov/groq-chat-plugin"
+    "source": "https://github.com/semernyakov/polychat"
 }

@@ -3,7 +3,7 @@ import type { Locale } from '../localization';
 import type { RateLimitsType } from '../services/groqService';
 
 /**
- * Настройки плагина Groq Chat
+ * Настройки плагина PolyChat
  */
 export interface GroqModelInfo {
   id: string;

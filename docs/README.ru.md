@@ -1,9 +1,9 @@
-# Groq Chat Plugin для Obsidian
+# PolyChat Plugin для Obsidian
 
-[![Релиз](https://img.shields.io/github/v/release/semernyakov/groq-chat-plugin?style=flat-square&label=релиз)](https://github.com/semernyakov/groq-chat-plugin/releases/latest)
-[![Загрузки](https://img.shields.io/github/downloads/semernyakov/groq-chat-plugin/total?style=flat-square&label=загрузки)](https://github.com/semernyakov/groq-chat-plugin/releases)
-[![Лицензия](https://img.shields.io/github/license/semernyakov/groq-chat-plugin?style=flat-square&label=лицензия)](LICENSE)
-[![Тесты](https://img.shields.io/github/actions/workflow/status/semernyakov/groq-chat-plugin/ci.yml?branch=master&style=flat-square&label=тесты)](https://github.com/semernyakov/groq-chat-plugin/actions/workflows/ci.yml)
+[![Релиз](https://img.shields.io/github/v/release/semernyakov/polychat?style=flat-square&label=релиз)](https://github.com/semernyakov/polychat/releases/latest)
+[![Загрузки](https://img.shields.io/github/downloads/semernyakov/polychat/total?style=flat-square&label=загрузки)](https://github.com/semernyakov/polychat/releases)
+[![Лицензия](https://img.shields.io/github/license/semernyakov/polychat?style=flat-square&label=лицензия)](LICENSE)
+[![Тесты](https://img.shields.io/github/actions/workflow/status/semernyakov/polychat/ci.yml?branch=master&style=flat-square&label=тесты)](https://github.com/semernyakov/polychat/actions/workflows/ci.yml)
 [![NPM](https://img.shields.io/npm/v/groq-chat-plugin?style=flat-square&label=npm)](https://www.npmjs.com/package/groq-chat-plugin)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa?style=flat-square)](../CODE_OF_CONDUCT.md)
 <!-- [![Покрытие](https://img.shields.io/codecov/c/github/semernyakov/groq-chat-plugin?style=flat-square&label=покрытие)](https://codecov.io/gh/semernyakov/groq-chat-plugin) -->
@@ -33,7 +33,7 @@
 
 1. Откройте настройки Obsidian
 2. Перейдите в раздел Community Plugins и отключите безопасный режим
-3. Нажмите "Обзор" и найдите "Groq Chat"
+3. Нажмите "Обзор" и найдите "PolyChat"
 4. Установите плагин
 5. Включите плагин в разделе Community Plugins
 
@@ -47,7 +47,7 @@
 ## Использование
 
 1. Откройте любую заметку
-2. Нажмите на иконку Groq Chat в боковой панели
+2. Нажмите на иконку PolyChat в боковой панели
 3. Начните общение с AI
 4. Используйте команды с `/` для дополнительных функций
 
@@ -55,7 +55,7 @@
 
 ```bash
 # Клонировать репозиторий
-git clone https://github.com/semernyakov/groq-chat-plugin.git
+git clone https://github.com/semernyakov/polychat.git
 
 # Установить зависимости
 npm install
@@ -89,9 +89,9 @@ npm run lint
 
 Если вы находите этот плагин полезным, рассмотрите возможность:
 
-- [Поставить звезду репозиторию](https://github.com/semernyakov/groq-chat-plugin)
+- [Поставить звезду репозиторию](https://github.com/semernyakov/polychat)
 - [Поддержать разработку](https://github.com/sponsors/semernyakov)
-- [Сообщить о проблеме](https://github.com/semernyakov/groq-chat-plugin/issues)
+- [Сообщить о проблеме](https://github.com/semernyakov/polychat/issues)
 
 ## История изменений
 
@@ -99,7 +99,7 @@ npm run lint
 
 ## 📝 Описание
 
-Groq Chat Plugin - это мощный плагин для Obsidian, который интегрирует возможности Groq AI непосредственно в ваше рабочее пространство. Используйте передовые языковые модели для улучшения вашего рабочего процесса в Obsidian.
+PolyChat Plugin - это мощный плагин для Obsidian, который интегрирует возможности Groq AI непосредственно в ваше рабочее пространство. Используйте передовые языковые модели для улучшения вашего рабочего процесса в Obsidian.
 
 ## ✨ Основные возможности
 
@@ -140,7 +140,7 @@ Groq Chat Plugin - это мощный плагин для Obsidian, котор�
 
 1. Откройте Obsidian
 2. Перейдите в Настройки → Сторонние плагины
-3. Нажмите "Просмотреть" и найдите "Groq Chat"
+3. Нажмите "Просмотреть" и найдите "PolyChat"
 4. Установите плагин
 5. Включите плагин в списке установленных
 
@@ -260,9 +260,9 @@ MIT License. См. файл [LICENSE](LICENSE) для подробностей.
 
 ## 📞 Поддержка
 
-- [Создать Issue](https://github.com/semernyakov/groq-chat-plugin/issues)
+- [Создать Issue](https://github.com/semernyakov/polychat/issues)
 - [Документация](docs/PUBLISHING.ru.md)
-- [Код проекта](https://github.com/semernyakov/groq-chat-plugin)
+- [Код проекта](https://github.com/semernyakov/polychat)
 
 ## 🎮 Демо
 

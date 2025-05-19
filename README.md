@@ -1,9 +1,9 @@
-# Groq Chat Plugin for Obsidian
+# PolyChat Plugin for Obsidian
 
-[![Release](https://img.shields.io/github/v/release/semernyakov/groq-chat-plugin?style=flat-square)](https://github.com/semernyakov/groq-chat-plugin/releases/latest)
-[![Downloads](https://img.shields.io/github/downloads/semernyakov/groq-chat-plugin/total?style=flat-square)](https://github.com/semernyakov/groq-chat-plugin/releases)
-[![License](https://img.shields.io/github/license/semernyakov/groq-chat-plugin?style=flat-square)](LICENSE)
-[![Tests](https://img.shields.io/github/actions/workflow/status/semernyakov/groq-chat-plugin/ci.yml?branch=master&style=flat-square)](https://github.com/semernyakov/groq-chat-plugin/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/semernyakov/polychat?style=flat-square)](https://github.com/semernyakov/polychat/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/semernyakov/polychat/total?style=flat-square)](https://github.com/semernyakov/polychat/releases)
+[![License](https://img.shields.io/github/license/semernyakov/polychat?style=flat-square)](LICENSE)
+[![Tests](https://img.shields.io/github/actions/workflow/status/semernyakov/polychat/ci.yml?branch=master&style=flat-square)](https://github.com/semernyakov/polychat/actions/workflows/ci.yml)
 [![NPM](https://img.shields.io/npm/v/groq-chat-plugin?style=flat-square)](https://www.npmjs.com/package/groq-chat-plugin)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa?style=flat-square)](code_of_conduct.md)
 <!-- [![Coverage](https://img.shields.io/codecov/c/github/semernyakov/groq-chat-plugin?style=flat-square)](https://codecov.io/gh/semernyakov/groq-chat-plugin) -->
@@ -64,7 +64,7 @@ This project is actively maintained and developed. New features are added regula
 
 1. Open Obsidian Settings
 2. Go to Community Plugins and disable Safe Mode
-3. Click Browse and search for "Groq Chat"
+3. Click Browse and search for "PolyChat"
 4. Install the plugin
 5. Enable the plugin in Community Plugins
 
@@ -78,7 +78,7 @@ This project is actively maintained and developed. New features are added regula
 ## Usage
 
 1. Open any note in Obsidian
-2. Click the Groq Chat icon in the sidebar
+2. Click the PolyChat icon in the sidebar
 3. Select the model you want (models update in real time)
 4. Start chatting with AI (text, code, or images)
 5. Use `/` commands for extra features (clear, settings, etc.)
@@ -89,7 +89,7 @@ This project is actively maintained and developed. New features are added regula
 
 ```bash
 # Clone the repository
-git clone https://github.com/semernyakov/groq-chat-plugin.git
+git clone https://github.com/semernyakov/polychat.git
 
 # Install dependencies
 npm install
@@ -123,9 +123,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 If you find this plugin helpful, consider:
 
-- [Starring the repository](https://github.com/semernyakov/groq-chat-plugin)
+- [Starring the repository](https://github.com/semernyakov/polychat)
 - [Sponsoring the development](https://yoomoney.ru/fundraise/194GT5A5R07.250321)
-- [Reporting issues](https://github.com/semernyakov/groq-chat-plugin/issues)
+- [Reporting issues](https://github.com/semernyakov/polychat/issues)
 
 ## Changelog
 

@@ -20,7 +20,7 @@ export class GroqChatSettingsTab extends PluginSettingTab {
     this.containerEl.empty();
     // --- Красивый заголовок и приветствие ---
     const title = this.containerEl.createEl('h2', {
-      text: locale === 'ru' ? '🚀 Добро пожаловать в настройки Groq Chat Plugin!' : '🚀 Welcome to Groq Chat Plugin Settings!'
+      text: locale === 'ru' ? '🚀 Добро пожаловать в настройки PolyChat Plugin!' : '🚀 Welcome to PolyChat Plugin Settings!'
     });
     title.style.marginTop = '0.5em';
     title.style.fontSize = '2em';
@@ -114,8 +114,8 @@ export class GroqChatSettingsTab extends PluginSettingTab {
       thanksBlock.style.border = '1px solid var(--background-modifier-border, #333)';
     }
     thanksBlock.innerHTML = locale === 'ru'
-      ? 'Спасибо за использование Groq Chat Plugin! <br> Вы можете <a href="https://yoomoney.ru/fundraise/194GT5A5R07.250321" target="_blank" rel="noopener noreferrer">поддержать разработку на YooMoney</a> <br> <a href="https://github.com/semernyakov" target="_blank" rel="noopener noreferrer">Оставить отзыв на Github</a> или <a href="https://t.me/semernyakov" target="_blank" rel="noopener noreferrer"> или связаться со мной в Telegram</a> ❤️'
-      : 'Thank you for using Groq Chat Plugin! <br> You can <a href="https://yoomoney.ru/fundraise/194GT5A5R07.250321" target="_blank" rel="noopener noreferrer">support the author on YooMoney</a> <br> <a href="https://github.com/semernyakov" target="_blank" rel="noopener noreferrer">Leave a review on Github</a> or <a href="https://t.me/semernyakov" target="_blank" rel="noopener noreferrer">contact me in Telegram</a> ❤️';
+      ? 'Спасибо за использование PolyChat Plugin! <br> Вы можете <a href="https://yoomoney.ru/fundraise/194GT5A5R07.250321" target="_blank" rel="noopener noreferrer">поддержать разработку на YooMoney</a> <br> <a href="https://github.com/semernyakov" target="_blank" rel="noopener noreferrer">Оставить отзыв на Github</a> или <a href="https://t.me/semernyakov" target="_blank" rel="noopener noreferrer"> или связаться со мной в Telegram</a> ❤️'
+      : 'Thank you for using PolyChat Plugin! <br> You can <a href="https://yoomoney.ru/fundraise/194GT5A5R07.250321" target="_blank" rel="noopener noreferrer">support the author on YooMoney</a> <br> <a href="https://github.com/semernyakov" target="_blank" rel="noopener noreferrer">Leave a review on Github</a> or <a href="https://t.me/semernyakov" target="_blank" rel="noopener noreferrer">contact me in Telegram</a> ❤️';
   }
 
   private createTemperatureSetting(locale: Locale): HTMLElement {

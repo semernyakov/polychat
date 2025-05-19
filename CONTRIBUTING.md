@@ -1,4 +1,4 @@
-# Contributing to Groq Chat Plugin
+# Contributing to PolyChat Plugin
 
 Thank you for your interest in contributing!
 

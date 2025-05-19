@@ -30,7 +30,7 @@ export class GroqChatView extends ItemView {
   }
 
   getDisplayText() {
-    return 'Groq Chat';
+    return 'PolyChat';
   }
 
   getIcon() {
