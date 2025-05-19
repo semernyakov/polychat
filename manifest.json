@@ -1,14 +1,16 @@
 {
-  "id": "groq-chat-plugin",
-  "name": "Groq Chat Plugin",
-  "version": "1.2.6",
-  "styles": ["styles.css"],
-  "minAppVersion": "1.8.7",
-  "description": "Groq Chat Plugin for Obsidian integrates Groq AI models with dynamic real-time model updates, customizable chat history, and a configurable interface. Supports text, vision, coder, and audio models, with markdown formatting, hotkeys, and secure API key storage. Open source and community-driven.",
-  "author": "Ivan Semernyakov",
-  "authorUrl": "https://github.com/semernyakov",
-  "isDesktopOnly": false,
-  "nodeIntegration": true,
-  "license": "MIT",
-  "source": "https://github.com/semernyakov/groq-chat-plugin"
+    "id": "groq-chat-plugin",
+    "name": "Groq Chat Plugin",
+    "version": "1.2.6",
+    "styles": [
+        "styles.css"
+    ],
+    "minAppVersion": "1.8.7",
+    "description": "Groq Chat Plugin for Obsidian integrates Groq AI models with dynamic real-time model updates, customizable chat history, and a configurable interface. Supports text, vision, coder, and audio models, with markdown formatting, hotkeys, and secure API key storage. Open source and community-driven.",
+    "author": "Ivan Semernyakov",
+    "authorUrl": "https://github.com/semernyakov",
+    "isDesktopOnly": false,
+    "nodeIntegration": true,
+    "license": "MIT",
+    "source": "https://github.com/semernyakov/groq-chat-plugin"
 }
