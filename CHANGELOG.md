@@ -30,6 +30,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Documentation updates and code cleanup.
+- Плагин переименован в PolyChat (ранее Groq Chat)
+- Все ссылки обновлены на новый репозиторий: https://github.com/semernyakov/polychat
+- Документация и инструкции обновлены под новое название
+- Обновлены community-plugins.json и manifest.json
 
 ## [1.2.6] - 2025-04-27
 
