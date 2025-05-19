@@ -1,11 +1,11 @@
 [
     {
-        "id": "groq-chat-plugin",
-        "name": "Groq Chat",
+        "id": "groq-poly-chat",
+        "name": "PolyChat",
         "version": "1.3.0",
         "author": "Ivan Semernyakov",
-        "description": "Groq Chat Plugin for Obsidian with support for latest AI models",
-        "repo": "semernyakov/groq-chat-plugin",
+        "description": "PolyChat is a powerful chat extension with support for AI models via the Groq API. Designed for flexibility and ease of use, it enables seamless communication with multiple models directly from your vault.",
+        "repo": "https://github.com/semernyakov/groq-chat-plugin",
         "fundingUrl": "https://yoomoney.ru/fundraise/194GT5A5R07.250321",
         "isDesktopOnly": false
     }
