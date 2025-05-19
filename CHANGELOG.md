@@ -18,6 +18,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.2] - 2025-05-19
+
+### Added
+- Minor improvements and optimizations for stability and performance.
+- Updated dependencies and compatibility with latest Obsidian versions.
+- UI/UX enhancements and localization updates.
+
+### Fixed
+- Bugfixes and minor corrections based on user feedback.
+
+### Changed
+- Documentation updates and code cleanup.
+
 ## [1.2.6] - 2025-04-27
 
 ### Latest
