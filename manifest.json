@@ -6,7 +6,7 @@
         "styles.css"
     ],
     "minAppVersion": "1.8.7",
-    "description": "PolyChat is a powerful chat plugin with support for AI models via the Groq API. Designed for flexibility and ease of use, it enables seamless communication with multiple models directly from your vault.",
+    "description": "PolyChat is a powerful chat extension with support for AI models via the Groq API. Designed for flexibility and ease of use, it enables seamless communication with multiple models directly from your vault.",
     "author": "Ivan Semernyakov",
     "authorUrl": "https://github.com/semernyakov",
     "isDesktopOnly": false,
