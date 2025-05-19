@@ -35,19 +35,30 @@ A plugin for [Obsidian](https://obsidian.md) that integrates Groq's AI chat capa
 This project is actively maintained and developed. New features are added regularly, including dynamic model updates, vision/coder/audio support, and improved UI/UX. Automated tests and advanced model integrations (audio/image) are planned. Feedback and contributions are welcome!
 
 
-### Supported Models (Examples)
+### Supported Models (Current List)
 
-- **Llama 3.3 70B Versatile** (Meta): Universal model, 32K context, high quality for complex tasks.
-- **Llama 3.2 1B/3B/11B/90B Vision** (Meta): Vision models for multimodal tasks (text + images), up to 8K context.
-- **Llama 3.1 8B Instant** (Meta): Fast, 131K context, for long conversations.
-- **Mixtral 8x7B** (Mistral AI): Mixture-of-Experts, 32K context, efficient for broad tasks.
-- **Gemma2 9B IT** (Google): Instruction-tuned, 8K context, for following instructions.
-- **Qwen 2.5 32B/32B Coder** (Alibaba): Large context (131K), code generation and analysis.
-- **DeepSeek Llama 70B / Qwen 32B**: Preview models, 131K context, for experimentation.
-- **Llama Guard 3 8B**: Safety model for content moderation.
-- **Whisper Large V3** (OpenAI): Audio transcription (audio input not yet implemented).
+- **distil-whisper-large-v3-en**
+- **whisper-large-v3**
+- **llama-3.3-70b-versatile**
+- **deepseek-r1-distill-llama-70b**
+- **meta-llama/llama-guard-4-12b**
+- **whisper-large-v3-turbo**
+- **meta-llama/llama-4-maverick-17b-128e-instruct**
+- **compound-beta**
+- **llama3-8b-8192**
+- **playai-tts**
+- **mistral-saba-24b**
+- **qwen-qwq-32b**
+- **llama-guard-3-8b**
+- **meta-llama/llama-4-scout-17b-16e-instruct**
+- **llama3-70b-8192**
+- **playai-tts-arabic**
+- **gemma2-9b-it**
+- **compound-beta-mini**
+- **allam-2-7b**
+- **llama-3.1-8b-instant**
 
-See plugin settings for the full up-to-date list (models are updated dynamically).
+> See plugin settings for the full up-to-date list. Descriptions will be updated as soon as they become available.
 
 ## Installation
 

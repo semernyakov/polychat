@@ -53,7 +53,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
           activeModels.map((m: any) => ({ ...m })),
         );
       } catch (error) {
-        console.error('Failed to fetch available models:', error);
+        // console.error('Failed to fetch available models:', error);
         setAvailableModels([]);
         toast.error('Не удалось загрузить список доступных моделей.'); // Добавляем toast
       } finally {

@@ -57,7 +57,7 @@ export class HistoryService {
       case 'file':
         return this.getFromFile();
       default:
-        console.warn(`Unknown history storage method: ${method}`);
+        // console.warn(`Unknown history storage method: ${method}`);
         return [];
     }
   }
@@ -80,7 +80,7 @@ export class HistoryService {
         await this.saveToFile(truncated);
         break;
       default:
-        console.warn(`Unknown history storage method: ${method}`);
+        // console.warn(`Unknown history storage method: ${method}`);
     }
   }
 
@@ -96,7 +96,7 @@ export class HistoryService {
       const data = localStorage.getItem(LOCAL_STORAGE_KEY);
       return data ? JSON.parse(data) : [];
     } catch (error) {
-      console.error('Error reading from localStorage', error);
+      // console.error('Error reading from localStorage', error);
       localStorage.removeItem(LOCAL_STORAGE_KEY);
       return [];
     }
@@ -106,7 +106,7 @@ export class HistoryService {
     try {
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(history));
     } catch (error) {
-      console.error('Error saving to localStorage', error);
+      // console.error('Error saving to localStorage', error);
       if (error instanceof Error && error.name === 'QuotaExceededError') {
         new Notice('Failed to save history: LocalStorage quota exceeded.');
       }
@@ -126,12 +126,12 @@ export class HistoryService {
         };
 
         request.onerror = event => {
-          console.error('IndexedDB getAll error:', (event.target as IDBRequest).error);
+          // console.error('IndexedDB getAll error:', (event.target as IDBRequest).error);
           reject((event.target as IDBRequest).error);
         };
       });
     } catch (error) {
-      console.error('Failed to get history from IndexedDB', error);
+      // console.error('Failed to get history from IndexedDB', error);
       return [];
     }
   }
@@ -156,29 +156,29 @@ export class HistoryService {
 
           Promise.all(putPromises)
             .then(() => {
-              console.log('IndexedDB save successful');
+              // console.log('IndexedDB save successful');
               resolve();
             })
             .catch(err => {
-              console.error('IndexedDB put error:', err);
+              // console.error('IndexedDB put error:', err);
               reject(err);
             });
         };
 
         clearRequest.onerror = event => {
-          console.error('IndexedDB clear error:', (event.target as IDBRequest).error);
+          // console.error('IndexedDB clear error:', (event.target as IDBRequest).error);
           reject((event.target as IDBRequest).error);
         };
 
         transaction.onerror = event => {
-          console.error('IndexedDB transaction error:', (event.target as IDBTransaction).error);
+          // console.error('IndexedDB transaction error:', (event.target as IDBTransaction).error);
           reject((event.target as IDBTransaction).error);
         };
 
         transaction.oncomplete = () => {};
       });
     } catch (error) {
-      console.error('Failed to save history to IndexedDB', error);
+      // console.error('Failed to save history to IndexedDB', error);
       throw error;
     }
   }
@@ -192,16 +192,16 @@ export class HistoryService {
         const request = store.clear();
 
         request.onsuccess = () => {
-          console.log('IndexedDB cleared successfully');
+          // console.log('IndexedDB cleared successfully');
           resolve();
         };
         request.onerror = event => {
-          console.error('IndexedDB clear error:', (event.target as IDBRequest).error);
+          // console.error('IndexedDB clear error:', (event.target as IDBRequest).error);
           reject((event.target as IDBRequest).error);
         };
       });
     } catch (error) {
-      console.error('Failed to clear IndexedDB', error);
+      // console.error('Failed to clear IndexedDB', error);
       throw error;
     }
   }
@@ -218,7 +218,7 @@ export class HistoryService {
       }
       return [];
     } catch (error) {
-      console.error('Error reading history file', error);
+      // console.error('Error reading history file', error);
       return [];
     }
   }
@@ -226,7 +226,7 @@ export class HistoryService {
   private async saveToFile(history: Message[]): Promise<void> {
     const path = this.plugin.settings.notePath;
     if (!path) {
-      console.warn('History file path is not set. Cannot save history to file.');
+      // console.warn('History file path is not set. Cannot save history to file.');
       return;
     }
 
@@ -240,12 +240,12 @@ export class HistoryService {
         const dir = path.substring(0, path.lastIndexOf('/'));
         if (dir && !(await this.plugin.app.vault.adapter.exists(dir))) {
           await this.plugin.app.vault.createFolder(dir);
-          console.log(`Created directory: ${dir}`);
+          // console.log(`Created directory: ${dir}`);
         }
         await this.plugin.app.vault.create(path, content);
       }
     } catch (error) {
-      console.error('Error saving history to file', error);
+      // console.error('Error saving history to file', error);
     }
   }
 
@@ -259,7 +259,7 @@ export class HistoryService {
         await this.plugin.app.vault.modify(file, '[]');
       }
     } catch (error) {
-      console.error('Error clearing history file', error);
+      // console.error('Error clearing history file', error);
     }
   }
 
@@ -278,12 +278,12 @@ export class HistoryService {
         await this.clearFile();
         break;
       default:
-        console.warn(`Unknown history storage method: ${method}`);
+        // console.warn(`Unknown history storage method: ${method}`);
     }
   }
 
   private handleError(context: string, error: unknown): void {
-    console.error(context, error);
+    // console.error(context, error);
     new Notice(`${context}: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 
@@ -292,28 +292,28 @@ export class HistoryService {
       const request = indexedDB.open(IDB_NAME, IDB_VERSION);
 
       request.onupgradeneeded = (event: IDBVersionChangeEvent) => {
-        console.log('IndexedDB upgrade needed');
+        // console.log('IndexedDB upgrade needed');
         const db = (event.target as IDBOpenDBRequest).result;
         if (!db.objectStoreNames.contains(IDB_STORE_NAME)) {
-          console.log(`Creating object store: ${IDB_STORE_NAME}`);
+          // console.log(`Creating object store: ${IDB_STORE_NAME}`);
           db.createObjectStore(IDB_STORE_NAME, { autoIncrement: true });
         }
       };
 
       request.onsuccess = event => {
-        console.log('IndexedDB opened successfully');
+        // console.log('IndexedDB opened successfully');
         resolve((event.target as IDBOpenDBRequest).result);
       };
 
       request.onerror = event => {
-        console.error('IndexedDB error:', (event.target as IDBOpenDBRequest).error);
+        // console.error('IndexedDB error:', (event.target as IDBOpenDBRequest).error);
         reject((event.target as IDBOpenDBRequest).error);
       };
 
       request.onblocked = () => {
-        console.warn(
-          'IndexedDB open blocked, please close other tabs/instances using the database.',
-        );
+        // console.warn(
+        //   'IndexedDB open blocked, please close other tabs/instances using the database.',
+        // );
         reject(new Error('IndexedDB open blocked'));
       };
     });

@@ -23,7 +23,7 @@ export const MessageItem: React.FC<{ message: Message }> = React.memo(({ message
       setIsCopied(true);
       setTimeout(() => setIsCopied(false), 2000);
     } catch (err) {
-      console.error('Error copying:', err);
+      // console.error('Error copying:', err);
       setCopyError(true);
       toast.error(t('copyError', language));
       setTimeout(() => setCopyError(false), 2000);

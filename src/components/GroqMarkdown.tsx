@@ -32,7 +32,7 @@ const CodeBlock = React.memo(({ language, code }: { language: string; code: stri
         timeoutId.current = setTimeout(() => setIsCopied(false), 1500);
       })
       .catch(err => {
-        console.error('Error copying code:', err);
+        // console.error('Error copying code:', err);
         setCopyError(true);
         timeoutId.current = setTimeout(() => setCopyError(false), 1500);
       });

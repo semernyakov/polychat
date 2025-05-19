@@ -53,7 +53,7 @@ export class AuthService {
         return false;
       }
     } catch (error) {
-      console.error('API key validation error:', error);
+      // console.error('API key validation error:', error);
       new Notice('⚠️ API key validation failed');
       return false;
     }

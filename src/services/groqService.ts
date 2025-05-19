@@ -66,7 +66,7 @@ export class GroqService implements GroqServiceMethods {
       );
       return true;
     } catch (error) {
-      console.error('API key validation failed:', error);
+      // console.error('API key validation failed:', error);
       return false;
     }
   }
@@ -180,16 +180,16 @@ export class GroqService implements GroqServiceMethods {
       }));
       // ВРЕМЕННО: логируем все поля моделей для отладки
       if (Array.isArray(data.data)) {
-        console.log('[GroqService] Получено моделей:', data.data.length);
+        // console.log('[GroqService] Получено моделей:', data.data.length);
         data.data.forEach((model: any, idx: number) => {
-          console.log(`[GroqService] Модель #${idx + 1}:`, model);
+          // console.log(`[GroqService] Модель #${idx + 1}:`, model);
         });
       }
       // Сохранение в кэш
       this.modelCache = { models, rateLimits: rl, timestamp: Date.now() };
       return { models, rateLimits: rl };
     } catch (error) {
-      console.error('Error fetching available models:', error);
+      // console.error('Error fetching available models:', error);
       return { models: [], rateLimits: {} };
     }
   }

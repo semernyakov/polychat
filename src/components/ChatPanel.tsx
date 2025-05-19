@@ -97,7 +97,7 @@ const useMessages = (initialMessages: Message[], historyService: any) => {
       setHasLoadedHistory(true);
       toast.success(t('historyCleared'));
     } catch (error) {
-      console.error('Error clearing history:', error);
+      // console.error('Error clearing history:', error);
       toast.error(t('historyClearError'));
     }
   };
@@ -210,7 +210,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
 
       try {
         await plugin.historyService.addMessage(userMessage).catch(err => {
-          console.error('Error saving user message:', err);
+          // console.error('Error saving user message:', err);
           toast.warn(t('messageSaveError'));
         });
 
@@ -219,11 +219,11 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
         setMessages(prev => [...prev, userMessage, assistantMessage]);
 
         await plugin.historyService.addMessage(assistantMessage).catch(err => {
-          console.error('Error saving assistant message:', err);
+          // console.error('Error saving assistant message:', err);
           toast.warn(t('assistantMessageSaveError'));
         });
       } catch (error: any) {
-        console.error('Error sending message:', error);
+        // console.error('Error sending message:', error);
         // Обработка ошибки terms acceptance
         if (
           error?.code === 'model_terms_required' ||
@@ -287,9 +287,9 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
     );
 
     React.useEffect(() => {
-      console.log('[DEBUG] selectedModel:', selectedModel);
-      console.log('[DEBUG] availableModels:', availableModels);
-      console.log('[DEBUG] selectedModelInfo:', selectedModelInfo);
+      // console.log('[DEBUG] selectedModel:', selectedModel);
+      // console.log('[DEBUG] availableModels:', availableModels);
+      // console.log('[DEBUG] selectedModelInfo:', selectedModelInfo);
     }, [selectedModel, availableModels, selectedModelInfo]);
 
     if (!plugin.settings.apiKey) {

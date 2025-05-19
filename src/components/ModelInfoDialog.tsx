@@ -42,7 +42,7 @@ export const ModelInfoDialog: React.FC<ModelInfoDialogProps> = ({
   }, []);
   React.useEffect(() => {
     // Логируем для отладки, чтобы убедиться, что данные приходят актуальные
-    console.log('[ModelInfoDialog] modelInfo:', modelInfo);
+    // console.log('[ModelInfoDialog] modelInfo:', modelInfo);
   }, [modelInfo]);
   if (!isOpen) return null;
 
