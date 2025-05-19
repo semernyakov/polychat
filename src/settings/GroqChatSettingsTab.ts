@@ -18,19 +18,40 @@ export class GroqChatSettingsTab extends PluginSettingTab {
   display(): void {
     const locale = (this.plugin.settings.language || 'ru') as Locale;
     this.containerEl.empty();
+    // --- Красивый заголовок и приветствие ---
+    const title = this.containerEl.createEl('h2', {
+      text: locale === 'ru' ? '🚀 Добро пожаловать в настройки Groq Chat Plugin!' : '🚀 Welcome to Groq Chat Plugin Settings!'
+    });
+    title.style.marginTop = '0.5em';
+    title.style.fontSize = '2em';
+    title.style.fontWeight = 'bold';
+    const subtitle = this.containerEl.createEl('div', {
+      text: locale === 'ru'
+        ? 'Настройте плагин под себя, чтобы общение с ИИ было максимально удобным и приятным! 😊'
+        : 'Make your AI chat experience as friendly and delightful as possible! 😊'
+    });
+    subtitle.style.marginBottom = '1.5em';
+    subtitle.style.fontSize = '1.15em';
+    subtitle.style.color = '#555';
     // --- API ---
-    this.containerEl.createEl('h3', { text: locale === 'ru' ? 'Настройки API' : 'API Settings' });
+    this.containerEl.createEl('h3', { text: locale === 'ru' ? '🔑 Доступ к API' : '🔑 API Access' });
+    // --- Ссылка на получение токена ---
+    const tokenLink = this.containerEl.createEl('div');
+    tokenLink.style.marginBottom = '1em';
+    tokenLink.innerHTML = locale === 'ru'
+      ? 'Получить токен Groq можно на <a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer">официальном сайте Groq API</a>.'
+      : 'You can get your Groq token at the <a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer">official Groq API website</a>.';
     this.addApiKeySetting(locale);
-    // --- Модель ---
-    this.containerEl.createEl('h3', { text: locale === 'ru' ? 'Модель' : 'Model' });
+
+    this.containerEl.createEl('h3', { text: locale === 'ru' ? '🤖 Выбор модели' : '🤖 Model Selection' });
     this.addModelSetting(locale);
     // --- Список моделей (отдельная строка) ---
     this.addModelListBlock(locale);
     // --- История ---
-    this.containerEl.createEl('h3', { text: locale === 'ru' ? 'История' : 'History' });
+    this.containerEl.createEl('h3', { text: locale === 'ru' ? '🕓 История чата' : '🕓 Chat History' });
     this.addHistorySettings(locale);
     // --- Интерфейс ---
-    this.containerEl.createEl('h3', { text: locale === 'ru' ? 'Интерфейс' : 'Interface' });
+    this.containerEl.createEl('h3', { text: locale === 'ru' ? '👀 Интерфейс и язык' : '👀 Interface & Language' });
     // this.addDisplayModeSetting(locale); // Метод отсутствует
     // --- Температура и макс. токены в сетке ---
     const flexGrid = document.createElement('div');
@@ -55,14 +76,14 @@ export class GroqChatSettingsTab extends PluginSettingTab {
     actionsBlock.style.gap = '16px';
     actionsBlock.style.justifyContent = 'flex-end';
     const btnSave = document.createElement('button');
-    btnSave.textContent = locale === 'ru' ? 'Сохранить все настройки' : 'Save all settings';
+    btnSave.textContent = locale === 'ru' ? '✅ Сохранить все настройки' : '✅ Save all settings';
     btnSave.className = 'mod-cta';
     btnSave.onclick = async () => {
       await this.plugin.saveSettings();
       new Notice(locale === 'ru' ? 'Настройки сохранены' : 'Settings saved');
     };
     const btnReset = document.createElement('button');
-    btnReset.textContent = locale === 'ru' ? 'Сбросить настройки по умолчанию' : 'Reset to default';
+    btnReset.textContent = locale === 'ru' ? '♻️ Сбросить настройки по умолчанию' : '♻️ Reset to default';
     btnReset.onclick = async () => {
       if (typeof this.plugin.resetSettingsToDefault === 'function') {
         await this.plugin.resetSettingsToDefault();
@@ -75,6 +96,26 @@ export class GroqChatSettingsTab extends PluginSettingTab {
     actionsBlock.appendChild(btnSave);
     actionsBlock.appendChild(btnReset);
     this.containerEl.appendChild(actionsBlock);
+
+    // --- Блок благодарности автору ---
+    const thanksBlock = this.containerEl.createEl('div');
+    thanksBlock.style.margin = '2em 0 1em 0';
+    thanksBlock.style.padding = '1em';
+    thanksBlock.style.borderRadius = '8px';
+    thanksBlock.style.textAlign = 'center';
+    thanksBlock.style.transition = 'background 0.3s, color 0.3s';
+    thanksBlock.style.background = 'linear-gradient(90deg, var(--background-modifier-box-hover, #f2f3f5) 0%, var(--background-secondary, #fcb69f) 100%)';
+    thanksBlock.style.color = 'var(--text-normal, #222)';
+    thanksBlock.style.border = '1px solid var(--background-modifier-border, #ddd)';
+    // адаптация для темной темы
+    if (document.body.classList.contains('theme-dark')) {
+      thanksBlock.style.background = 'linear-gradient(90deg, var(--background-secondary, #23272e) 0%, #3a3f4b 100%)';
+      thanksBlock.style.color = 'var(--text-normal, #eee)';
+      thanksBlock.style.border = '1px solid var(--background-modifier-border, #333)';
+    }
+    thanksBlock.innerHTML = locale === 'ru'
+      ? 'Спасибо за использование Groq Chat Plugin! <br> Вы можете <a href="https://yoomoney.ru/fundraise/194GT5A5R07.250321" target="_blank" rel="noopener noreferrer">поддержать разработку на YooMoney</a> <br> <a href="https://github.com/semernyakov" target="_blank" rel="noopener noreferrer">Оставить отзыв на Github</a> или <a href="https://t.me/semernyakov" target="_blank" rel="noopener noreferrer"> или связаться со мной в Telegram</a> ❤️'
+      : 'Thank you for using Groq Chat Plugin! <br> You can <a href="https://yoomoney.ru/fundraise/194GT5A5R07.250321" target="_blank" rel="noopener noreferrer">support the author on YooMoney</a> <br> <a href="https://github.com/semernyakov" target="_blank" rel="noopener noreferrer">Leave a review on Github</a> or <a href="https://t.me/semernyakov" target="_blank" rel="noopener noreferrer">contact me in Telegram</a> ❤️';
   }
 
   private createTemperatureSetting(locale: Locale): HTMLElement {

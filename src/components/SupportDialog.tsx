@@ -8,6 +8,34 @@ interface SupportDialogProps {
   supportLink?: string;
 }
 
+// Красивый блок благодарности с темизацией
+const SupportThanksBlock: React.FC = () => {
+  const locale = (window.localStorage.getItem('groq-chat-locale') || 'ru') as 'ru' | 'en';
+  // Определяем тему Obsidian
+  const isDark = document.body.classList.contains('theme-dark');
+  const style: React.CSSProperties = {
+    margin: '2em 0 1em 0',
+    padding: '1em',
+    borderRadius: '8px',
+    textAlign: 'center',
+    transition: 'background 0.3s, color 0.3s',
+    background: isDark
+      ? 'linear-gradient(90deg, var(--background-secondary, #23272e) 0%, #3a3f4b 100%)'
+      : 'linear-gradient(90deg, var(--background-modifier-box-hover, #f2f3f5) 0%, var(--background-secondary, #fcb69f) 100%)',
+    color: isDark ? 'var(--text-normal, #eee)' : 'var(--text-normal, #222)',
+    border: isDark
+      ? '1px solid var(--background-modifier-border, #333)'
+      : '1px solid var(--background-modifier-border, #ddd)'
+  };
+  return (
+    <div style={style}>
+      {locale === 'ru'
+        ? (<span>Спасибо за использование Groq Chat Plugin! <br/>Вы можете <a href="https://yoomoney.ru/fundraise/194GT5A5R07.250321" target="_blank" rel="noopener noreferrer">поддержать разработку на YooMoney</a> <br/>или <a href="https://github.com/semernyakov" target="_blank" rel="noopener noreferrer">оставить отзыв</a> или <a href="https://t.me/semernyakov" target="_blank" rel="noopener noreferrer">связаться со мной в Telegram</a> 💖</span>)
+        : (<span>Thank you for using Groq Chat Plugin! <br/>You can <a href="https://yoomoney.ru/fundraise/194GT5A5R07.250321" target="_blank" rel="noopener noreferrer">support the author on YooMoney</a> and also <a href="https://github.com/semernyakov" target="_blank" rel="noopener noreferrer">leave a review</a> or <a href="https://t.me/semernyakov" target="_blank" rel="noopener noreferrer">contact me in Telegram</a> 💖</span>)}
+    </div>
+  );
+};
+
 export const SupportDialog: React.FC<SupportDialogProps> = ({
   isOpen,
   onClose,
@@ -78,7 +106,8 @@ export const SupportDialog: React.FC<SupportDialogProps> = ({
             ускорить разработку, добавить новые функции и поддерживать проект в актуальном
             состоянии. Спасибо за использование!
           </p>
-          {/* Можно добавить QR код или другие способы поддержки */}
+          {/* Красивый блок благодарности, как в настройках */}
+          <SupportThanksBlock />
         </div>
 
         <div className="groq-dialog-actions">

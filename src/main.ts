@@ -34,7 +34,7 @@ export default class GroqChatPlugin extends Plugin implements GroqPluginInterfac
 
   private initializeServices(): void {
     this.groqService = new GroqService(this);
-    this.authService = new AuthService();
+    this.authService = new AuthService(this.groqService, this);
     this.historyService = new HistoryService(this);
   }
 

@@ -1,22 +1,57 @@
 import { Notice } from 'obsidian';
 
 export class AuthService {
-  constructor() {}
+  private apiKeyIsSet: boolean = false;
+  private apiKey: string | null = null;
 
-  get isAuthenticated(): boolean {
-    return this.validateApiKeyFormat('');
+  // Теперь принимаем plugin с методами saveData/loadData
+  constructor(
+    private readonly groqService: { validateApiKey: (apiKey: string) => Promise<boolean> },
+    private readonly plugin: { saveData: (data: any) => Promise<void>; loadData: () => Promise<any> }
+  ) {
+    if (!groqService || typeof groqService.validateApiKey !== 'function') {
+      throw new Error('groqService with validateApiKey(apiKey) must be provided to AuthService');
+    }
+    if (!plugin || typeof plugin.saveData !== 'function' || typeof plugin.loadData !== 'function') {
+      throw new Error('plugin with saveData/loadData methods must be provided to AuthService');
+    }
   }
 
+  get isAuthenticated(): boolean {
+    return this.apiKeyIsSet;
+  }
+
+  /**
+   * Загрузка сохранённого API-ключа при инициализации
+   */
+  async loadApiKey(): Promise<void> {
+    const data = await this.plugin.loadData();
+    if (data?.apiKey) {
+      this.apiKey = data.apiKey;
+      this.apiKeyIsSet = true;
+    } else {
+      this.apiKey = null;
+      this.apiKeyIsSet = false;
+    }
+  }
+
+  /**
+   * Validate API key format and then via GroqService
+   */
   async validateApiKey(apiKey: string): Promise<boolean> {
     if (!this.validateApiKeyFormat(apiKey)) {
-      new Notice('❌ Неверный формат API ключа');
+      new Notice('❌ Invalid API key format');
       return false;
     }
-
     try {
-      const isValid = await this.validateApiKey(apiKey);
-      new Notice(isValid ? '✅ Valid API key' : '❌ Invalid API key');
-      return isValid;
+      const isValid = await this.groqService.validateApiKey(apiKey);
+      if (isValid) {
+        new Notice('✅ Valid API key');
+        return true;
+      } else {
+        new Notice('❌ Invalid API key');
+        return false;
+      }
     } catch (error) {
       console.error('API key validation error:', error);
       new Notice('⚠️ API key validation failed');
@@ -29,14 +64,24 @@ export class AuthService {
       await this.clearApiKey();
       return;
     }
-
-    if (await this.validateApiKey(apiKey)) {
-      this.clearApiKey();
+    const isValid = await this.validateApiKey(apiKey);
+    if (isValid) {
+      await this.plugin.saveData({ apiKey });
+      this.apiKey = apiKey;
+      this.apiKeyIsSet = true;
+      new Notice('API key set successfully.');
+      return;
+    } else {
+      this.apiKeyIsSet = false;
+      this.apiKey = null;
       return;
     }
   }
 
   async clearApiKey(): Promise<void> {
+    await this.plugin.saveData({ apiKey: null });
+    this.apiKeyIsSet = false;
+    this.apiKey = null;
     new Notice('API key cleared');
   }
 
@@ -44,11 +89,9 @@ export class AuthService {
     if (!apiKey) {
       return false;
     }
-
     if (!/^gsk_[a-zA-Z0-9]{32,}$/.test(apiKey)) {
       return false;
     }
-
     return true;
   }
 }
