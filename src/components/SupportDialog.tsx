@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { FiExternalLink } from 'react-icons/fi';
 import '../styles.css'; // Используем единый style.css
+import { t, tHtml } from '../localization';
 
 interface SupportDialogProps {
   isOpen: boolean;
@@ -25,13 +26,11 @@ const SupportThanksBlock: React.FC = () => {
     color: isDark ? 'var(--text-normal, #eee)' : 'var(--text-normal, #222)',
     border: isDark
       ? '1px solid var(--background-modifier-border, #333)'
-      : '1px solid var(--background-modifier-border, #ddd)'
+      : '1px solid var(--background-modifier-border, #ddd)',
   };
   return (
     <div style={style}>
-      {locale === 'ru'
-        ? (<span>Спасибо за использование PolyChat Plugin! <br/>Вы можете <a href="https://yoomoney.ru/fundraise/194GT5A5R07.250321" target="_blank" rel="noopener noreferrer">поддержать разработку на YooMoney</a> <br/>или <a href="https://github.com/semernyakov" target="_blank" rel="noopener noreferrer">оставить отзыв</a> или <a href="https://t.me/semernyakov" target="_blank" rel="noopener noreferrer">связаться со мной в Telegram</a> 💖</span>)
-        : (<span>Thank you for using PolyChat Plugin! <br/>You can <a href="https://yoomoney.ru/fundraise/194GT5A5R07.250321" target="_blank" rel="noopener noreferrer">support the author on YooMoney</a> and also <a href="https://github.com/semernyakov" target="_blank" rel="noopener noreferrer">leave a review</a> or <a href="https://t.me/semernyakov" target="_blank" rel="noopener noreferrer">contact me in Telegram</a> 💖</span>)}
+      <span dangerouslySetInnerHTML={tHtml('supportDialogThanks')} />
     </div>
   );
 };
@@ -90,22 +89,18 @@ export const SupportDialog: React.FC<SupportDialogProps> = ({
       {/* Предотвращаем закрытие при клике на сам диалог */}
       <div className="groq-support-dialog" onClick={e => e.stopPropagation()}>
         <div className="groq-dialog-header">
-          <h3>Поддержать разработку</h3>
+          <h3>{t('supportDialogTitle')}</h3>
           <button
             onClick={onClose}
             className="groq-dialog-close groq-icon-button" // Общий стиль для иконок-кнопок
-            aria-label="Закрыть"
+            aria-label={t('supportDialogClose')}
           >
             × {/* Можно заменить иконкой FiX */}
           </button>
         </div>
 
         <div className="groq-dialog-content">
-          <p>
-            Этот плагин разрабатывается энтузиастом в свободное время. Ваша поддержка поможет
-            ускорить разработку, добавить новые функции и поддерживать проект в актуальном
-            состоянии. Спасибо за использование!
-          </p>
+          <p dangerouslySetInnerHTML={tHtml('supportDialogContent')} />
           {/* Красивый блок благодарности, как в настройках */}
           <SupportThanksBlock />
         </div>
@@ -118,10 +113,10 @@ export const SupportDialog: React.FC<SupportDialogProps> = ({
             rel="noopener noreferrer"
             className="groq-button groq-button--primary groq-support-button"
           >
-            <FiExternalLink /> Перейти к поддержке
+            <FiExternalLink /> {t('supportDialogGoToSupport')}
           </a>
           <button onClick={onClose} className="groq-button groq-dialog-secondary-button">
-            Закрыть
+            {t('supportDialogClose')}
           </button>
         </div>
       </div>

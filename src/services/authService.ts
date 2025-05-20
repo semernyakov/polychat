@@ -7,7 +7,10 @@ export class AuthService {
   // Теперь принимаем plugin с методами saveData/loadData
   constructor(
     private readonly groqService: { validateApiKey: (apiKey: string) => Promise<boolean> },
-    private readonly plugin: { saveData: (data: any) => Promise<void>; loadData: () => Promise<any> }
+    private readonly plugin: {
+      saveData: (data: any) => Promise<void>;
+      loadData: () => Promise<any>;
+    },
   ) {
     if (!groqService || typeof groqService.validateApiKey !== 'function') {
       throw new Error('groqService with validateApiKey(apiKey) must be provided to AuthService');
@@ -53,7 +56,7 @@ export class AuthService {
         return false;
       }
     } catch (error) {
-      // console.error('API key validation error:', error);
+      console.error('API key validation error:', error);
       new Notice('⚠️ API key validation failed');
       return false;
     }

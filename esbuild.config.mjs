@@ -67,7 +67,12 @@ const copyFilesPlugin = {
         const stylesCssDest = path.join(rootDir, 'styles.css');
         await fs.copyFile(stylesCssSource, stylesCssDest);
         console.log(`✅  ${path.basename(stylesCssDest)} скопирован в корень проекта.`);
-      } catch (err) {
+
+				const manifestSource = path.join(rootDir, 'manifest.json');
+        const manifestDest = path.join(distDir, 'manifest.json');
+        await fs.copyFile(manifestSource, manifestDest);
+        console.log(`✅  ${path.basename(manifestDest)} скопирован в директорию dist.`);
+			} catch (err) {
         console.error('❌  Ошибка при копировании собранных файлов в корень:', err);
       }
     });

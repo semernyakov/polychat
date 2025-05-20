@@ -32,7 +32,7 @@ const CodeBlock = React.memo(({ language, code }: { language: string; code: stri
         timeoutId.current = setTimeout(() => setIsCopied(false), 1500);
       })
       .catch(err => {
-        // console.error('Error copying code:', err);
+        console.error('Error copying code:', err);
         setCopyError(true);
         timeoutId.current = setTimeout(() => setCopyError(false), 1500);
       });
@@ -106,9 +106,7 @@ const customComponents = {
   code: CodeRenderer,
   p({ node, children, ...props }: { node?: any; children?: any; [key: string]: any }) {
     const childArray = React.Children.toArray(children);
-    const hasDiv = childArray.some(
-      child => React.isValidElement(child) && child.type === 'div'
-    );
+    const hasDiv = childArray.some(child => React.isValidElement(child) && child.type === 'div');
     if (hasDiv) {
       return <>{children}</>;
     }
@@ -124,8 +122,7 @@ const customComponents = {
       typeof firstMeaningfulChild === 'object' &&
       firstMeaningfulChild.props &&
       firstMeaningfulChild.type &&
-      ((typeof firstMeaningfulChild.type === 'object' &&
-        'mdxType' in firstMeaningfulChild.type) ||
+      ((typeof firstMeaningfulChild.type === 'object' && 'mdxType' in firstMeaningfulChild.type) ||
         typeof firstMeaningfulChild.type === 'function');
 
     if (containsSingleBlock) {

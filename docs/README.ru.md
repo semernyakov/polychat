@@ -6,9 +6,10 @@
 [![Тесты](https://img.shields.io/github/actions/workflow/status/semernyakov/polychat/ci.yml?branch=master&style=flat-square&label=тесты)](https://github.com/semernyakov/polychat/actions/workflows/ci.yml)
 [![NPM](https://img.shields.io/npm/v/groq-chat-plugin?style=flat-square&label=npm)](https://www.npmjs.com/package/groq-chat-plugin)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa?style=flat-square)](../CODE_OF_CONDUCT.md)
+
 <!-- [![Покрытие](https://img.shields.io/codecov/c/github/semernyakov/groq-chat-plugin?style=flat-square&label=покрытие)](https://codecov.io/gh/semernyakov/groq-chat-plugin) -->
 
-[English version](README.md) | 
+[English version](README.md) |
 [Документация](https://semernyakov.github.io/groq-chat-plugin/ru/)
 
 Плагин для [Obsidian](https://obsidian.md), который интегрирует возможности чата с AI от Groq прямо в ваши заметки.
@@ -250,6 +251,7 @@ MIT License. См. файл [LICENSE](LICENSE) для подробностей.
 ## 💸 Поддержать разработчика
 
 Если проект вам полезен, поддержите развитие через YooMoney:
+
 - [YooMoney](https://yoomoney.ru/fundraise/194GT5A5R07.250321)
 
 ## 🙏 Благодарности
@@ -266,8 +268,7 @@ MIT License. См. файл [LICENSE](LICENSE) для подробностей.
 
 ## 🎮 Демо
 
-
 ---
 
 Создано с ❤️ для сообщества Obsidian, [
-   поддержка автора](https://yoomoney.ru/fundraise/194GT5A5R07.250321)
+поддержка автора](https://yoomoney.ru/fundraise/194GT5A5R07.250321)

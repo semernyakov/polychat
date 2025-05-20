@@ -1,6 +1,7 @@
 # Changelog
 
 ## Highlights of v1.2.6
+
 - Dynamic model updates, always up-to-date
 - Support for new models (Vision, Coder, DeepSeek, and more)
 - Improved ModelInfo dialog
@@ -10,6 +11,7 @@
 - Documentation streamlined and updated
 
 ## Plans
+
 - Automated tests are planned to improve stability and quality
 - Support for models working with audio files and images (audio/vision) is planned
 
@@ -21,14 +23,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.3.2] - 2025-05-19
 
 ### Added
+
 - Minor improvements and optimizations for stability and performance.
 - Updated dependencies and compatibility with latest Obsidian versions.
 - UI/UX enhancements and localization updates.
 
 ### Fixed
+
 - Bugfixes and minor corrections based on user feedback.
 
 ### Changed
+
 - Documentation updates and code cleanup.
 - Плагин переименован в PolyChat (ранее Groq Chat)
 - Все ссылки обновлены на новый репозиторий: https://github.com/semernyakov/polychat
@@ -44,14 +49,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Localized interface (English/Russian) for all user-facing strings.
 
 ## [1.2.6] - 2025-04-26
+
 ### Added
+
 - Dynamic model updates: models list and info now refresh in real-time without reloading the plugin.
 - General improvements and code optimizations for stability and performance.
 
 ## [1.2.5] - 2025-04-26
+
 ## [1.2.4] - 2025-03-18
+
 ## [1.2.3] - 2025-03-18
+
 **Internal releases:**
+
 - Refactoring of codebase and project structure.
 - Documentation updates and localization improvements.
 - Improvements to release workflow and CI/CD processes.

@@ -66,7 +66,7 @@ export class GroqService implements GroqServiceMethods {
       );
       return true;
     } catch (error) {
-      // console.error('API key validation failed:', error);
+      console.error('API key validation failed:', error);
       return false;
     }
   }
@@ -88,8 +88,8 @@ export class GroqService implements GroqServiceMethods {
           messages: [
             {
               role: 'user',
-              content: content
-            }
+              content: content,
+            },
           ],
           temperature: this.plugin.settings.temperature,
           max_tokens: Math.min(this.plugin.settings.maxTokens, this.getModelMaxTokens(model)),
@@ -174,7 +174,8 @@ export class GroqService implements GroqServiceMethods {
         name: m.name || m.id,
         description: m.description || '',
         developer: { name: m.owned_by || '—' },
-        maxTokens: typeof m.max_completion_tokens === 'number' ? m.max_completion_tokens : undefined,
+        maxTokens:
+          typeof m.max_completion_tokens === 'number' ? m.max_completion_tokens : undefined,
         active: typeof m.active === 'boolean' ? m.active : undefined,
         releaseStatus: m.release_status || m.releaseStatus || undefined,
       }));
@@ -189,7 +190,7 @@ export class GroqService implements GroqServiceMethods {
       this.modelCache = { models, rateLimits: rl, timestamp: Date.now() };
       return { models, rateLimits: rl };
     } catch (error) {
-      // console.error('Error fetching available models:', error);
+      console.error('Error fetching available models:', error);
       return { models: [], rateLimits: {} };
     }
   }

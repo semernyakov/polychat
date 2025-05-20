@@ -15,11 +15,7 @@ export class GroqChatView extends ItemView {
   private messages: Message[] = [];
   private plugin: GroqPluginInterface;
 
-  constructor(
-    leaf: WorkspaceLeaf,
-    plugin: GroqPluginInterface,
-    state?: GroqChatViewState,
-  ) {
+  constructor(leaf: WorkspaceLeaf, plugin: GroqPluginInterface, state?: GroqChatViewState) {
     super(leaf);
     this.plugin = plugin;
     this.messages = state?.messages || [];

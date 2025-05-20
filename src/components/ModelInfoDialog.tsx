@@ -51,7 +51,11 @@ export const ModelInfoDialog: React.FC<ModelInfoDialogProps> = ({
       <div className="groq-support-dialog">
         <div className="groq-dialog-header">
           <h3>{t('modelInfo')}</h3>
-          <button onClick={onClose} className="groq-dialog-close groq-icon-button" title={t('close')}>
+          <button
+            onClick={onClose}
+            className="groq-dialog-close groq-icon-button"
+            title={t('close')}
+          >
             <FiX size={16} />
           </button>
         </div>
@@ -76,23 +80,35 @@ export const ModelInfoDialog: React.FC<ModelInfoDialogProps> = ({
               {typeof modelInfo.created === 'number' && (
                 <div className="groq-model-info__detail">
                   <span className="groq-model-info__label">{t('releaseDate')}:</span>
-                  <span className="groq-model-info__value">{new Date(modelInfo.created * 1000).toISOString().slice(0, 10)}</span>
+                  <span className="groq-model-info__value">
+                    {new Date(modelInfo.created * 1000).toISOString().slice(0, 10)}
+                  </span>
                 </div>
               )}
               {typeof modelInfo.updated === 'number' && (
                 <div className="groq-model-info__detail">
                   <span className="groq-model-info__label">{t('actualDate')}:</span>
-                  <span className="groq-model-info__value">{new Date(modelInfo.updated * 1000).toISOString().slice(0, 10)}</span>
+                  <span className="groq-model-info__value">
+                    {new Date(modelInfo.updated * 1000).toISOString().slice(0, 10)}
+                  </span>
                 </div>
               )}
               <div className="groq-model-info__detail">
                 <span className="groq-model-info__label">{t('maxTokens')}:</span>
-                <span className="groq-model-info__value">{typeof modelInfo.maxTokens === 'number' ? modelInfo.maxTokens : '—'}</span>
+                <span className="groq-model-info__value">
+                  {typeof modelInfo.maxTokens === 'number' ? modelInfo.maxTokens : '—'}
+                </span>
               </div>
               {modelInfo.releaseStatus && (
                 <div className="groq-model-info__detail">
                   <span className="groq-model-info__label">{t('releaseStatus')}:</span>
-                  <span className="groq-model-info__value">{modelInfo.releaseStatus === 'main' ? 'Основная' : modelInfo.releaseStatus === 'preview' ? 'Предварительная' : modelInfo.releaseStatus}</span>
+                  <span className="groq-model-info__value">
+                    {modelInfo.releaseStatus === 'main'
+                      ? 'Основная'
+                      : modelInfo.releaseStatus === 'preview'
+                        ? 'Предварительная'
+                        : modelInfo.releaseStatus}
+                  </span>
                 </div>
               )}
             </div>

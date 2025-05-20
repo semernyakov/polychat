@@ -59,7 +59,6 @@ interface ModelInfo {
   maxFileSize?: number;
 }
 
-
 // Хук для управления сообщениями
 const useMessages = (initialMessages: Message[], historyService: any) => {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
@@ -97,7 +96,7 @@ const useMessages = (initialMessages: Message[], historyService: any) => {
       setHasLoadedHistory(true);
       toast.success(t('historyCleared'));
     } catch (error) {
-      // console.error('Error clearing history:', error);
+      console.error('Error clearing history:', error);
       toast.error(t('historyClearError'));
     }
   };
@@ -125,7 +124,6 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
       return initialModels[0]?.id || GroqModel.LLAMA3_70B;
     };
     const [selectedModel, setSelectedModel] = useState<string>(getInitialModel());
-
 
     // Если выбранная модель исчезла из списка, сбрасываем на первую доступную
     // Если выбранная модель исчезла из списка, сбрасываем на первую доступную
@@ -210,7 +208,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
 
       try {
         await plugin.historyService.addMessage(userMessage).catch(err => {
-          // console.error('Error saving user message:', err);
+          console.error('Error saving user message:', err);
           toast.warn(t('messageSaveError'));
         });
 
@@ -219,11 +217,11 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
         setMessages(prev => [...prev, userMessage, assistantMessage]);
 
         await plugin.historyService.addMessage(assistantMessage).catch(err => {
-          // console.error('Error saving assistant message:', err);
+          console.error('Error saving assistant message:', err);
           toast.warn(t('assistantMessageSaveError'));
         });
       } catch (error: any) {
-        // console.error('Error sending message:', error);
+        console.error('Error sending message:', error);
         // Обработка ошибки terms acceptance
         if (
           error?.code === 'model_terms_required' ||
@@ -233,12 +231,14 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
           toast.error(
             t('termsRequired', locale) +
               `\n${error?.message || ''}\n` +
-              t('acceptTermsHere', locale) + `: ` + link,
-            { autoClose: false }
+              t('acceptTermsHere', locale) +
+              `: ` +
+              link,
+            { autoClose: false },
           );
           const errorMessage = MessageUtils.create(
             'assistant',
-            `${t('termsRequired', locale)}\n${error?.message || ''}\n${t('acceptTermsHere', locale)}: ${link}`
+            `${t('termsRequired', locale)}\n${error?.message || ''}\n${t('acceptTermsHere', locale)}: ${link}`,
           );
           setMessages(prev => [...prev, userMessage, errorMessage]);
           setIsLoading(false);
@@ -302,7 +302,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
       <div className={`groq-container groq-chat groq-chat--${displayMode}`} ref={containerRef}>
         <div className="groq-chat__header">
           <div className="groq-chat__header-left">
-             <ModelSelector
+            <ModelSelector
               plugin={plugin}
               selectedModel={selectedModel}
               onSelectModel={handleModelChange}

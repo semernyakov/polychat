@@ -10,8 +10,6 @@ interface DynamicModelInfo {
   description?: string;
 }
 
-
-
 export interface ModelSelectorProps {
   plugin: GroqPluginInterface;
   selectedModel: string;
@@ -49,11 +47,9 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
               ),
             )
           : models;
-        setAvailableModels(
-          activeModels.map((m: any) => ({ ...m })),
-        );
+        setAvailableModels(activeModels.map((m: any) => ({ ...m })));
       } catch (error) {
-        // console.error('Failed to fetch available models:', error);
+        console.error('Failed to fetch available models:', error);
         setAvailableModels([]);
         toast.error('Не удалось загрузить список доступных моделей.'); // Добавляем toast
       } finally {

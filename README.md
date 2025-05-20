@@ -6,6 +6,7 @@
 [![Tests](https://img.shields.io/github/actions/workflow/status/semernyakov/polychat/ci.yml?branch=master&style=flat-square)](https://github.com/semernyakov/polychat/actions/workflows/ci.yml)
 [![NPM](https://img.shields.io/npm/v/groq-chat-plugin?style=flat-square)](https://www.npmjs.com/package/groq-chat-plugin)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa?style=flat-square)](code_of_conduct.md)
+
 <!-- [![Coverage](https://img.shields.io/codecov/c/github/semernyakov/groq-chat-plugin?style=flat-square)](https://codecov.io/gh/semernyakov/groq-chat-plugin) -->
 
 [Русская версия](README.ru.md) | [English version](README.md)
@@ -33,7 +34,6 @@ A plugin for [Obsidian](https://obsidian.md) that integrates Groq's AI chat capa
 ## Project Status
 
 This project is actively maintained and developed. New features are added regularly, including dynamic model updates, vision/coder/audio support, and improved UI/UX. Automated tests and advanced model integrations (audio/image) are planned. Feedback and contributions are welcome!
-
 
 ### Supported Models (Current List)
 
@@ -83,7 +83,6 @@ This project is actively maintained and developed. New features are added regula
 4. Start chatting with AI (text, code, or images)
 5. Use `/` commands for extra features (clear, settings, etc.)
 6. View model info any time via the Model Info Dialog
-
 
 ## Development
 

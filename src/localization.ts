@@ -5,6 +5,13 @@ export const defaultLocale: Locale = 'en';
 
 export const translations: Record<Locale, Record<string, string>> = {
   ru: {
+    supportDialogTitle: 'Поддержать разработку',
+    supportDialogClose: 'Закрыть',
+    supportDialogContent:
+      'Этот плагин разрабатывается энтузиастом в свободное время. Ваша поддержка поможет ускорить разработку, добавить новые функции и поддерживать проект в актуальном состоянии. Спасибо за использование!',
+    supportDialogThanks:
+      'Спасибо за использование PolyChat Plugin! <br> Вы можете <a href="https://yoomoney.ru/fundraise/194GT5A5R07.250321" target="_blank" rel="noopener noreferrer">поддержать разработку на YooMoney</a> <br> <a href="https://github.com/semernyakov" target="_blank" rel="noopener noreferrer">Оставить отзыв на Github</a> или <a href="https://t.me/semernyakov" target="_blank" rel="noopener noreferrer"> или связаться со мной в Telegram</a> ❤️',
+    supportDialogGoToSupport: 'Перейти к поддержке',
     language: 'Язык',
     save: 'Сохранить',
     cancel: 'Сбросить',
@@ -72,6 +79,13 @@ export const translations: Record<Locale, Record<string, string>> = {
     symbolsTokens: 'символы/токены',
   },
   en: {
+    supportDialogTitle: 'Support development',
+    supportDialogClose: 'Close',
+    supportDialogContent:
+      'This plugin is developed by an enthusiast in their free time. Your support will help accelerate development, add new features, and maintain the project in an up-to-date state. Thank you for using it!',
+    supportDialogThanks:
+      'Thank you for using PolyChat Plugin! <br> You can <a href="https://yoomoney.ru/fundraise/194GT5A5R07.250321" target="_blank" rel="noopener noreferrer">support the author on YooMoney</a> <br> <a href="https://github.com/semernyakov" target="_blank" rel="noopener noreferrer">Leave a review on Github</a> or <a href="https://t.me/semernyakov" target="_blank" rel="noopener noreferrer">contact with author in Telegram</a> ❤️',
+    supportDialogGoToSupport: 'Go to support',
     language: 'Language',
     save: 'Save',
     cancel: 'Reset',
@@ -141,4 +155,9 @@ export const translations: Record<Locale, Record<string, string>> = {
 
 export function t(key: string, locale: Locale = defaultLocale): string {
   return translations[locale][key] || key;
+}
+
+export function tHtml(key: string, locale: Locale = defaultLocale): { __html: string } {
+  const translation = translations[locale][key];
+  return { __html: translation || key };
 }
