@@ -20,6 +20,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.4] - 2025-05-20
+
+### Added
+
+- Enhanced error handling and logging
+- Improved localization support
+- Added proper translations for all UI elements
+- Updated package name to groq-poly-chat
+- Added better error messages and user notifications
+
+### Changed
+
+- Updated package name in all configuration files
+- Improved UI consistency in different languages
+- Enhanced error logging for better debugging
+
 ## [1.3.2] - 2025-05-19
 
 ### Added
