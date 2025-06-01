@@ -1,24 +1,48 @@
 # Changelog
 
-## Highlights of v1.2.6
+## [1.3.5] - 2025-06-01
 
-- Dynamic model updates, always up-to-date
-- Support for new models (Vision, Coder, DeepSeek, and more)
-- Improved ModelInfo dialog
-- Vision/coder model support
-- Minimalist Code of Conduct and Contributing (bilingual)
-- YooMoney for supporting the author
-- Documentation streamlined and updated
+### Fixed
+- **ModelInfoDialog**:
+  - Removed duplicate instance from ChatPanel
+  - Enhanced model change tracking
+  - Improved state management and reliability
+  - Fixed TypeScript errors and improved type safety
+  - Added proper key prop for re-renders
 
-## Plans
+### Security
+- Replaced all `innerHTML` usages with secure DOM API methods
+- Updated network requests to use Obsidian's `requestUrl` for cross-platform compatibility
 
-- Automated tests are planned to improve stability and quality
-- Support for models working with audio files and images (audio/vision) is planned
+### Refactored
+- **Code Organization**:
+  - Moved all inline styles to CSS files
+  - Implemented CSS variables for theming
+  - Added consistent class naming conventions
+  - Improved theme support
 
-All notable changes to this project will be documented in this file.
+### Changed
+- **Settings UI**:
+  - Moved table styles to CSS
+  - Improved theme support in settings
+  - Enhanced accessibility with proper semantic HTML
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+### Added
+- New utility: `src/utils/domUtils.ts`
+- Comprehensive CSS classes for better maintainability
+- Improved error handling and user feedback
+
+### Performance
+- Reduced JavaScript bundle size
+- Improved rendering performance
+- Optimized style recalculations
+
+### Build
+- Updated project dependencies
+- Optimized build configuration
+- Improved TypeScript configuration
+
+**Note:** This release includes significant refactoring with 15 files changed, 1,667 insertions, and 345 deletions.
 
 ## [1.3.4] - 2025-05-20
 
