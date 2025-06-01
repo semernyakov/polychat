@@ -2,7 +2,7 @@
   {
     "id": "groq-poly-chat",
     "name": "PolyChat",
-    "version": "1.3.4",
+    "version": "1.3.5",
     "author": "Ivan Semernyakov",
     "description": "PolyChat is a powerful chat extension with support for AI models via the Groq API. Designed for flexibility and ease of use, it enables seamless communication with multiple models directly from your vault.",
     "repo": "https://github.com/semernyakov/polychat",
