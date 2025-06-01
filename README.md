@@ -4,8 +4,8 @@
 [![Downloads](https://img.shields.io/github/downloads/semernyakov/polychat/total?style=flat-square)](https://github.com/semernyakov/polychat/releases)
 [![License](https://img.shields.io/github/license/semernyakov/polychat?style=flat-square)](LICENSE)
 [![Tests](https://img.shields.io/github/actions/workflow/status/semernyakov/polychat/ci.yml?branch=master&style=flat-square)](https://github.com/semernyakov/polychat/actions/workflows/ci.yml)
-[![NPM](https://img.shields.io/npm/v/groq-chat-plugin?style=flat-square)](https://www.npmjs.com/package/groq-chat-plugin)
-[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa?style=flat-square)](code_of_conduct.md)
+[![NPM](https://img.shields.io/npm/v/groq-poly-chat?style=flat-square)](https://www.npmjs.com/package/groq-poly-chat)
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa?style=flat-square)](CODE_OF_CONDUCT.md)
 
 <!-- [![Coverage](https://img.shields.io/codecov/c/github/semernyakov/groq-chat-plugin?style=flat-square)](https://codecov.io/gh/semernyakov/groq-chat-plugin) -->
 
