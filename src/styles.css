@@ -607,6 +607,172 @@
 
 /* --- Таблицы и лимиты --- */
 .groq-models-table,
+/* Settings Tab Styles */
+.groq-settings-title {
+  margin-top: 0.5em;
+  font-size: 2em;
+  font-weight: bold;
+}
+
+.groq-settings-subtitle {
+  margin-bottom: 1.5em;
+  font-size: 1.15em;
+  color: var(--text-muted);
+}
+
+.groq-settings-token-link {
+  margin-bottom: 1em;
+}
+
+/* Settings Tab Components */
+.groq-settings-flex-grid {
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+}
+
+.groq-settings-flex-item {
+  flex: 1;
+}
+
+.groq-settings-actions {
+  margin: 32px 0 0 0;
+  display: flex;
+  gap: 16px;
+  justify-content: flex-end;
+}
+
+.groq-thanks-spacer {
+  height: 32px;
+}
+
+.groq-thanks-block {
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 8px;
+  background-color: var(--background-modifier-hover);
+  font-size: 0.9em;
+  line-height: 1.5;
+}
+
+.groq-settings-thanks {
+  margin: 2em 0 1em 0;
+  padding: 1em;
+  border-radius: 8px;
+  text-align: center;
+  transition: background 0.3s, color 0.3s;
+  background: linear-gradient(90deg, var(--background-modifier-box-hover, #f2f3f5) 0%, var(--background-secondary, #fcb69f) 100%);
+  color: var(--text-normal, #222);
+  border: 1px solid var(--background-modifier-border, #ddd);
+}
+
+.theme-dark .groq-settings-thanks {
+  background: linear-gradient(90deg, var(--background-modifier-box-hover, #2a2a2a) 0%, var(--background-secondary, #3a3a3a) 100%);
+  color: var(--text-normal, #eee);
+  border: 1px solid var(--background-modifier-border, #333);
+}
+
+.groq-saved-icon {
+  color: #3cb371;
+  margin-left: 8px;
+  font-weight: bold;
+  font-size: 16px;
+  transition: opacity 0.5s;
+}
+
+.groq-models-select-all {
+  margin: 8px 0 8px 0;
+  display: flex;
+  gap: 8px;
+}
+
+.groq-models-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin: 24px 0 24px 0;
+}
+
+.groq-model-toggle {
+  transform: scale(1.2);
+}
+
+/* Message Item Styles */
+.groq-message__copy-error {
+  color: var(--text-error);
+}
+
+/* Message List Styles */
+.groq-message-row {
+  padding-bottom: 12px;
+}
+
+/* Support Dialog Styles */
+.groq-support-thanks {
+  margin: 2em 0 1em 0;
+  padding: 1em;
+  border-radius: 8px;
+  text-align: center;
+  transition: background 0.3s, color 0.3s;
+  background: linear-gradient(90deg, var(--background-modifier-box-hover, #f2f3f5) 0%, var(--background-secondary, #fcb69f) 100%);
+  color: var(--text-normal, #222);
+  border: 1px solid var(--background-modifier-border, #ddd);
+}
+
+.theme-dark .groq-support-thanks {
+  background: linear-gradient(90deg, var(--background-secondary, #23272e) 0%, #3a3f4b 100%);
+  color: var(--text-normal, #eee);
+  border: 1px solid var(--background-modifier-border, #333);
+}
+
+/* Model Info Dialog Styles */
+.groq-model-info__detail {
+  margin-bottom: 10px;
+  display: flex;
+  gap: 8px;
+}
+
+.groq-model-info__label {
+  min-width: 140px;
+  font-weight: 500;
+}
+
+.groq-model-info__value {
+  flex: 1;
+}
+
+/* Table Styles for Settings */
+.groq-models-table thead tr {
+  background: var(--background-modifier-hover, #f0f0f0);
+}
+
+.groq-models-table th {
+  text-align: left;
+  padding: 4px 8px;
+}
+
+.groq-models-table td {
+  padding: 4px 8px;
+}
+
+/* Small text styles */
+.groq-small-text {
+  font-size: var(--font-ui-smaller, 0.85em);
+}
+
+.groq-margin-left {
+  margin-left: 5px;
+}
+
+.groq-margin-top {
+  margin-top: 5px;
+}
+
+/* Code Block Styles */
+.groq-code-error {
+  color: var(--text-error);
+}
+
 .groq-limits-block {
   margin: var(--spacing-medium) 0;
   padding: var(--spacing-medium);

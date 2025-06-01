@@ -6,11 +6,20 @@ export class AuthService {
 
   // Теперь принимаем plugin с методами saveData/loadData
   constructor(
-    private readonly groqService: { validateApiKey: (apiKey: string) => Promise<boolean> },
+    private readonly groqService: { 
+      validateApiKey: (apiKey: string) => Promise<boolean>;
+      updateApiKey?: (apiKey: string) => void;
+    },
     private readonly plugin: {
       saveData: (data: any) => Promise<void>;
       loadData: () => Promise<any>;
-    },
+      app?: {
+        plugins?: {
+          disablePlugin?: (id: string) => Promise<void>;
+          enablePlugin?: (id: string) => Promise<void>;
+        };
+      };
+    } & { id?: string },
   ) {
     if (!groqService || typeof groqService.validateApiKey !== 'function') {
       throw new Error('groqService with validateApiKey(apiKey) must be provided to AuthService');
@@ -57,27 +66,37 @@ export class AuthService {
       }
     } catch (error) {
       console.error('API key validation error:', error);
-      new Notice('⚠️ API key validation failed');
+      new Notice('⚠️ API key validation failed. Please check your connection and try again.');
       return false;
     }
   }
 
-  async setApiKey(apiKey: string): Promise<void> {
+  async setApiKey(apiKey: string): Promise<boolean> {
     if (!apiKey) {
       await this.clearApiKey();
-      return;
+      return false;
     }
+    
     const isValid = await this.validateApiKey(apiKey);
     if (isValid) {
       await this.plugin.saveData({ apiKey });
       this.apiKey = apiKey;
       this.apiKeyIsSet = true;
-      new Notice('API key set successfully.');
-      return;
+      new Notice('✅ API key set successfully');
+      
+      // Update the GroqService with the new API key if the method exists
+      if (this.groqService && typeof this.groqService.updateApiKey === 'function') {
+        this.groqService.updateApiKey(apiKey);
+      }
+      
+      // Refresh the plugin to apply changes
+      await this.refreshPlugin();
+      return true;
     } else {
       this.apiKeyIsSet = false;
       this.apiKey = null;
-      return;
+      new Notice('❌ Invalid API key. Please check and try again.');
+      return false;
     }
   }
 
@@ -96,5 +115,35 @@ export class AuthService {
       return false;
     }
     return true;
+  }
+
+  /**
+   * Refreshes the plugin by disabling and enabling it
+   * This ensures all services are reinitialized with the new API key
+   */
+  private async refreshPlugin(): Promise<void> {
+    if (!this.plugin.id || !this.plugin.app?.plugins?.disablePlugin || !this.plugin.app.plugins.enablePlugin) {
+      console.log('Cannot refresh plugin: missing required methods');
+      return;
+    }
+
+    const pluginId = this.plugin.id;
+    try {
+      // Disable the plugin
+      await this.plugin.app.plugins.disablePlugin(pluginId);
+      // Re-enable the plugin after a short delay
+      setTimeout(async () => {
+        try {
+          await this.plugin.app?.plugins?.enablePlugin?.(pluginId);
+          new Notice('✅ Plugin refreshed successfully');
+        } catch (error) {
+          console.error('Error re-enabling plugin:', error);
+          new Notice('⚠️ Error refreshing plugin. Please restart Obsidian.');
+        }
+      }, 1000);
+    } catch (error) {
+      console.error('Error disabling plugin:', error);
+      new Notice('⚠️ Error refreshing plugin. Please restart Obsidian.');
+    }
   }
 }

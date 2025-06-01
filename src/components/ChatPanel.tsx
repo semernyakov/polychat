@@ -319,12 +319,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
             >
               <FiInfo size={16} />
             </button>
-            <ModelInfoDialog
-              isOpen={isModelInfoOpen}
-              onClose={() => setIsModelInfoOpen(false)}
-              modelInfo={selectedModelInfo}
-              isAvailable={!!availableModels.find(m => m.id === selectedModel)}
-            />
+            {/* ModelInfoDialog has been moved to the bottom of the component */}
             <button
               onClick={toggleDisplayMode}
               className="groq-icon-button groq-display-mode-button"
@@ -431,7 +426,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
 
         <SupportDialog isOpen={isSupportOpen} onClose={() => setIsSupportOpen(false)} />
         <ModelInfoDialog
-          key={selectedModel}
+          key={`${selectedModel}-${isModelInfoOpen}`}
           isOpen={isModelInfoOpen}
           onClose={() => setIsModelInfoOpen(false)}
           modelInfo={selectedModelInfo}

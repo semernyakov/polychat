@@ -17,34 +17,30 @@ export const ModelInfoDialog: React.FC<ModelInfoDialogProps> = ({
   modelInfo,
   isAvailable,
 }) => {
-  // Добавим стили для визуальных отступов между параметрами
+  const prevModelIdRef = React.useRef<string>(modelInfo.id);
+  const [currentModelInfo, setCurrentModelInfo] = React.useState(modelInfo);
+  const [isDialogOpen, setIsDialogOpen] = React.useState(isOpen);
+
+  // Update current model info when modelInfo prop changes and dialog is open
   React.useEffect(() => {
-    const styleId = 'groq-model-info-spacing-style';
-    if (!document.getElementById(styleId)) {
-      const style = document.createElement('style');
-      style.id = styleId;
-      style.innerHTML = `
-        .groq-model-info__detail {
-          margin-bottom: 10px;
-          display: flex;
-          gap: 8px;
-        }
-        .groq-model-info__label {
-          min-width: 140px;
-          font-weight: 500;
-        }
-        .groq-model-info__value {
-          flex: 1;
-        }
-      `;
-      document.head.appendChild(style);
+    if (isOpen && modelInfo.id !== prevModelIdRef.current) {
+      setCurrentModelInfo(modelInfo);
+      prevModelIdRef.current = modelInfo.id;
     }
-  }, []);
+  }, [isOpen, modelInfo]);
+
+  // Handle dialog open/close state
   React.useEffect(() => {
-    // Логируем для отладки, чтобы убедиться, что данные приходят актуальные
-    // console.log('[ModelInfoDialog] modelInfo:', modelInfo);
-  }, [modelInfo]);
-  if (!isOpen) return null;
+    if (isOpen !== isDialogOpen) {
+      setIsDialogOpen(isOpen);
+      // When opening, ensure we have the latest model info
+      if (isOpen) {
+        setCurrentModelInfo(modelInfo);
+      }
+    }
+  }, [isOpen, isDialogOpen, modelInfo]);
+
+  if (!isDialogOpen) return null;
 
   return (
     <div className="groq-support-dialog-overlay">
@@ -63,51 +59,51 @@ export const ModelInfoDialog: React.FC<ModelInfoDialogProps> = ({
         <div className="groq-dialog-content">
           <div className="groq-model-info">
             <div className="groq-model-info__header">
-              <h3>{modelInfo.name || modelInfo.id}</h3>
+              <h3>{currentModelInfo.name || currentModelInfo.id}</h3>
             </div>
 
             <div className="groq-model-info__details">
-              {modelInfo.description && modelInfo.description.trim() !== '' && (
+              {currentModelInfo.description && currentModelInfo.description.trim() !== '' && (
                 <div className="groq-model-info__detail">
                   <span className="groq-model-info__label">{t('description')}:</span>
-                  <span className="groq-model-info__value">{modelInfo.description}</span>
+                  <span className="groq-model-info__value">{currentModelInfo.description}</span>
                 </div>
               )}
               <div className="groq-model-info__detail">
                 <span className="groq-model-info__label">{t('developer')}:</span>
-                <span className="groq-model-info__value">{modelInfo.developer?.name || '—'}</span>
+                <span className="groq-model-info__value">{currentModelInfo.developer?.name || '—'}</span>
               </div>
-              {typeof modelInfo.created === 'number' && (
+              {typeof currentModelInfo.created === 'number' && (
                 <div className="groq-model-info__detail">
                   <span className="groq-model-info__label">{t('releaseDate')}:</span>
                   <span className="groq-model-info__value">
-                    {new Date(modelInfo.created * 1000).toISOString().slice(0, 10)}
+                    {new Date(currentModelInfo.created * 1000).toISOString().slice(0, 10)}
                   </span>
                 </div>
               )}
-              {typeof modelInfo.updated === 'number' && (
+              {typeof currentModelInfo.updated === 'number' && (
                 <div className="groq-model-info__detail">
                   <span className="groq-model-info__label">{t('actualDate')}:</span>
                   <span className="groq-model-info__value">
-                    {new Date(modelInfo.updated * 1000).toISOString().slice(0, 10)}
+                    {new Date(currentModelInfo.updated * 1000).toISOString().slice(0, 10)}
                   </span>
                 </div>
               )}
               <div className="groq-model-info__detail">
                 <span className="groq-model-info__label">{t('maxTokens')}:</span>
                 <span className="groq-model-info__value">
-                  {typeof modelInfo.maxTokens === 'number' ? modelInfo.maxTokens : '—'}
+                  {typeof currentModelInfo.maxTokens === 'number' ? currentModelInfo.maxTokens : '—'}
                 </span>
               </div>
-              {modelInfo.releaseStatus && (
+              {currentModelInfo.releaseStatus && (
                 <div className="groq-model-info__detail">
                   <span className="groq-model-info__label">{t('releaseStatus')}:</span>
                   <span className="groq-model-info__value">
-                    {modelInfo.releaseStatus === 'main'
+                    {currentModelInfo.releaseStatus === 'main'
                       ? 'Основная'
-                      : modelInfo.releaseStatus === 'preview'
+                      : currentModelInfo.releaseStatus === 'preview'
                         ? 'Предварительная'
-                        : modelInfo.releaseStatus}
+                        : currentModelInfo.releaseStatus}
                   </span>
                 </div>
               )}

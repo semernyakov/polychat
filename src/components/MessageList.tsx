@@ -66,7 +66,7 @@ export const MessageList = React.memo(
         const id = message.id || `msg-${index}`;
 
         return (
-          <div key={`message-${id}`} style={{ ...style, paddingBottom: 12 }}>
+          <div key={`message-${id}`} className="groq-message-row" style={style}>
             <div ref={el => measureRow(el, index, id)}>
               <MessageItem message={message} key={`item-${id}`} />
             </div>

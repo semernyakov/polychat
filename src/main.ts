@@ -1,5 +1,5 @@
 import './hot-reload';
-import { Plugin, WorkspaceLeaf } from 'obsidian';
+import { Plugin, WorkspaceLeaf, Notice } from 'obsidian';
 import { GroqChatView, VIEW_TYPE_GROQ_CHAT } from './views/GroqChatView';
 import { DEFAULT_SETTINGS, GroqChatSettings } from './settings/GroqChatSettings';
 import { AuthService } from './services/authService';
@@ -21,6 +21,17 @@ export default class GroqChatPlugin extends Plugin implements GroqPluginInterfac
   async onload() {
     await this.loadSettings();
     this.initializeServices();
+    
+    // Check API key on plugin load
+    if (this.settings.apiKey) {
+      const isValid = await this.groqService.validateApiKey(this.settings.apiKey);
+      if (!isValid) {
+        new Notice('⚠️ Invalid API key. Please update your API key in settings.');
+      }
+    } else {
+      new Notice('⚠️ Please set your Groq API key in settings.');
+    }
+
     this.registerView(VIEW_TYPE_GROQ_CHAT, leaf => {
       this.currentLeaf = leaf;
       return new GroqChatView(leaf, this);

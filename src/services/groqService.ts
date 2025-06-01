@@ -2,7 +2,7 @@ import { Groq } from 'groq-sdk';
 import { GroqPluginInterface } from '../types/plugin';
 import { Message } from '../types/types';
 import type { GroqModelInfo } from '../settings/GroqChatSettings';
-import { Notice } from 'obsidian';
+import { Notice, requestUrl } from 'obsidian';
 
 // Тип для лимитов
 export type RateLimitsType = {
@@ -136,31 +136,40 @@ export class GroqService implements GroqServiceMethods {
       return { models: this.modelCache.models, rateLimits: this.modelCache.rateLimits };
     }
     try {
-      const resp = await this.retryRequest(() =>
-        fetch('https://api.groq.com/openai/v1/models', {
-          headers: { Authorization: `Bearer ${this.plugin.settings.apiKey}` },
-        }),
-      );
-      if (!resp.ok) throw new Error(`API error: ${resp.status}`);
-      const data = await resp.json();
+      const response = await this.retryRequest(async () => {
+        return await requestUrl({
+          url: 'https://api.groq.com/openai/v1/models',
+          method: 'GET',
+          headers: { 
+            'Authorization': `Bearer ${this.plugin.settings.apiKey}`,
+            'Content-Type': 'application/json'
+          }
+        });
+      });
+      
+      if (response.status !== 200) {
+        throw new Error(`API error: ${response.status}`);
+      }
+      
       const rl: RateLimitsType = {
-        requestsPerDay: resp.headers.get('x-ratelimit-limit-requests')
-          ? parseInt(resp.headers.get('x-ratelimit-limit-requests')!) || undefined
+        requestsPerDay: response.headers['x-ratelimit-limit-requests']
+          ? parseInt(response.headers['x-ratelimit-limit-requests']) || undefined
           : undefined,
-        tokensPerMinute: resp.headers.get('x-ratelimit-limit-tokens')
-          ? parseInt(resp.headers.get('x-ratelimit-limit-tokens')!) || undefined
+        tokensPerMinute: response.headers['x-ratelimit-limit-tokens']
+          ? parseInt(response.headers['x-ratelimit-limit-tokens']) || undefined
           : undefined,
-        remainingRequests: resp.headers.get('x-ratelimit-remaining-requests')
-          ? parseInt(resp.headers.get('x-ratelimit-remaining-requests')!) || undefined
+        remainingRequests: response.headers['x-ratelimit-remaining-requests']
+          ? parseInt(response.headers['x-ratelimit-remaining-requests']) || undefined
           : undefined,
-        remainingTokens: resp.headers.get('x-ratelimit-remaining-tokens')
-          ? parseInt(resp.headers.get('x-ratelimit-remaining-tokens')!) || undefined
+        remainingTokens: response.headers['x-ratelimit-remaining-tokens']
+          ? parseInt(response.headers['x-ratelimit-remaining-tokens']) || undefined
           : undefined,
-        resetRequests: resp.headers.get('x-ratelimit-reset-requests') || undefined,
-        resetTokens: resp.headers.get('x-ratelimit-reset-tokens') || undefined,
+        resetRequests: response.headers['x-ratelimit-reset-requests'] || undefined,
+        resetTokens: response.headers['x-ratelimit-reset-tokens'] || undefined,
       };
+      
       this.rateLimits = rl;
-      const filtered = (data.data || []).filter((m: any) => {
+      const filtered = ((response.json && response.json.data) || []).filter((m: any) => {
         const name = (m.name || m.id || '').toLowerCase();
         return !/speech\s*to\s*text|text\s*to\s*speech|audio|image|vision|multimodal/.test(name);
       });
@@ -179,13 +188,15 @@ export class GroqService implements GroqServiceMethods {
         active: typeof m.active === 'boolean' ? m.active : undefined,
         releaseStatus: m.release_status || m.releaseStatus || undefined,
       }));
+      
       // ВРЕМЕННО: логируем все поля моделей для отладки
-      if (Array.isArray(data.data)) {
-        // console.log('[GroqService] Получено моделей:', data.data.length);
-        data.data.forEach((model: any, idx: number) => {
+      if (response.json && Array.isArray(response.json.data)) {
+        // console.log('[GroqService] Получено моделей:', response.json.data.length);
+        response.json.data.forEach((model: any, idx: number) => {
           // console.log(`[GroqService] Модель #${idx + 1}:`, model);
         });
       }
+      
       // Сохранение в кэш
       this.modelCache = { models, rateLimits: rl, timestamp: Date.now() };
       return { models, rateLimits: rl };
@@ -199,43 +210,36 @@ export class GroqService implements GroqServiceMethods {
     if (error instanceof Error) {
       if (error.message.includes('401')) {
         return new Error('Неверный API ключ. Проверьте настройки.');
-      }
-      if (error.message.includes('429')) {
+      } else if (error.message.includes('429')) {
         return new Error('Превышен лимит запросов. Попробуйте позже.');
-      }
-      if (error.message.includes('503')) {
-        return new Error('Сервис временно недоступен.');
-      }
-      if (error.message.includes('Failed to fetch')) {
-        return new Error('Проблемы с интернет-соединением.');
+      } else if (error.message.includes('500')) {
+        return new Error('Ошибка сервера. Пожалуйста, попробуйте позже.');
+      } else if (error.message.includes('network')) {
+        return new Error('Ошибка сети. Проверьте подключение к интернету.');
       }
       return error;
     }
-    return new Error('Неизвестная ошибка API');
+    return new Error('Произошла неизвестная ошибка');
   }
 
-  private async retryRequest<T>(fn: () => Promise<T>, retries = 3, delay = 1000): Promise<T> {
-    for (let i = 0; i < retries; i++) {
-      try {
-        return await fn();
-      } catch (error) {
-        if (
-          i === retries - 1 ||
-          !(
-            error instanceof Error &&
-            (error.message.includes('429') || error.message.includes('503'))
-          )
-        ) {
-          throw error;
-        }
-        await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
-      }
+  public async retryRequest<T>(fn: () => Promise<T>, retries = 3, delay = 1000): Promise<T> {
+    try {
+      return await fn();
+    } catch (error) {
+      if (retries === 0) throw error;
+      await new Promise(resolve => setTimeout(resolve, delay));
+      return this.retryRequest(fn, retries - 1, delay * 2);
     }
-    throw new Error('Не удалось выполнить запрос после повторных попыток');
   }
 
-  private getModelMaxTokens(modelId: string): number {
-    const model = this.plugin.settings.groqAvailableModels?.find(m => m.id === modelId);
-    return model?.maxTokens || 4096;
+  public getModelMaxTokens(modelId: string): number {
+    // Default max tokens for common models
+    const modelMap: Record<string, number> = {
+      'llama3-8b-8192': 8192,
+      'llama3-70b-8192': 8192,
+      'mixtral-8x7b-32768': 32768,
+      'gemma-7b-it': 8192,
+    };
+    return modelMap[modelId] || 4096; // Default to 4096 if model not found
   }
 }

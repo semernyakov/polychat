@@ -57,7 +57,7 @@ const CodeBlock = React.memo(({ language, code }: { language: string; code: stri
           title={t('copyCode', locale)}
         >
           {copyError ? (
-            <span style={{ color: 'var(--text-error)' }}>!</span>
+            <span className="groq-code-error">!</span>
           ) : isCopied ? (
             <FiCheck size={14} color="var(--text-success)" />
           ) : (

@@ -62,7 +62,7 @@ export const MessageItem: React.FC<{ message: Message }> = React.memo(({ message
               aria-label={t('copyMessage', language)}
             >
               {copyError ? (
-                <span style={{ color: 'var(--text-error)' }} title={t('copyError', language)}>
+                <span className="groq-message__copy-error" title={t('copyError', language)}>
                   !
                 </span>
               ) : isCopied ? (

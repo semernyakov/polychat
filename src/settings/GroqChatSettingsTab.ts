@@ -1,11 +1,27 @@
-import { App, PluginSettingTab, Setting } from 'obsidian';
+import { App, PluginSettingTab, Setting, Notice, requestUrl } from 'obsidian';
 import { GroqPluginInterface } from '../types/plugin';
 import { HistoryStorageMethod } from '../types/settings';
-import { Notice } from 'obsidian';
 import { isValidFileName } from '../utils/validation';
+import { createLink, createTextNode } from '../utils/domUtils';
 import { t, Locale } from '../localization';
 import type { RateLimitsType } from '../services/groqService';
-import type { GroqChatSettings } from './GroqChatSettings';
+
+interface GroqChatSettings {
+  groqAvailableModels: Array<{
+    id: string;
+    name: string;
+    description?: string;
+    isActive: boolean;
+  }>;
+  model: string;
+  apiKey: string;
+  language: 'en' | 'ru';
+  temperature: number;
+  maxTokens: number;
+  historyStorageMethod: HistoryStorageMethod;
+  maxHistoryLength: number;
+  notePath: string;
+}
 
 export class GroqChatSettingsTab extends PluginSettingTab {
   constructor(
@@ -24,30 +40,39 @@ export class GroqChatSettingsTab extends PluginSettingTab {
         locale === 'ru'
           ? '🚀 Добро пожаловать в настройки PolyChat Plugin!'
           : '🚀 Welcome to PolyChat Plugin Settings!',
+      cls: 'groq-settings-title',
     });
-    title.style.marginTop = '0.5em';
-    title.style.fontSize = '2em';
-    title.style.fontWeight = 'bold';
     const subtitle = this.containerEl.createEl('div', {
       text:
         locale === 'ru'
           ? 'Настройте плагин под себя, чтобы общение с ИИ было максимально удобным и приятным! 😊'
           : 'Make your AI chat experience as friendly and delightful as possible! 😊',
+      cls: 'groq-settings-subtitle',
     });
-    subtitle.style.marginBottom = '1.5em';
-    subtitle.style.fontSize = '1.15em';
-    subtitle.style.color = '#555';
     // --- API ---
     this.containerEl.createEl('h3', {
       text: locale === 'ru' ? '🔑 Доступ к API' : '🔑 API Access',
     });
     // --- Ссылка на получение токена ---
-    const tokenLink = this.containerEl.createEl('div');
-    tokenLink.style.marginBottom = '1em';
-    tokenLink.innerHTML =
-      locale === 'ru'
-        ? 'Получить токен Groq можно на <a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer">официальном сайте Groq API</a>.'
-        : 'You can get your Groq token at the <a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer">official Groq API website</a>.';
+    const tokenLink = this.containerEl.createEl('div', {
+      cls: 'groq-settings-token-link',
+    });
+    
+    if (locale === 'ru') {
+      createTextNode(tokenLink, 'Получить токен Groq можно на ');
+      createLink(tokenLink, 'официальном сайте Groq API', 'https://console.groq.com/keys', {
+        target: '_blank',
+        rel: 'noopener noreferrer'
+      });
+      createTextNode(tokenLink, '.');
+    } else {
+      createTextNode(tokenLink, 'You can get your Groq token at the ');
+      createLink(tokenLink, 'official Groq API website', 'https://console.groq.com/keys', {
+        target: '_blank',
+        rel: 'noopener noreferrer'
+      });
+      createTextNode(tokenLink, '.');
+    }
     this.addApiKeySetting(locale);
 
     this.containerEl.createEl('h3', {
@@ -67,15 +92,10 @@ export class GroqChatSettingsTab extends PluginSettingTab {
     });
     // this.addDisplayModeSetting(locale); // Метод отсутствует
     // --- Температура и макс. токены в сетке ---
-    const flexGrid = document.createElement('div');
-    flexGrid.style.display = 'flex';
-    flexGrid.style.gap = '16px';
-    flexGrid.style.alignItems = 'flex-end';
-    const tempDiv = document.createElement('div');
-    tempDiv.style.flex = '1';
+    const flexGrid = this.containerEl.createEl('div', { cls: 'groq-settings-flex-grid' });
+    const tempDiv = this.containerEl.createEl('div', { cls: 'groq-settings-flex-item' });
     tempDiv.appendChild(this.createTemperatureSetting(locale));
-    const tokensDiv = document.createElement('div');
-    tokensDiv.style.flex = '1';
+    const tokensDiv = this.containerEl.createEl('div', { cls: 'groq-settings-flex-item' });
     tokensDiv.appendChild(this.createMaxTokensSetting(locale));
     flexGrid.appendChild(tempDiv);
     flexGrid.appendChild(tokensDiv);
@@ -83,11 +103,7 @@ export class GroqChatSettingsTab extends PluginSettingTab {
     this.addLanguageSetting(locale);
 
     // --- Кнопки "Сохранить все настройки" и "Сбросить настройки по умолчанию" ---
-    const actionsBlock = document.createElement('div');
-    actionsBlock.style.margin = '32px 0 0 0';
-    actionsBlock.style.display = 'flex';
-    actionsBlock.style.gap = '16px';
-    actionsBlock.style.justifyContent = 'flex-end';
+    const actionsBlock = this.containerEl.createEl('div', { cls: 'groq-settings-actions' });
     const btnSave = document.createElement('button');
     btnSave.textContent = locale === 'ru' ? '✅ Сохранить все настройки' : '✅ Save all settings';
     btnSave.className = 'mod-cta';
@@ -112,27 +128,57 @@ export class GroqChatSettingsTab extends PluginSettingTab {
     this.containerEl.appendChild(actionsBlock);
 
     // --- Блок благодарности автору ---
-    const thanksBlock = this.containerEl.createEl('div');
-    thanksBlock.style.margin = '2em 0 1em 0';
-    thanksBlock.style.padding = '1em';
-    thanksBlock.style.borderRadius = '8px';
-    thanksBlock.style.textAlign = 'center';
-    thanksBlock.style.transition = 'background 0.3s, color 0.3s';
-    thanksBlock.style.background =
-      'linear-gradient(90deg, var(--background-modifier-box-hover, #f2f3f5) 0%, var(--background-secondary, #fcb69f) 100%)';
-    thanksBlock.style.color = 'var(--text-normal, #222)';
-    thanksBlock.style.border = '1px solid var(--background-modifier-border, #ddd)';
-    // адаптация для темной темы
-    if (document.body.classList.contains('theme-dark')) {
-      thanksBlock.style.background =
-        'linear-gradient(90deg, var(--background-secondary, #23272e) 0%, #3a3f4b 100%)';
-      thanksBlock.style.color = 'var(--text-normal, #eee)';
-      thanksBlock.style.border = '1px solid var(--background-modifier-border, #333)';
-    }
-    thanksBlock.innerHTML =
-      locale === 'ru'
-        ? 'Спасибо за использование PolyChat Plugin! <br> Вы можете <a href="https://yoomoney.ru/fundraise/194GT5A5R07.250321" target="_blank" rel="noopener noreferrer">поддержать разработку на YooMoney</a> <br> <a href="https://github.com/semernyakov" target="_blank" rel="noopener noreferrer">Оставить отзыв на Github</a> или <a href="https://t.me/semernyakov" target="_blank" rel="noopener noreferrer"> или связаться со мной в Telegram</a> ❤️'
-        : 'Thank you for using PolyChat Plugin! <br> You can <a href="https://yoomoney.ru/fundraise/194GT5A5R07.250321" target="_blank" rel="noopener noreferrer">support the author on YooMoney</a> <br> <a href="https://github.com/semernyakov" target="_blank" rel="noopener noreferrer">Leave a review on Github</a> or <a href="https://t.me/semernyakov" target="_blank" rel="noopener noreferrer">contact with autor in Telegram</a> ❤️';
+    // Add a spacer div to create space between buttons and thanks block
+    const spacer = this.containerEl.createEl('div', { cls: 'groq-thanks-spacer' });
+    
+    const thanksBlock = this.containerEl.createEl('div', { cls: 'groq-thanks-block' });
+    
+    // Add heart emoji
+    createTextNode(thanksBlock, '💙 ');
+    
+    // Add strong text
+    const strong = thanksBlock.createEl('strong');
+    strong.textContent = locale === 'ru' ? 'Спасибо за использование плагина!' : 'Thank you for using the plugin!';
+    
+    // Add space after strong
+    createTextNode(thanksBlock, ' ');
+    
+    // Add link text before and after the link
+    const linkText = locale === 'ru' ? 'оставьте отзыв на GitHub' : 'leave a review on GitHub';
+    const textBeforeLink = locale === 'ru' ? 'Если вам нравится Groq Chat, пожалуйста, ' : 'If you like Groq Chat, please ';
+    const textAfterLink = locale === 'ru' ? '.' : '.';
+    
+    createTextNode(thanksBlock, textBeforeLink);
+    createLink(thanksBlock, linkText, 'https://github.com/semernyakov/groq-chat-obsidian', {
+      target: '_blank',
+      rel: 'noopener noreferrer'
+    });
+    createTextNode(thanksBlock, textAfterLink);
+
+    // Add link to Telegram
+    const telegramLinkText = locale === 'ru' ? 'связаться со мной в Telegram' : 'contact with autor in Telegram';
+    const telegramTextBeforeLink = locale === 'ru' ? ' или ' : ' or ';
+    const telegramTextAfterLink = locale === 'ru' ? ' ❤️' : ' ❤️';
+    
+    createTextNode(thanksBlock, telegramTextBeforeLink);
+    createLink(thanksBlock, telegramLinkText, 'https://t.me/semernyakov', {
+      target: '_blank',
+      rel: 'noopener noreferrer'
+    });
+    createTextNode(thanksBlock, telegramTextAfterLink);
+
+    // Add link to YooMoney
+    const yoomoneyLinkText = locale === 'ru' ? 'поддержать разработку на YooMoney' : 'support the author on YooMoney';
+    const yoomoneyTextBeforeLink = locale === 'ru' ? ' Вы можете ' : ' You can ';
+    const yoomoneyTextAfterLink = locale === 'ru' ? '.' : '.';
+    
+    createTextNode(thanksBlock, yoomoneyTextBeforeLink);
+    createLink(thanksBlock, yoomoneyLinkText, 'https://yoomoney.ru/fundraise/194GT5A5R07.250321', {
+      target: '_blank',
+      rel: 'noopener noreferrer'
+    });
+    createTextNode(thanksBlock, yoomoneyTextAfterLink);
+
   }
 
   private createTemperatureSetting(locale: Locale): HTMLElement {
@@ -188,19 +234,13 @@ export class GroqChatSettingsTab extends PluginSettingTab {
     return wrapper;
   }
 
-  private showSavedIcon(targetEl: HTMLElement) {
-    const icon = document.createElement('span');
-    icon.textContent = '✓';
-    icon.style.color = '#3cb371';
-    icon.style.marginLeft = '8px';
-    icon.style.fontWeight = 'bold';
-    icon.style.fontSize = '16px';
-    icon.style.transition = 'opacity 0.5s';
-    targetEl.parentElement?.appendChild(icon);
+  private showSavedIcon(element: HTMLElement) {
+    const icon = element.createEl('span', { text: '✓', cls: 'groq-saved-icon' });
+
     setTimeout(() => {
       icon.style.opacity = '0';
       setTimeout(() => icon.remove(), 500);
-    }, 1200);
+    }, 2000);
   }
 
   private addApiKeySetting(locale: Locale): void {
@@ -234,109 +274,127 @@ export class GroqChatSettingsTab extends PluginSettingTab {
 
   private async fetchGroqModels(apiKey: string): Promise<any[]> {
     try {
-      const resp = await fetch('https://api.groq.com/openai/v1/models', {
-        headers: { Authorization: `Bearer ${apiKey}` },
+      const response = await requestUrl({
+        url: 'https://api.groq.com/openai/v1/models',
+        method: 'GET',
+        headers: { 
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
+        }
       });
-      if (!resp.ok) throw new Error('API error');
-      const data = await resp.json();
-      return data.data || [];
+      
+      if (response.status !== 200) {
+        console.error('API error:', response.status);
+        throw new Error(`API error: ${response.status}`);
+      }
+      
+      return response.json.data || [];
     } catch (error) {
+      console.error('Error fetching Groq models:', error);
       return [];
     }
   }
 
   private addModelSetting(locale: Locale): void {
-    const setting = new Setting(this.containerEl)
+    const modelSetting = new Setting(this.containerEl)
       .setName(t('model', locale))
-      .setDesc(
-        locale === 'ru'
-          ? 'Выберите модель для генерации ответов'
-          : 'Select model for generating responses',
-      );
+      .setDesc(t('modelDesc', locale));
 
-    // Dropdown для выбора модели
-    let dropdownEl: HTMLSelectElement | null = null;
-    const updateDropdown = () => {
-      if (!dropdownEl) return;
-      const settings = this.plugin.settings as GroqChatSettings;
-      const models: { id: string; name: string; description?: string; isActive?: boolean }[] = (
-        settings.groqAvailableModels || []
-      ).filter(m => m.isActive !== false);
-      dropdownEl.innerHTML = '';
-      if (models.length === 0) {
-        const opt = document.createElement('option');
-        opt.value = 'none';
-        opt.textContent = t('noModelsFound', locale);
-        if (dropdownEl) dropdownEl.appendChild(opt);
-      } else {
-        models.forEach(model => {
-          const opt = document.createElement('option');
-          opt.value = model.id;
-          opt.textContent = model.name;
-          if (dropdownEl) dropdownEl.appendChild(opt);
-        });
+    // Create the dropdown
+    let selectEl: HTMLSelectElement;
+    const dropdown = modelSetting.addDropdown(dd => {
+      selectEl = dd.selectEl;
+      dd.addOption('', locale === 'ru' ? 'Выберите модель' : 'Select a model');
+      
+      // Add available models
+      if (this.plugin.settings.groqAvailableModels) {
+        for (const model of this.plugin.settings.groqAvailableModels) {
+          if (model.isActive) {
+            dd.addOption(model.id, model.name);
+          }
+        }
       }
-      // Если текущая выбранная модель неактивна — выбрать первую активную
-      if (settings.model && !models.some(m => m.id === settings.model)) {
-        settings.model = models[0]?.id || 'none';
-      }
-      dropdownEl.value = settings.model || (models[0]?.id ?? 'none');
-    };
-    const dropdown = setting.addDropdown(dropdown => {
-      dropdownEl = dropdown.selectEl;
-      updateDropdown();
-      dropdown
-        .setValue(
-          (this.plugin.settings as GroqChatSettings).model ||
-            (dropdownEl.options[0]?.value ?? 'none'),
-        )
-        .onChange(async value => {
-          (this.plugin.settings as GroqChatSettings).model = value;
-          await this.plugin.saveSettings();
-          this.showSavedIcon(dropdownEl!);
-        });
+      
+      // Set the selected model
+      dd.setValue(this.plugin.settings.model || '');
+      
+      // Handle model change
+      dd.onChange(async (value: string) => {
+        this.plugin.settings.model = value;
+        await this.plugin.saveSettings();
+      });
     });
-
-    // Кнопка обновления моделей
-    setting.addExtraButton(btn => {
+    
+    // Add refresh button with custom spinner
+    modelSetting.addButton(btn => {
+      const spinner = document.createElement('span');
+      spinner.className = 'mod-spinner';
+      spinner.style.display = 'none';
+      btn.buttonEl.appendChild(spinner);
+      
       btn
         .setIcon('refresh-cw')
         .setTooltip(t('refreshModels', locale))
         .onClick(async () => {
-          btn.setDisabled(true);
-          btn.extraSettingsEl.classList.add('mod-spinner');
-          const apiModels = await this.fetchGroqModels(this.plugin.settings.apiKey);
-          if (apiModels.length > 0) {
-            const settings = this.plugin.settings as GroqChatSettings;
-            settings.groqAvailableModels = apiModels.map((m: any) => ({
-              id: m.id,
-              name: m.name || m.id,
-              description: m.description || '',
-              isActive: true,
-            }));
-            await this.plugin.saveSettings();
-            new Notice(t('modelsUpdated', locale));
-            updateDropdown();
-          } else {
+          try {
+            btn.setDisabled(true);
+            spinner.style.display = 'inline-block';
+            
+            const apiModels = await this.fetchGroqModels(this.plugin.settings.apiKey);
+            if (apiModels?.length) {
+              // Update available models
+              const settings = this.plugin.settings as any;
+              settings.groqAvailableModels = apiModels.map((m: any) => ({
+                id: m.id,
+                name: m.name || m.id,
+                description: m.description || '',
+                isActive: true,
+              }));
+              
+              await this.plugin.saveSettings();
+              new Notice(t('modelsUpdated', locale));
+              
+              // Update the dropdown
+              if (selectEl) {
+                selectEl.empty();
+                selectEl.createEl('option', {
+                  text: locale === 'ru' ? 'Выберите модель' : 'Select a model',
+                  value: ''
+                });
+                
+                if (this.plugin.settings.groqAvailableModels) {
+                  for (const model of this.plugin.settings.groqAvailableModels) {
+                    if (model.isActive) {
+                      selectEl.createEl('option', {
+                        text: model.name,
+                        value: model.id
+                      });
+                    }
+                  }
+                }
+                
+                // Restore selected value if any
+                if (this.plugin.settings.model) {
+                  selectEl.value = this.plugin.settings.model;
+                }
+              }
+            } else {
+              new Notice(t('modelsUpdateError', locale));
+            }
+          } catch (error) {
+            console.error('Error refreshing models:', error);
             new Notice(t('modelsUpdateError', locale));
+          } finally {
+            btn.setDisabled(false);
+            spinner.style.display = 'none';
           }
-          btn.setDisabled(false);
-          btn.extraSettingsEl.classList.remove('mod-spinner');
         });
     });
-
-    // Синхронизация при изменении активности моделей
-    // Переопределим метод addModelListBlock, чтобы после изменений обновлять dropdown
-    const origAddModelListBlock = this.addModelListBlock.bind(this);
-    this.addModelListBlock = (loc: Locale) => {
-      origAddModelListBlock(loc);
-      updateDropdown();
-    };
   }
 
-  // --- Список моделей (таблица, отдельная строка) ---
-  private addModelListBlock(locale: Locale) {
-    // Создаём или находим отдельный контейнер для таблицы моделей
+  // --- Model List (table, separate row) ---
+  private addModelListBlock(locale: Locale): void {
+    // Create or find container for models table
     let modelsBlock = this.containerEl.querySelector('.groq-models-block') as HTMLDivElement | null;
     if (!modelsBlock) {
       modelsBlock = document.createElement('div');
@@ -344,99 +402,126 @@ export class GroqChatSettingsTab extends PluginSettingTab {
       this.containerEl.appendChild(modelsBlock);
     }
     modelsBlock.innerHTML = '';
-    // Расширенный тип модели для таблицы
-    type DisplayModel = {
+
+    // Extended model type for the table
+    interface DisplayModel {
       id: string;
       name: string;
       description?: string;
       created?: number;
       owned_by?: string;
       object?: string;
-      isActive?: boolean;
+      isActive: boolean;
       category?: string;
       developer?: { name: string; url?: string };
       maxTokens?: number;
       tokensPerMinute?: number;
       releaseStatus?: string;
-    };
+    }
+
     const settings = this.plugin.settings as GroqChatSettings;
-    let models: DisplayModel[] = (settings.groqAvailableModels || []) as DisplayModel[];
-    // Нормализация: гарантировать наличие isActive у каждой модели
-    models = models.map(m => ({
-      ...m,
-      isActive: typeof m.isActive === 'boolean' ? m.isActive : true,
+    const models: DisplayModel[] = (settings.groqAvailableModels || []).map(model => ({
+      ...model,
+      isActive: model.isActive !== false // Default to true if undefined
     }));
-    const rateLimits: RateLimitsType = settings.groqRateLimits || {};
-    // --- Кнопки "Выбрать все" и "Отменить все" ---
+
+    // --- Select All / Deselect All buttons ---
     const selectAllBlock = document.createElement('div');
-    selectAllBlock.style.margin = '8px 0 8px 0';
-    selectAllBlock.style.display = 'flex';
-    selectAllBlock.style.gap = '8px';
+    selectAllBlock.className = 'groq-models-select-all';
+    
     const btnSelectAll = document.createElement('button');
     btnSelectAll.textContent = locale === 'ru' ? 'Выбрать все' : 'Select all';
     btnSelectAll.className = 'mod-cta';
+    
     const btnDeselectAll = document.createElement('button');
     btnDeselectAll.textContent = locale === 'ru' ? 'Отменить все' : 'Deselect all';
-    // --- Таблица ---
+    
+    // --- Table ---
     const modelsTable = document.createElement('table');
     modelsTable.className = 'groq-models-table';
-    modelsTable.style.width = '100%';
-    modelsTable.style.borderCollapse = 'collapse';
-    modelsTable.style.fontSize = '13px';
-    modelsTable.style.margin = '24px 0 24px 0';
-    modelsTable.innerHTML = `
-      <thead><tr style='background:#f0f0f0;'>
-        <th style='text-align:left;padding:4px 8px;'>${t('model', locale)}</th>
-        <th style='text-align:left;padding:4px 8px;'>${t('active', locale)}</th>
-      </tr></thead>
-      <tbody></tbody>
-    `;
-    const tbody = modelsTable.querySelector('tbody') as HTMLTableSectionElement;
-    // Сохраняем ссылки на чекбоксы для массовых операций
+    
+    // Create table header
+    const thead = modelsTable.createTHead();
+    const headerRow = thead.insertRow();
+    headerRow.className = 'groq-models-table-header';
+    
+    const headerModel = document.createElement('th');
+    headerModel.textContent = t('model', locale);
+    headerRow.appendChild(headerModel);
+    
+    const headerActive = document.createElement('th');
+    headerActive.textContent = t('active', locale);
+    headerRow.appendChild(headerActive);
+    
+    // Create table body
+    const tbody = modelsTable.createTBody();
     const checkboxes: HTMLInputElement[] = [];
+    
+    // Create table rows
     models.forEach((model, idx) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td style='padding:4px 8px;'>${model.name.replace(' (недоступна)', '')}</td>
-        <td style='padding:4px 8px;'></td>
-      `;
-      // Toggle для "Активна"
-      const toggleTd = tr.children[1] as HTMLTableCellElement;
+      const tr = tbody.insertRow();
+      tr.className = 'groq-models-table-row';
+      
+      // Model name cell
+      const nameCell = tr.insertCell();
+      nameCell.className = 'groq-models-table-cell';
+      nameCell.textContent = model.name.replace(' (недоступна)', '');
+      
+      // Toggle cell
+      const toggleCell = tr.insertCell();
+      toggleCell.className = 'groq-models-table-cell';
+      
       const toggle = document.createElement('input');
       toggle.type = 'checkbox';
-      toggle.checked = (model as any).isActive !== false;
-      toggle.style.transform = 'scale(1.2)';
-      toggle.title =
-        locale === 'ru' ? 'Включить/выключить модель для чата' : 'Enable/disable model for chat';
+      toggle.checked = model.isActive;
+      toggle.classList.add('groq-model-toggle');
+      toggle.title = locale === 'ru' 
+        ? 'Включить/выключить модель для чата' 
+        : 'Enable/disable model for chat';
+      
       toggle.addEventListener('change', async () => {
-        (models[idx] as any).isActive = toggle.checked;
-        settings.groqAvailableModels = [...models];
-        await this.plugin.saveSettings();
-        this.showSavedIcon(toggle);
+        models[idx].isActive = toggle.checked;
+        if (settings.groqAvailableModels) {
+          settings.groqAvailableModels = [...models];
+          await this.plugin.saveSettings();
+          this.showSavedIcon(toggle);
+        }
       });
-      toggleTd.appendChild(toggle);
+      
+      toggleCell.appendChild(toggle);
       checkboxes.push(toggle);
-      tbody.appendChild(tr);
     });
-    // Логика кнопок массового выбора
+    
+    // Select all functionality
     btnSelectAll.onclick = async () => {
       checkboxes.forEach((cb, idx) => {
         cb.checked = true;
-        (models[idx] as any).isActive = true;
+        models[idx].isActive = true;
       });
-      settings.groqAvailableModels = [...models];
-      await this.plugin.saveSettings();
+      if (settings.groqAvailableModels) {
+        settings.groqAvailableModels = [...models];
+        await this.plugin.saveSettings();
+      }
     };
+    
+    // Deselect all functionality
     btnDeselectAll.onclick = async () => {
       checkboxes.forEach((cb, idx) => {
         cb.checked = false;
-        (models[idx] as any).isActive = false;
+        models[idx].isActive = false;
       });
-      settings.groqAvailableModels = [...models];
-      await this.plugin.saveSettings();
+      if (settings.groqAvailableModels) {
+        settings.groqAvailableModels = [...models];
+        await this.plugin.saveSettings();
+      }
     };
+    
+    // Append buttons to select all block
     selectAllBlock.appendChild(btnSelectAll);
     selectAllBlock.appendChild(btnDeselectAll);
+    
+    // Clear any existing content and append the new content
+    modelsBlock.innerHTML = '';
     modelsBlock.appendChild(selectAllBlock);
     modelsBlock.appendChild(modelsTable);
   }
@@ -473,7 +558,7 @@ export class GroqChatSettingsTab extends PluginSettingTab {
           });
         text.inputEl.insertAdjacentHTML(
           'afterend',
-          `<span style="font-size: var(--font-ui-smaller, 0.85em); margin-left: 5px;">(${locale === 'ru' ? '0 = не хранить' : '0 = do not store'})</span>`,
+          `<span class="groq-small-text groq-margin-left">(${locale === 'ru' ? '0 = не хранить' : '0 = do not store'})</span>`,
         );
         text.inputEl.type = 'number';
         text.inputEl.min = '0';
@@ -481,7 +566,7 @@ export class GroqChatSettingsTab extends PluginSettingTab {
       .settingEl.setAttribute('title', locale === 'ru' ? 'Настройки истории' : 'History settings');
 
     if (this.plugin.settings.historyStorageMethod === 'file') {
-      new Setting(this.containerEl)
+      const historyFileSetting = new Setting(this.containerEl)
         .setName(t('historyFile', locale))
         .setDesc(
           locale === 'ru'
@@ -503,29 +588,31 @@ export class GroqChatSettingsTab extends PluginSettingTab {
                   locale === 'ru' ? 'Некорректное имя/путь файла' : 'Invalid file name/path',
                 );
               }
-            }),
-        )
-        .settingEl.insertAdjacentHTML(
-          'beforeend',
-          `<p style="font-size: var(--font-ui-smaller, 0.85em); margin-top: 5px;">${locale === 'ru' ? 'Пример: notes/history.md' : 'Example: notes/history.md'}</p>`,
+            })
         );
+      
+      historyFileSetting.settingEl.insertAdjacentHTML(
+        'beforeend',
+        `<p class="groq-small-text groq-margin-top">${locale === 'ru' ? 'Пример: notes/history.md' : 'Example: notes/history.md'}</p>`,
+      );
     }
   }
 
   private addLanguageSetting(locale: Locale): void {
-    new Setting(this.containerEl)
+    const languageSetting = new Setting(this.containerEl)
       .setName(t('language', locale))
-      .setDesc(locale === 'ru' ? 'Выберите язык интерфейса' : 'Select UI language')
-      .addDropdown(dropdown => {
-        dropdown
-          .addOption('ru', 'Русский')
-          .addOption('en', 'English')
-          .setValue(this.plugin.settings.language)
-          .onChange(async value => {
-            this.plugin.settings.language = value as 'ru' | 'en';
-            await this.plugin.saveSettings();
-            this.display(); // перерисовать настройки
-          });
-      });
+      .setDesc(locale === 'ru' ? 'Выберите язык интерфейса' : 'Select UI language');
+
+    languageSetting.addDropdown(dropdown => {
+      dropdown
+        .addOption('en', 'English')
+        .addOption('ru', 'Русский')
+        .setValue(locale)
+        .onChange(async (value: string) => {
+          this.plugin.settings.language = value as 'en' | 'ru';
+          await this.plugin.saveSettings();
+          this.display();
+        });
+    });
   }
 }

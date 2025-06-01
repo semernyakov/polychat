@@ -1,8 +1,14 @@
 import { MODEL_INFO } from '../src/types/models';
 import * as fs from 'fs';
+import * as path from 'path';
 
-// Загрузить последний groqAvailableModels.json (или settings.json, если есть)
-const settingsPath = '../.obsidian/plugins/groq-chat-plugin/data/settings.json';
+// Get the plugin directory path
+const pluginDir = path.join(__dirname, '..');
+const vaultDir = path.join(pluginDir, '..', '..'); // Go up two levels from plugin dir to reach vault root
+const configDir = process.env.OBSIDIAN_CONFIG_DIR || '.obsidian';
+
+// Load the latest groqAvailableModels.json (or settings.json if exists)
+const settingsPath = path.join(vaultDir, configDir, 'plugins/groq-chat-plugin/data/settings.json');
 let availableModels: string[] = [];
 if (fs.existsSync(settingsPath)) {
   const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));

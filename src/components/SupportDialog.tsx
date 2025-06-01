@@ -12,24 +12,8 @@ interface SupportDialogProps {
 // Красивый блок благодарности с темизацией
 const SupportThanksBlock: React.FC = () => {
   const locale = (window.localStorage.getItem('groq-chat-locale') || 'ru') as 'ru' | 'en';
-  // Определяем тему Obsidian
-  const isDark = document.body.classList.contains('theme-dark');
-  const style: React.CSSProperties = {
-    margin: '2em 0 1em 0',
-    padding: '1em',
-    borderRadius: '8px',
-    textAlign: 'center',
-    transition: 'background 0.3s, color 0.3s',
-    background: isDark
-      ? 'linear-gradient(90deg, var(--background-secondary, #23272e) 0%, #3a3f4b 100%)'
-      : 'linear-gradient(90deg, var(--background-modifier-box-hover, #f2f3f5) 0%, var(--background-secondary, #fcb69f) 100%)',
-    color: isDark ? 'var(--text-normal, #eee)' : 'var(--text-normal, #222)',
-    border: isDark
-      ? '1px solid var(--background-modifier-border, #333)'
-      : '1px solid var(--background-modifier-border, #ddd)',
-  };
   return (
-    <div style={style}>
+    <div className="groq-support-thanks">
       <span dangerouslySetInnerHTML={tHtml('supportDialogThanks')} />
     </div>
   );
