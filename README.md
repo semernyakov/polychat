@@ -9,7 +9,7 @@
 
 <!-- [![Coverage](https://img.shields.io/codecov/c/github/semernyakov/groq-chat-plugin?style=flat-square)](https://codecov.io/gh/semernyakov/groq-chat-plugin) -->
 
-[Русская версия](README.ru.md) | [English version](README.md)
+[Русская версия](docs/README.ru.md) | [English version](README.md)
 
 A plugin for [Obsidian](https://obsidian.md) that integrates Groq's AI chat capabilities directly into your notes.
 
