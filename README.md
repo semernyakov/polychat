@@ -49,26 +49,30 @@ This project is actively maintained and developed. New features are added regula
 
 ### Supported Models (Current List)
 
-- **distil-whisper-large-v3-en**
-- **whisper-large-v3**
-- **llama-3.3-70b-versatile**
-- **deepseek-r1-distill-llama-70b**
-- **meta-llama/llama-guard-4-12b**
-- **whisper-large-v3-turbo**
-- **meta-llama/llama-4-maverick-17b-128e-instruct**
-- **compound-beta**
-- **llama3-8b-8192**
-- **playai-tts**
-- **mistral-saba-24b**
-- **qwen-qwq-32b**
-- **llama-guard-3-8b**
-- **meta-llama/llama-4-scout-17b-16e-instruct**
-- **llama3-70b-8192**
-- **playai-tts-arabic**
-- **gemma2-9b-it**
-- **compound-beta-mini**
-- **allam-2-7b**
-- **llama-3.1-8b-instant**
+- "deepseek-r1-distill-llama-70b"
+- "llama-guard-3-8b"
+- "distil-whisper-large-v3-en"
+- "deepseek-r1-distill-llama-70b"
+- "meta-llama/llama-4-scout-17b-16e-instruct"
+- "llama-3.1-8b-instant"
+- "whisper-large-v3"
+- "playai-tts"
+- "meta-llama/llama-prompt-guard-2-22m"
+- "qwen-qwq-32b"
+- "meta-llama/llama-guard-4-12b"
+- "meta-llama/llama-4-maverick-17b-128e-instruct"
+- "mistral-saba-24b"
+- "llama-3.3-70b-versatile"
+- "compound-beta"
+- "llama3-8b-8192"
+- "meta-llama/llama-prompt-guard-2-86m"
+- "playai-tts-arabic"
+- "gemma2-9b-it"
+- "compound-beta-mini"
+- "llama3-70b-8192"
+- "qwen/qwen3-32b"
+- "allam-2-7b"
+- "whisper-large-v3-turbo"
 
 > See plugin settings for the full up-to-date list. Descriptions will be updated as soon as they become available.
 
