@@ -11,7 +11,19 @@
 
 [Русская версия](docs/README.ru.md) | [English version](README.md)
 
-A plugin for [Obsidian](https://obsidian.md) that integrates Groq's AI chat capabilities directly into your notes.
+A plugin for [Obsidian](https://obsidian.md) that integrates Groq's AI chat capabilities directly into your notes. 
+
+PolyChat is a powerful chat extension with support for AI models via the Groq API. Designed for flexibility and ease of use, it enables seamless communication with multiple models directly from your vault.
+
+## Screenshots
+
+**Main Interface**
+
+![polychat-main.png](docs/polychat-main.png)
+
+**Settings Interface**
+
+![polychat-settings.png](docs/polychat-settings.png)
 
 ## Features
 
@@ -80,9 +92,8 @@ This project is actively maintained and developed. New features are added regula
 1. Open any note in Obsidian
 2. Click the PolyChat icon in the sidebar
 3. Select the model you want (models update in real time)
-4. Start chatting with AI (text, code, or images)
-5. Use `/` commands for extra features (clear, settings, etc.)
-6. View model info any time via the Model Info Dialog
+4. Start chatting with AI (text, code)
+5. View model info any time via the Model Info Dialog
 
 ## Development
 
@@ -98,9 +109,6 @@ npm run dev
 
 # Build the plugin
 npm run build
-
-# Run tests
-npm run test
 
 # Check code style
 npm run lint
@@ -129,3 +137,9 @@ If you find this plugin helpful, consider:
 ## Changelog
 
 See [CHANGELOG.ru.md](CHANGELOG.ru.md) for all changes.
+
+---
+
+Made with ❤️ for Obsidian Community,
+
+[Support developer with YooMoney](https://yoomoney.ru/fundraise/194GT5A5R07.250321)
