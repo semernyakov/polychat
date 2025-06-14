@@ -9,8 +9,7 @@
 
 <!-- [![Покрытие](https://img.shields.io/codecov/c/github/semernyakov/groq-chat-plugin?style=flat-square&label=покрытие)](https://codecov.io/gh/semernyakov/groq-chat-plugin) -->
 
-[English version](../README.md) |
-[Документация](https://semernyakov.github.io/groq-chat-plugin/ru/)
+[English version](../README.md)
 
 Плагин для [Obsidian](https://obsidian.md), который интегрирует возможности чата с AI от Groq прямо в ваши заметки.
 
