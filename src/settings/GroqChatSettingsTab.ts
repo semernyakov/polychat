@@ -556,10 +556,10 @@ export class GroqChatSettingsTab extends PluginSettingTab {
             this.plugin.settings.maxHistoryLength = !isNaN(num) && num >= 0 ? num : 0;
             await this.plugin.saveSettings();
           });
-        text.inputEl.insertAdjacentHTML(
-          'afterend',
-          `<span class="groq-small-text groq-margin-left">(${locale === 'ru' ? '0 = не хранить' : '0 = do not store'})</span>`,
-        );
+        const hintSpan = document.createElement('span');
+        hintSpan.className = 'groq-small-text groq-margin-left';
+        hintSpan.textContent = `(${locale === 'ru' ? '0 = не хранить' : '0 = do not store'})`;
+        text.inputEl.after(hintSpan);
         text.inputEl.type = 'number';
         text.inputEl.min = '0';
       })
@@ -591,10 +591,10 @@ export class GroqChatSettingsTab extends PluginSettingTab {
             })
         );
       
-      historyFileSetting.settingEl.insertAdjacentHTML(
-        'beforeend',
-        `<p class="groq-small-text groq-margin-top">${locale === 'ru' ? 'Пример: notes/history.md' : 'Example: notes/history.md'}</p>`,
-      );
+      const exampleP = document.createElement('p');
+      exampleP.className = 'groq-small-text groq-margin-top';
+      exampleP.textContent = locale === 'ru' ? 'Пример: notes/history.md' : 'Example: notes/history.md';
+      historyFileSetting.settingEl.appendChild(exampleP);
     }
   }
 
