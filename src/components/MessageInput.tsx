@@ -29,8 +29,9 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   useEffect(() => {
     const textarea = textareaRef.current;
     if (textarea) {
+      // Auto-resize textarea
       textarea.style.height = 'auto';
-      textarea.style.height = `${textarea.scrollHeight}px`;
+      textarea.style.height = `${Math.min(textarea.scrollHeight, 200)}px`;
     }
   }, [value]);
 
@@ -82,7 +83,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
           placeholder={t('inputPlaceholder', locale)}
           disabled={disabled}
           rows={1}
-          className="groq-chat-input__textarea"
+          className="groq-chat-input__textarea groq-textarea-auto"
           aria-label={t('inputAriaLabel', locale)}
           aria-describedby="input-hint input-counter"
         />

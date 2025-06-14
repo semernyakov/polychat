@@ -28,15 +28,25 @@ export const SupportDialog: React.FC<SupportDialogProps> = ({
   useEffect(() => {
     const body = document.body;
     const originalOverflow = body.style.overflow;
+    
     if (isOpen) {
-      body.style.overflow = 'hidden';
-    } else {
-      body.style.overflow = originalOverflow; // Восстанавливаем исходное значение
+      // Сохраняем текущее состояние overflow
+      body.dataset.originalOverflow = originalOverflow;
+      body.classList.add('body-overflow-hidden');
+    } else if (body.dataset.originalOverflow !== undefined) {
+      // Восстанавливаем исходное значение
+      body.style.overflow = body.dataset.originalOverflow;
+      delete body.dataset.originalOverflow;
+      body.classList.remove('body-overflow-hidden');
     }
 
     // Очистка при размонтировании
     return () => {
-      body.style.overflow = originalOverflow;
+      if (body.dataset.originalOverflow !== undefined) {
+        body.style.overflow = body.dataset.originalOverflow;
+        delete body.dataset.originalOverflow;
+        body.classList.remove('body-overflow-hidden');
+      }
     };
   }, [isOpen]);
 

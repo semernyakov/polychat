@@ -38,6 +38,19 @@
   --icon-size: 13px; /* Размер иконок, соответствующий Obsidian */
 }
 
+/* --- Auto-height textarea --- */
+.groq-textarea-auto {
+  resize: none;
+  overflow-y: hidden;
+  min-height: var(--input-height, 40px);
+  max-height: 200px; /* Prevent textarea from growing too much */
+}
+
+/* --- Body overflow control --- */
+.body-overflow-hidden {
+  overflow: hidden !important;
+}
+
 /* --- Сброс и базовые стили --- */
 *,
 *::before,
