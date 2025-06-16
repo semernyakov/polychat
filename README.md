@@ -69,6 +69,9 @@ This project is actively maintained and developed. New features are added regula
 - compound-beta-mini
 - allam-2-7b
 - llama-3.1-8b-instant
+- meta-llama/llama-prompt-guard-2-22m
+- meta-llama/llama-prompt-guard-2-86m
+- qwen/qwen3-32b
 
 > See plugin settings for the full up-to-date list. Descriptions will be updated as soon as they become available.
 
