@@ -14,7 +14,7 @@ const SupportThanksBlock: React.FC = () => {
   const locale = (window.localStorage.getItem('groq-chat-locale') || 'ru') as 'ru' | 'en';
   return (
     <div className="groq-support-thanks">
-      <span dangerouslySetInnerHTML={tHtml('supportDialogThanks')} />
+      <span className="groq-support-thanks__text">{t('supportDialogThanks')}</span>
     </div>
   );
 };
@@ -27,26 +27,16 @@ export const SupportDialog: React.FC<SupportDialogProps> = ({
   // Блокировка скролла фона при открытом диалоге
   useEffect(() => {
     const body = document.body;
-    const originalOverflow = body.style.overflow;
-    
+
     if (isOpen) {
-      // Сохраняем текущее состояние overflow
-      body.dataset.originalOverflow = originalOverflow;
-      body.classList.add('body-overflow-hidden');
-    } else if (body.dataset.originalOverflow !== undefined) {
-      // Восстанавливаем исходное значение
-      body.style.overflow = body.dataset.originalOverflow;
-      delete body.dataset.originalOverflow;
-      body.classList.remove('body-overflow-hidden');
+      body.classList.add('groq-dialog-open');
+    } else {
+      body.classList.remove('groq-dialog-open');
     }
 
     // Очистка при размонтировании
     return () => {
-      if (body.dataset.originalOverflow !== undefined) {
-        body.style.overflow = body.dataset.originalOverflow;
-        delete body.dataset.originalOverflow;
-        body.classList.remove('body-overflow-hidden');
-      }
+      body.classList.remove('groq-dialog-open');
     };
   }, [isOpen]);
 
@@ -94,7 +84,10 @@ export const SupportDialog: React.FC<SupportDialogProps> = ({
         </div>
 
         <div className="groq-dialog-content">
-          <p dangerouslySetInnerHTML={tHtml('supportDialogContent')} />
+          <p
+            className="groq-dialog-content__text"
+            dangerouslySetInnerHTML={tHtml('supportDialogContent')}
+          />
           {/* Красивый блок благодарности, как в настройках */}
           <SupportThanksBlock />
         </div>

@@ -621,16 +621,16 @@
 /* --- Таблицы и лимиты --- */
 
 .groq-settings-title {
-	margin-top: 0.5em;
-	font-size: 2em !important;
-	font-weight: bold;
+  margin-top: 0.5em;
+  font-size: 2em !important;
+  font-weight: bold;
 }
 
 .groq-models-table,
 /* Settings Tab Styles */
 .groq-settings-title {
   margin-top: 0.5em;
-  font-size: 2em ;
+  font-size: 2em;
   font-weight: bold;
 }
 
@@ -680,14 +680,24 @@
   padding: 1em;
   border-radius: 8px;
   text-align: center;
-  transition: background 0.3s, color 0.3s;
-  background: linear-gradient(90deg, var(--background-modifier-box-hover, #f2f3f5) 0%, var(--background-secondary, #fcb69f) 100%);
+  transition:
+    background 0.3s,
+    color 0.3s;
+  background: linear-gradient(
+    90deg,
+    var(--background-modifier-box-hover, #f2f3f5) 0%,
+    var(--background-secondary, #fcb69f) 100%
+  );
   color: var(--text-normal, #222);
   border: 1px solid var(--background-modifier-border, #ddd);
 }
 
 .theme-dark .groq-settings-thanks {
-  background: linear-gradient(90deg, var(--background-modifier-box-hover, #2a2a2a) 0%, var(--background-secondary, #3a3a3a) 100%);
+  background: linear-gradient(
+    90deg,
+    var(--background-modifier-box-hover, #2a2a2a) 0%,
+    var(--background-secondary, #3a3a3a) 100%
+  );
   color: var(--text-normal, #eee);
   border: 1px solid var(--background-modifier-border, #333);
 }
@@ -733,8 +743,14 @@
   padding: 1em;
   border-radius: 8px;
   text-align: center;
-  transition: background 0.3s, color 0.3s;
-  background: linear-gradient(90deg, var(--background-modifier-box-hover, #f2f3f5) 0%, var(--background-secondary, #fcb69f) 100%);
+  transition:
+    background 0.3s,
+    color 0.3s;
+  background: linear-gradient(
+    90deg,
+    var(--background-modifier-box-hover, #f2f3f5) 0%,
+    var(--background-secondary, #fcb69f) 100%
+  );
   color: var(--text-normal, #222);
   border: 1px solid var(--background-modifier-border, #ddd);
 }
@@ -838,4 +854,59 @@
   .groq-chat__input-container {
     padding: var(--spacing-medium);
   }
+}
+
+/* Стили для MessageInput */
+.groq-textarea-overflow {
+  overflow-y: auto !important;
+}
+
+.groq-send-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* Стили для SupportDialog */
+.groq-dialog-open {
+  overflow: hidden !important;
+}
+
+/* Стили для иконки сохранения */
+.groq-saved-icon {
+  color: var(--text-success);
+  margin-left: var(--spacing-small);
+  transition: opacity 0.3s ease;
+}
+
+.groq-saved-icon--fade-out {
+  opacity: 0;
+}
+
+/* Стили для спиннера */
+.groq-spinner {
+  display: none;
+  margin-left: var(--spacing-small);
+  vertical-align: middle;
+}
+
+.groq-spinner--visible {
+  display: inline-block;
+}
+
+.groq-support-thanks__text,
+.groq-dialog-content__text {
+  line-height: 1.6;
+  margin: var(--spacing-medium) 0;
+}
+
+.groq-dialog-content__text p {
+  margin: var(--spacing-medium) 0;
+}
+
+.groq-dialog-content__text p:first-child {
+  margin-top: 0;
+}
+
+.groq-dialog-content__text p:last-child {
+  margin-bottom: 0;
 }

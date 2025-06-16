@@ -29,9 +29,9 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   useEffect(() => {
     const textarea = textareaRef.current;
     if (textarea) {
-      // Auto-resize textarea
-      textarea.style.height = 'auto';
-      textarea.style.height = `${Math.min(textarea.scrollHeight, 200)}px`;
+      // Auto-resize textarea using CSS classes
+      textarea.classList.add('groq-textarea-auto');
+      textarea.classList.toggle('groq-textarea-overflow', textarea.scrollHeight > 200);
     }
   }, [value]);
 
@@ -94,7 +94,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
           aria-label={t('sendMessage', locale)}
           title={t('sendTitle', locale)}
         >
-          <FiSend size={18} />
+          <FiSend className="groq-send-icon" />
         </button>
       </div>
       <div className="groq-chat-input__footer">

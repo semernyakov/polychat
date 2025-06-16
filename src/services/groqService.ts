@@ -140,17 +140,17 @@ export class GroqService implements GroqServiceMethods {
         return await requestUrl({
           url: 'https://api.groq.com/openai/v1/models',
           method: 'GET',
-          headers: { 
-            'Authorization': `Bearer ${this.plugin.settings.apiKey}`,
-            'Content-Type': 'application/json'
-          }
+          headers: {
+            Authorization: `Bearer ${this.plugin.settings.apiKey}`,
+            'Content-Type': 'application/json',
+          },
         });
       });
-      
+
       if (response.status !== 200) {
         throw new Error(`API error: ${response.status}`);
       }
-      
+
       const rl: RateLimitsType = {
         requestsPerDay: response.headers['x-ratelimit-limit-requests']
           ? parseInt(response.headers['x-ratelimit-limit-requests']) || undefined
@@ -167,7 +167,7 @@ export class GroqService implements GroqServiceMethods {
         resetRequests: response.headers['x-ratelimit-reset-requests'] || undefined,
         resetTokens: response.headers['x-ratelimit-reset-tokens'] || undefined,
       };
-      
+
       this.rateLimits = rl;
       const filtered = ((response.json && response.json.data) || []).filter((m: any) => {
         const name = (m.name || m.id || '').toLowerCase();
@@ -188,7 +188,7 @@ export class GroqService implements GroqServiceMethods {
         active: typeof m.active === 'boolean' ? m.active : undefined,
         releaseStatus: m.release_status || m.releaseStatus || undefined,
       }));
-      
+
       // ВРЕМЕННО: логируем все поля моделей для отладки
       if (response.json && Array.isArray(response.json.data)) {
         // console.log('[GroqService] Получено моделей:', response.json.data.length);
@@ -196,7 +196,7 @@ export class GroqService implements GroqServiceMethods {
           // console.log(`[GroqService] Модель #${idx + 1}:`, model);
         });
       }
-      
+
       // Сохранение в кэш
       this.modelCache = { models, rateLimits: rl, timestamp: Date.now() };
       return { models, rateLimits: rl };

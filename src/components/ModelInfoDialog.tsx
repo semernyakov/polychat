@@ -71,7 +71,9 @@ export const ModelInfoDialog: React.FC<ModelInfoDialogProps> = ({
               )}
               <div className="groq-model-info__detail">
                 <span className="groq-model-info__label">{t('developer')}:</span>
-                <span className="groq-model-info__value">{currentModelInfo.developer?.name || '—'}</span>
+                <span className="groq-model-info__value">
+                  {currentModelInfo.developer?.name || '—'}
+                </span>
               </div>
               {typeof currentModelInfo.created === 'number' && (
                 <div className="groq-model-info__detail">
@@ -92,7 +94,9 @@ export const ModelInfoDialog: React.FC<ModelInfoDialogProps> = ({
               <div className="groq-model-info__detail">
                 <span className="groq-model-info__label">{t('maxTokens')}:</span>
                 <span className="groq-model-info__value">
-                  {typeof currentModelInfo.maxTokens === 'number' ? currentModelInfo.maxTokens : '—'}
+                  {typeof currentModelInfo.maxTokens === 'number'
+                    ? currentModelInfo.maxTokens
+                    : '—'}
                 </span>
               </div>
               {currentModelInfo.releaseStatus && (

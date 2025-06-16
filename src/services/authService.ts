@@ -6,7 +6,7 @@ export class AuthService {
 
   // Теперь принимаем plugin с методами saveData/loadData
   constructor(
-    private readonly groqService: { 
+    private readonly groqService: {
       validateApiKey: (apiKey: string) => Promise<boolean>;
       updateApiKey?: (apiKey: string) => void;
     },
@@ -76,19 +76,19 @@ export class AuthService {
       await this.clearApiKey();
       return false;
     }
-    
+
     const isValid = await this.validateApiKey(apiKey);
     if (isValid) {
       await this.plugin.saveData({ apiKey });
       this.apiKey = apiKey;
       this.apiKeyIsSet = true;
       new Notice('✅ API key set successfully');
-      
+
       // Update the GroqService with the new API key if the method exists
       if (this.groqService && typeof this.groqService.updateApiKey === 'function') {
         this.groqService.updateApiKey(apiKey);
       }
-      
+
       // Refresh the plugin to apply changes
       await this.refreshPlugin();
       return true;
@@ -122,7 +122,11 @@ export class AuthService {
    * This ensures all services are reinitialized with the new API key
    */
   private async refreshPlugin(): Promise<void> {
-    if (!this.plugin.id || !this.plugin.app?.plugins?.disablePlugin || !this.plugin.app.plugins.enablePlugin) {
+    if (
+      !this.plugin.id ||
+      !this.plugin.app?.plugins?.disablePlugin ||
+      !this.plugin.app.plugins.enablePlugin
+    ) {
       console.log('Cannot refresh plugin: missing required methods');
       return;
     }

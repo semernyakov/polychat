@@ -21,7 +21,7 @@ export default class GroqChatPlugin extends Plugin implements GroqPluginInterfac
   async onload() {
     await this.loadSettings();
     this.initializeServices();
-    
+
     // Check API key on plugin load
     if (this.settings.apiKey) {
       const isValid = await this.groqService.validateApiKey(this.settings.apiKey);

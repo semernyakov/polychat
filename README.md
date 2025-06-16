@@ -11,7 +11,7 @@
 
 [Русская версия](docs/README.ru.md) | [English version](README.md)
 
-A plugin for [Obsidian](https://obsidian.md) that integrates Groq's AI chat capabilities directly into your notes. 
+A plugin for [Obsidian](https://obsidian.md) that integrates Groq's AI chat capabilities directly into your notes.
 
 PolyChat is a powerful chat extension with support for AI models via the Groq API. Designed for flexibility and ease of use, it enables seamless communication with multiple models directly from your vault.
 
@@ -49,26 +49,26 @@ This project is actively maintained and developed. New features are added regula
 
 ### Supported Models (Current List)
 
-- **distil-whisper-large-v3-en**
-- **whisper-large-v3**
-- **llama-3.3-70b-versatile**
-- **deepseek-r1-distill-llama-70b**
-- **meta-llama/llama-guard-4-12b**
-- **whisper-large-v3-turbo**
-- **meta-llama/llama-4-maverick-17b-128e-instruct**
-- **compound-beta**
-- **llama3-8b-8192**
-- **playai-tts**
-- **mistral-saba-24b**
-- **qwen-qwq-32b**
-- **llama-guard-3-8b**
-- **meta-llama/llama-4-scout-17b-16e-instruct**
-- **llama3-70b-8192**
-- **playai-tts-arabic**
-- **gemma2-9b-it**
-- **compound-beta-mini**
-- **allam-2-7b**
-- **llama-3.1-8b-instant**
+- distil-whisper-large-v3-en
+- whisper-large-v3
+- llama-3.3-70b-versatile
+- deepseek-r1-distill-llama-70b
+- meta-llama/llama-guard-4-12b
+- whisper-large-v3-turbo
+- meta-llama/llama-4-maverick-17b-128e-instruct
+- compound-beta
+- llama3-8b-8192
+- playai-tts
+- mistral-saba-24b
+- qwen-qwq-32b
+- llama-guard-3-8b
+- meta-llama/llama-4-scout-17b-16e-instruct
+- llama3-70b-8192
+- playai-tts-arabic
+- gemma2-9b-it
+- compound-beta-mini
+- allam-2-7b
+- llama-3.1-8b-instant
 
 > See plugin settings for the full up-to-date list. Descriptions will be updated as soon as they become available.
 
@@ -104,15 +104,68 @@ git clone https://github.com/semernyakov/polychat.git
 # Install dependencies
 npm install
 
-# Start development server
-npm run dev
-
 # Build the plugin
 npm run build
 
-# Check code style
+# Lint the code
 npm run lint
+
+# Check for obsolete models
+npm run check-models -- --help
 ```
+
+## Model Checking
+
+The `check_obsolete_models.ts` script verifies if the plugin is using any obsolete Groq models.
+
+### Quick Start (Recommended)
+
+```bash
+# Show help
+npm run check-models -- --help
+
+# Check models in default location
+npm run check-models
+
+# Check with custom plugin data path (Linux/macOS)
+npm run check-models -- --plugin-data-dir=~/.config/obsidian/plugins/groq-chat-plugin/data
+
+# Check with custom plugin data path (Windows)
+npm run check-models -- --plugin-data-dir=%APPDATA%\\obsidian\\plugins\\groq-chat-plugin\\data
+```
+
+### Additional Options
+
+1. **Specify Obsidian config directory** (if you know the path to `.obsidian`):
+   ```bash
+   npm run check-models -- --config-dir=~/.config/obsidian
+   ```
+
+2. **Use environment variables** (useful for scripts):
+   ```bash
+   OBSIDIAN_VAULT_PATH=~/.config/obsidian \
+   npm run check-models
+   ```
+
+3. **Development mode** (uses default paths):
+   ```bash
+   NODE_ENV=development npm run check-models
+   ```
+
+### Plugin Settings Location
+
+Plugin settings are usually found in one of these locations:
+
+- **Linux**: `~/.config/obsidian/plugins/groq-chat-plugin/data/settings.json`
+- **Windows**: `%APPDATA%\\obsidian\\plugins\\groq-chat-plugin\\data\\settings.json`
+- **macOS**: `~/Library/Application Support/obsidian/plugins/groq-chat-plugin/data/settings.json`
+
+### What Does the Script Do?
+
+1. Finds the plugin's settings file
+2. Checks which models are specified in the settings
+3. Compares them with the current list of available Groq models
+4. Shows any obsolete or non-existent models
 
 ## Contributing
 
