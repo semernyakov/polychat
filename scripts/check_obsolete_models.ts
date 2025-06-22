@@ -117,7 +117,7 @@ function checkSettingsFile(filePath: string): boolean {
 }
 
 // Функция для поиска файла настроек в типичных местах
-function findSettingsFile(): string | null {
+function findSettingsFile(options: CheckOptions): string | null {
   // Список возможных мест для поиска
   const possiblePaths = [
     // 1. Текущая директория
@@ -127,7 +127,7 @@ function findSettingsFile(): string | null {
     // 3. Стандартный путь в хранилище Obsidian
     path.join(
       process.env.HOME || process.env.USERPROFILE || '',
-      '.obsidian',
+      options.configDir || '.obsidian',
       'plugins',
       'groq-chat-plugin',
       'data',
@@ -140,7 +140,7 @@ function findSettingsFile(): string | null {
       'Mobile Documents',
       'iCloud~md~obsidian',
       'Documents',
-      '.obsidian',
+      options.configDir || '.obsidian',
       'plugins',
       'groq-chat-plugin',
       'data',
@@ -316,7 +316,11 @@ if (isMain) {
     console.log('  Путь к настройкам:', settingsPath);
   } else {
     // Пытаемся автоматически найти файл настроек
-    settingsPath = findSettingsFile();
+    settingsPath = findSettingsFile({
+      configDir: configDirArg || configDir,
+      pluginDataPath: '', // Это значение не используется в findSettingsFile, но требуется по типу
+      listAll: false
+    });
 
     if (!settingsPath) {
       console.error('Ошибка: Не удалось автоматически определить путь к настройкам.');

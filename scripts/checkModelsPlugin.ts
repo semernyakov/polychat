@@ -11,16 +11,11 @@ export default class CheckModelsPlugin extends Plugin {
   }
 
   async onload() {
-    console.log('Запуск проверки моделей...');
-
     try {
       // Получаем путь к каталогу конфигурации из Vault
       const vault = this.app.vault as unknown as VaultWithConfigDir;
       const configDir = vault.configDir || '.obsidian';
       const pluginDataPath = `${configDir}/plugins/groq-chat-plugin/data/settings.json`;
-
-      console.log(`Используется каталог конфигурации: ${configDir}`);
-      console.log(`Путь к настройкам плагина: ${pluginDataPath}`);
 
       // Запускаем проверку
       const success = await checkObsoleteModels({
