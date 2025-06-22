@@ -124,12 +124,6 @@ The `check_obsolete_models.ts` script verifies if the plugin is using any obsole
 ### Quick Start (Recommended)
 
 ```bash
-# Show help
-npm run check-models -- --help
-
-# Check models in default location
-npm run check-models
-
 # Check with custom plugin data path (Linux/macOS)
 npm run check-models -- --plugin-data-dir=~/.config/obsidian/plugins/groq-chat-plugin/data
 

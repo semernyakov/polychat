@@ -90,20 +90,20 @@ interface PluginSettings {
 
 // Функция для вывода справки
 function showHelp() {
-  console.log(`
-Проверка устаревших моделей для плагина Groq Chat
+  // console.log(`
+// Проверка устаревших моделей для плагина Groq Chat
 
-Использование:
-  1. С указанием каталога конфигурации:
-     npm run check-models -- --config-dir=ваш_каталог_конфигурации
-  2. С указанием полного пути к данным плагина:
-     npm run check-models -- --plugin-data-dir=путь/к/плагину/data
+// Использование:
+//   1. С указанием каталога конфигурации:
+//      npm run check-models -- --config-dir=ваш_каталог_конфигурации
+//   2. С указанием полного пути к данным плагина:
+//      npm run check-models -- --plugin-data-dir=путь/к/плагину/data
 
-Переменные окружения:
-  OBSIDIAN_VAULT_PATH - путь к корню хранилища Obsidian
-  OBSIDIAN_CONFIG_DIR - имя каталога конфигурации (по умолчанию: .obsidian)
-  NODE_ENV=development - использовать пути по умолчанию для разработки
-`);
+// Переменные окружения:
+//   OBSIDIAN_VAULT_PATH - путь к корню хранилища Obsidian
+//   OBSIDIAN_CONFIG_DIR - имя каталога конфигурации (по умолчанию: .obsidian)
+//   NODE_ENV=development - использовать пути по умолчанию для разработки
+// `);
   process.exit(1);
 }
 
@@ -151,7 +151,7 @@ function findSettingsFile(options: CheckOptions): string | null {
   // Проверяем каждый путь
   for (const filePath of possiblePaths) {
     if (checkSettingsFile(filePath)) {
-      console.log(`Автоматически обнаружен файл настроек: ${filePath}`);
+      // console.log(`Автоматически обнаружен файл настроек: ${filePath}`);
       return filePath;
     }
   }
@@ -162,7 +162,7 @@ function findSettingsFile(options: CheckOptions): string | null {
 // Функция для проверки устаревших моделей
 export async function checkObsoleteModels(options: CheckOptions) {
   const { pluginDataPath, listAll = false } = options;
-  console.log(`Проверка моделей в каталоге: ${options.configDir}`);
+  // console.log(`Проверка моделей в каталоге: ${options.configDir}`);
 
   // Загружаем настройки
   let settings: PluginSettings = {};
@@ -172,7 +172,7 @@ export async function checkObsoleteModels(options: CheckOptions) {
     return false;
   }
 
-  console.log(`Загрузка настроек из: ${pluginDataPath}`);
+  // console.log(`Загрузка настроек из: ${pluginDataPath}`);
 
   try {
     const settingsContent = fs.readFileSync(pluginDataPath, 'utf-8');
@@ -211,11 +211,11 @@ export async function checkObsoleteModels(options: CheckOptions) {
 
   // Выводим информацию об устаревших моделях
   if (deprecatedModels.length > 0) {
-    console.log('\n⚠️  Обнаружены устаревшие модели в настройках:');
+    // console.log('\n⚠️  Обнаружены устаревшие модели в настройках:');
     deprecatedModels.forEach(model => {
-      console.log(`\n❌ ${model.id} (${model.name})`);
-      if (model.deprecationDate) console.log(`  Устареет: ${model.deprecationDate}`);
-      if (model.replacementModel) console.log(`  Замена: ${model.replacementModel}`);
+      // console.log(`\n❌ ${model.id} (${model.name})`);
+      // if (model.deprecationDate) console.log(`  Устареет: ${model.deprecationDate}`);
+      // if (model.replacementModel) console.log(`  Замена: ${model.replacementModel}`);
     });
   }
 
@@ -226,48 +226,48 @@ export async function checkObsoleteModels(options: CheckOptions) {
     MODEL_INFO[currentModel as keyof typeof MODEL_INFO]?.deprecated
   ) {
     const currentModelInfo = MODEL_INFO[currentModel as keyof typeof MODEL_INFO];
-    console.log('\n❌ Внимание: В настройках выбрана устаревшая модель!');
-    console.log(`   Текущая модель: ${currentModel} (${currentModelInfo?.name || 'неизвестно'})`);
+    // console.log('\n❌ Внимание: В настройках выбрана устаревшая модель!');
+    // console.log(`   Текущая модель: ${currentModel} (${currentModelInfo?.name || 'неизвестно'})`);
     if (currentModelInfo?.replacementModel) {
-      console.log(`   Рекомендуется заменить на: ${currentModelInfo.replacementModel}`);
+      // console.log(`   Рекомендуется заменить на: ${currentModelInfo.replacementModel}`);
     }
     if (currentModelInfo?.deprecationDate) {
-      console.log(`   Дата устаревания: ${currentModelInfo.deprecationDate}`);
+      // console.log(`   Дата устаревания: ${currentModelInfo.deprecationDate}`);
     }
   } else if (currentModel) {
-    console.log('\n✅ Выбранная модель актуальна.');
+    // console.log('\n✅ Выбранная модель актуальна.');
   }
 
   // Выводим список всех доступных моделей, если запрошено
   if (options.listAll) {
-    console.log('\n=== Все доступные модели ===');
+    // console.log('\n=== Все доступные модели ===');
     allModelIds.forEach(modelId => {
       const model = MODEL_INFO[modelId as keyof typeof MODEL_INFO];
       const deprecatedInfo = model?.deprecated ? ' (DEPRECATED)' : '';
-      console.log(`- ${modelId}${deprecatedInfo}: ${model?.name || 'неизвестно'}`);
-      if (model?.description) console.log(`  ${model.description}`);
-      if (model?.maxTokens) console.log(`  Макс. токенов: ${model.maxTokens}`);
-      if (model?.deprecationDate) console.log(`  Устареет: ${model.deprecationDate}`);
-      if (model?.replacementModel) console.log(`  Замена: ${model.replacementModel}`);
+      // console.log(`- ${modelId}${deprecatedInfo}: ${model?.name || 'неизвестно'}`);
+      // if (model?.description) console.log(`  ${model.description}`);
+      // if (model?.maxTokens) console.log(`  Макс. токенов: ${model.maxTokens}`);
+      // if (model?.deprecationDate) console.log(`  Устареет: ${model.deprecationDate}`);
+      // if (model?.replacementModel) console.log(`  Замена: ${model.replacementModel}`);
     });
   }
 
   // Выводим информацию об отсутствующих моделях
   if (obsoleteModels.length > 0) {
-    console.log('\n⚠️  Следующие модели отсутствуют в настройках, но есть в списке доступных:');
+    // console.log('\n⚠️  Следующие модели отсутствуют в настройках, но есть в списке доступных:');
     obsoleteModels.forEach(id => {
       const info = MODEL_INFO[id as keyof typeof MODEL_INFO];
-      console.log(`  - ${id} (${info?.name || 'неизвестно'})`);
+      // console.log(`  - ${id} (${info?.name || 'неизвестно'})`);
     });
   }
 
   // Завершаем выполнение с соответствующим кодом выхода
   const hasIssues = deprecatedModels.length > 0 || obsoleteModels.length > 0;
   if (hasIssues) {
-    console.log('\n❌ Обнаружены проблемы с настройками моделей.');
+    // console.log('\n❌ Обнаружены проблемы с настройками моделей.');
     return false;
   } else {
-    console.log('\n✅ Настройки моделей в порядке.');
+    // console.log('\n✅ Настройки моделей в порядке.');
     return true;
   }
 }
@@ -296,7 +296,7 @@ if (isMain) {
     settingsPath = path.isAbsolute(pluginDataDirArg)
       ? path.join(pluginDataDirArg, 'settings.json')
       : path.join(process.cwd(), pluginDataDirArg, 'settings.json');
-    console.log(`Используется переданный путь к данным плагина: ${settingsPath}`);
+    // console.log(`Используется переданный путь к данным плагина: ${settingsPath}`);
   } else if (configDirArg) {
     // Если передан configDir, используем стандартную структуру
     const vaultRoot = process.env.OBSIDIAN_VAULT_PATH || path.join(process.cwd(), '..', '..');
@@ -305,15 +305,15 @@ if (isMain) {
       : path.join('.', configDirArg); // Иначе делаем относительным
 
     settingsPath = path.join(vaultRoot, configPath, 'plugins/groq-chat-plugin/data/settings.json');
-    console.log(`Используется configDir: ${path.join(vaultRoot, configPath)}`);
+    // console.log(`Используется configDir: ${path.join(vaultRoot, configPath)}`);
   } else if (process.env.NODE_ENV === 'development') {
     // Только для разработки - используем значения по умолчанию
     const vaultRoot = process.env.OBSIDIAN_VAULT_PATH || path.join(process.cwd(), '..', '..');
     settingsPath = path.join(vaultRoot, configDir, 'plugins/groq-chat-plugin/data/settings.json');
-    console.log('Режим разработки. Используются пути по умолчанию:');
-    console.log('  Хранилище:', vaultRoot);
-    console.log('  Каталог конфигурации:', configDir);
-    console.log('  Путь к настройкам:', settingsPath);
+    // console.log('Режим разработки. Используются пути по умолчанию:');
+    // console.log('  Хранилище:', vaultRoot);
+    // console.log('  Каталог конфигурации:', configDir);
+    // console.log('  Путь к настройкам:', settingsPath);
   } else {
     // Пытаемся автоматически найти файл настроек
     settingsPath = findSettingsFile({

@@ -24,12 +24,12 @@ export default class CheckModelsPlugin extends Plugin {
         listAll: true,
       });
 
-      console.log(`Проверка моделей завершена ${success ? 'успешно' : 'с ошибками'}`);
+      // console.log(`Проверка моделей завершена ${success ? 'успешно' : 'с ошибками'}`);
     } catch (error) {
-      console.error(
-        'Ошибка при проверке моделей:',
-        error instanceof Error ? error.message : String(error),
-      );
+      // console.error(
+      //   'Ошибка при проверке моделей:',
+      //   error instanceof Error ? error.message : String(error),
+      // );
     } finally {
       // Завершаем работу плагина
       this.app.workspace.detachLeavesOfType('check-models');
