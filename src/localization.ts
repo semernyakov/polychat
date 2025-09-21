@@ -153,11 +153,21 @@ export const translations: Record<Locale, Record<string, string>> = {
   },
 };
 
-export function t(key: string, locale: Locale = defaultLocale): string {
-  return translations[locale][key] || key;
+function getCurrentLocale(): Locale {
+  try {
+    const appLang = (window as any)?.app?.getLanguage?.();
+    if (typeof appLang === 'string' && appLang.toLowerCase().startsWith('ru')) return 'ru';
+  } catch {}
+  return defaultLocale;
 }
 
-export function tHtml(key: string, locale: Locale = defaultLocale): { __html: string } {
-  const translation = translations[locale][key];
+export function t(key: string, locale?: Locale): string {
+  const loc = locale ?? getCurrentLocale();
+  return translations[loc][key] || key;
+}
+
+export function tHtml(key: string, locale?: Locale): { __html: string } {
+  const loc = locale ?? getCurrentLocale();
+  const translation = translations[loc][key];
   return { __html: translation || key };
 }

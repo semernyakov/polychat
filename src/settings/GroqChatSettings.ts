@@ -1,5 +1,4 @@
 import { HistoryStorageMethod } from '../types/settings';
-import type { Locale } from '../localization';
 import type { RateLimitsType } from '../services/groqService';
 
 /**
@@ -30,7 +29,6 @@ export interface GroqChatSettings {
   maxHistoryLength: number;
   notePath: string;
   displayMode: 'tab' | 'sidepanel'; // Новое поле
-  language: Locale; // Язык интерфейса
   groqAvailableModels?: GroqModelInfo[];
   groqRateLimits?: RateLimitsType;
 }
@@ -47,5 +45,4 @@ export const DEFAULT_SETTINGS: Readonly<GroqChatSettings> = Object.freeze({
   maxHistoryLength: 20,
   notePath: 'groq-chat-history.md',
   displayMode: 'tab', // Значение по умолчанию
-  language: 'en', // По умолчанию английский
 });

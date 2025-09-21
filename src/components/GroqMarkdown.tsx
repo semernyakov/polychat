@@ -5,7 +5,6 @@ import rehypeRaw from 'rehype-raw';
 
 import { Highlight, themes, PrismTheme } from 'prism-react-renderer';
 import { FiCopy, FiCheck } from 'react-icons/fi';
-import { usePluginSettings } from '../utils/usePluginSettings';
 import { t, Locale } from '../localization';
 import '../styles.css';
 
@@ -21,7 +20,8 @@ const CodeBlock = React.memo(({ language, code }: { language: string; code: stri
   const [isCopied, setIsCopied] = React.useState(false);
   const [copyError, setCopyError] = React.useState(false);
   const timeoutId = React.useRef<NodeJS.Timeout | null>(null);
-  const { language: locale = 'en' } = usePluginSettings() || {};
+  const appLang = (window as any)?.app?.getLanguage?.();
+  const locale: Locale = (appLang && appLang.toLowerCase().startsWith('ru') ? 'ru' : 'en') as Locale;
 
   const handleCopy = () => {
     setCopyError(false);
@@ -165,7 +165,8 @@ const customComponents = {
 };
 
 export const GroqMarkdown: React.FC<{ content: string }> = ({ content }) => {
-  const language = (usePluginSettings()?.language ?? 'en') as Locale;
+  const appLang = (window as any)?.app?.getLanguage?.();
+  const language = (appLang && appLang.toLowerCase().startsWith('ru') ? 'ru' : 'en') as Locale;
   const components = useMemo(
     () => ({
       ...customComponents,

@@ -21,7 +21,6 @@ import '../styles.css';
 import { ModelInfoDialog } from './ModelInfoDialog';
 import { PluginSettingsProvider } from '../context/PluginSettingsContext';
 import { t, Locale } from '../localization';
-import { usePluginSettings } from '../utils/usePluginSettings';
 // import { DEFAULT_MODEL } from '../types/models'; // Удалено, если не используется
 import { GroqModel, ModelCategory, ModelReleaseStatus } from '../types/types';
 
@@ -137,9 +136,9 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
     const [rateLimits, setRateLimits] = useState<any>(null);
     const messageListRef = useRef<MessageListHandles>(null);
     const containerRef = useRef<HTMLDivElement>(null);
-    const settings = usePluginSettings();
-    // Язык по умолчанию — en
-    const locale: Locale = settings?.language ?? 'en';
+    // Определяем язык из настроек Obsidian (App API). Требуется minAppVersion: 1.8.0
+    const appLang = (plugin.app as any)?.getLanguage?.();
+    const locale: Locale = (appLang && appLang.toLowerCase().startsWith('ru') ? 'ru' : 'en') as Locale;
 
     const { messages, setMessages, isHistoryLoading, clearHistory } = useMessages(
       initialMessages,

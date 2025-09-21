@@ -11,7 +11,6 @@ interface SupportDialogProps {
 
 // Красивый блок благодарности с темизацией
 const SupportThanksBlock: React.FC = () => {
-  const locale = (window.localStorage.getItem('groq-chat-locale') || 'ru') as 'ru' | 'en';
   return (
     <div className="groq-support-thanks">
       <span className="groq-support-thanks__text">{t('supportDialogThanks')}</span>

@@ -28,7 +28,16 @@ export function PluginSettingsProvider({
   };
 
   return (
-    <PluginSettingsContext.Provider value={{ ...settings, setSettings, language: 'en' }}>
+    <PluginSettingsContext.Provider
+      value={{
+        ...settings,
+        setSettings,
+        // Язык интерфейса берём из настроек Obsidian, а не из настроек плагина
+        language: ((window as any)?.app?.getLanguage?.() || 'en').toLowerCase().startsWith('ru')
+          ? ('ru' as Locale)
+          : ('en' as Locale),
+      }}
+    >
       {children}
     </PluginSettingsContext.Provider>
   );

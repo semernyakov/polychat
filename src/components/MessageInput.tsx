@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FiSend } from 'react-icons/fi';
 import { t, Locale } from '../localization';
-import { usePluginSettings } from '../utils/usePluginSettings';
 import '../styles.css';
 
 interface MessageInputProps {
@@ -23,8 +22,8 @@ export const MessageInput: React.FC<MessageInputProps> = ({
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isComposing, setIsComposing] = useState(false);
-  const settings = usePluginSettings();
-  const locale: Locale = settings?.language ?? 'en';
+  const appLang = (window as any)?.app?.getLanguage?.();
+  const locale: Locale = (appLang && appLang.toLowerCase().startsWith('ru') ? 'ru' : 'en') as Locale;
 
   useEffect(() => {
     const textarea = textareaRef.current;

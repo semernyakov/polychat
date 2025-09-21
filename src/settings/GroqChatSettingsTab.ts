@@ -5,23 +5,9 @@ import { isValidFileName } from '../utils/validation';
 import { createLink, createTextNode, clearElement } from '../utils/domUtils';
 import { t, Locale } from '../localization';
 import type { RateLimitsType } from '../services/groqService';
+import type { GroqChatSettings as GroqChatSettingsType } from '../settings/GroqChatSettings';
 
-interface GroqChatSettings {
-  groqAvailableModels: Array<{
-    id: string;
-    name: string;
-    description?: string;
-    isActive: boolean;
-  }>;
-  model: string;
-  apiKey: string;
-  language: 'en' | 'ru';
-  temperature: number;
-  maxTokens: number;
-  historyStorageMethod: HistoryStorageMethod;
-  maxHistoryLength: number;
-  notePath: string;
-}
+// NOTE: Use canonical settings type imported from '../settings/GroqChatSettings'
 
 export class GroqChatSettingsTab extends PluginSettingTab {
   constructor(
@@ -32,7 +18,8 @@ export class GroqChatSettingsTab extends PluginSettingTab {
   }
 
   display(): void {
-    const locale = (this.plugin.settings.language || 'ru') as Locale;
+    const appLang = (this.app as any)?.getLanguage?.();
+    const locale = (appLang && appLang.toLowerCase().startsWith('ru') ? 'ru' : 'en') as Locale;
     this.containerEl.empty();
     // --- Красивый заголовок и приветствие ---
     const title = this.containerEl.createEl('h2', {
@@ -88,7 +75,7 @@ export class GroqChatSettingsTab extends PluginSettingTab {
     this.addHistorySettings(locale);
     // --- Интерфейс ---
     this.containerEl.createEl('h3', {
-      text: locale === 'ru' ? '👀 Интерфейс и язык' : '👀 Interface & Language',
+      text: locale === 'ru' ? '👀 Интерфейс' : '👀 Interface',
     });
     // this.addDisplayModeSetting(locale); // Метод отсутствует
     // --- Температура и макс. токены в сетке ---
@@ -100,7 +87,7 @@ export class GroqChatSettingsTab extends PluginSettingTab {
     flexGrid.appendChild(tempDiv);
     flexGrid.appendChild(tokensDiv);
     this.containerEl.appendChild(flexGrid);
-    this.addLanguageSetting(locale);
+    // Язык больше не настраивается в плагине; используется Obsidian app.getLanguage()
 
     // --- Кнопки "Сохранить все настройки" и "Сбросить настройки по умолчанию" ---
     const actionsBlock = this.containerEl.createEl('div', { cls: 'groq-settings-actions' });
@@ -425,7 +412,7 @@ export class GroqChatSettingsTab extends PluginSettingTab {
       releaseStatus?: string;
     }
 
-    const settings = this.plugin.settings as GroqChatSettings;
+    const settings = this.plugin.settings as GroqChatSettingsType;
     const models: DisplayModel[] = (settings.groqAvailableModels || []).map(model => ({
       ...model,
       isActive: model.isActive !== false, // Default to true if undefined
@@ -605,21 +592,5 @@ export class GroqChatSettingsTab extends PluginSettingTab {
     }
   }
 
-  private addLanguageSetting(locale: Locale): void {
-    const languageSetting = new Setting(this.containerEl)
-      .setName(t('language', locale))
-      .setDesc(locale === 'ru' ? 'Выберите язык интерфейса' : 'Select UI language');
-
-    languageSetting.addDropdown(dropdown => {
-      dropdown
-        .addOption('en', 'English')
-        .addOption('ru', 'Русский')
-        .setValue(locale)
-        .onChange(async (value: string) => {
-          this.plugin.settings.language = value as 'en' | 'ru';
-          await this.plugin.saveSettings();
-          this.display();
-        });
-    });
-  }
+  // Удалён выбор языка из настроек. Локаль берётся из Obsidian.
 }

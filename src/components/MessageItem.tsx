@@ -4,15 +4,15 @@ import { GroqMarkdown } from './GroqMarkdown';
 import { FiCopy, FiCheck, FiCode } from 'react-icons/fi';
 import '../styles.css';
 import { toast } from 'react-toastify';
-import { t } from '../localization';
-import { usePluginSettings } from '../utils/usePluginSettings';
+import { t, Locale } from '../localization';
 
 export const MessageItem: React.FC<{ message: Message }> = React.memo(({ message }) => {
   const [isCopied, setIsCopied] = useState(false);
   const [copyError, setCopyError] = useState(false);
   const [showRaw, setShowRaw] = useState(false);
   const content = useMemo(() => message.content || '', [message.content]);
-  const { language = 'en' } = usePluginSettings() || {};
+  const appLang = (window as any)?.app?.getLanguage?.();
+  const language: Locale = (appLang && appLang.toLowerCase().startsWith('ru') ? 'ru' : 'en') as Locale;
 
   const handleCopy = useCallback(async () => {
     if (!content) return;
