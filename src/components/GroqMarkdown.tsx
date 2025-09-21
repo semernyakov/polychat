@@ -104,6 +104,15 @@ const CodeRenderer: React.FC<CodeProps> = ({ inline, className = '', children })
 
 const customComponents = {
   code: CodeRenderer,
+  // Безопасная обработка нестандартного тега <think>
+  // Преобразуем в span с классом и скрываем стилями, чтобы избежать предупреждения React
+  think({ node, children, ...props }: { node?: any; children?: any; [key: string]: any }) {
+    return (
+      <span className="groq-think" {...props}>
+        {children}
+      </span>
+    );
+  },
   p({ node, children, ...props }: { node?: any; children?: any; [key: string]: any }) {
     const childArray = React.Children.toArray(children);
     const hasDiv = childArray.some(child => React.isValidElement(child) && child.type === 'div');

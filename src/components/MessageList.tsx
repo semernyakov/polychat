@@ -39,7 +39,8 @@ export const MessageList = React.memo(
       useEffect(() => {
         if (messages.length > 0 && listRef.current) {
           const timer = setTimeout(() => {
-            listRef.current?.scrollToItem(messages.length - 1, 'end');
+            // Scroll to top when messages change (since we're showing newest first)
+            listRef.current?.scrollToItem(0, 'start');
           }, 50);
           return () => clearTimeout(timer);
         }
@@ -51,7 +52,7 @@ export const MessageList = React.memo(
         },
         scrollToBottom: () => {
           if (messages.length > 0) {
-            listRef.current?.scrollToItem(messages.length - 1, 'end');
+            listRef.current?.scrollToItem(0, 'start');
           }
         },
         forceUpdate: () => {
@@ -61,14 +62,16 @@ export const MessageList = React.memo(
         },
       }));
 
+      const reversedMessages = [...messages].reverse();
+
       const Row = ({ index, style }: { index: number; style: React.CSSProperties }) => {
-        const message = messages[index];
+        const message = reversedMessages[index];
         const id = message.id || `msg-${index}`;
 
         return (
           <div key={`message-${id}`} className="groq-message-row" style={style}>
             <div ref={el => measureRow(el, index, id)}>
-              <MessageItem message={message} key={`item-${id}`} />
+              <MessageItem message={message} />
             </div>
           </div>
         );
@@ -81,7 +84,7 @@ export const MessageList = React.memo(
       }, [messages]);
 
       const getItemSize = (index: number): number => {
-        const message = messages[index];
+        const message = reversedMessages[index];
         const id = message.id || `msg-${index}`;
         if (rowHeights.current[id]) {
           return rowHeights.current[id] + 12;
