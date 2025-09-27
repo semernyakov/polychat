@@ -176,7 +176,8 @@
   margin-bottom: 0; /* отступ перенесён на .groq-message-row */
   padding: var(--spacing-medium, 8px);
   border-radius: var(--border-radius, 3px);
-  max-width: 80%;
+  /* Используем min() для гибкой ширины сообщений */
+  max-width: min(80%, 900px);
 }
 
 .groq-message--user {
@@ -220,6 +221,11 @@
   line-height: 1.6;
   user-select: text;
   display: flow-root; /* предотвращает коллапс внешних отступов внутри, стабилизирует высоту */
+  /* Контент не должен выпадать: разрешаем горизонтальный скролл при переполнении */
+  overflow-x: auto;
+  /* Усиление переносов слов для общего текста */
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 /* (удалены дополнительные wrap-правила; базовые остаются ниже в код-блоках) */
 
@@ -302,9 +308,7 @@
 }
 
 /* Минимальная защита от переполнения длинными словами/URL */
-.groq-container .groq-message__content {
-  overflow-wrap: anywhere;
-}
+/* Усиление переносов остаётся, но теперь задано выше на .groq-message__content */
 
 .groq-container .groq-message__content a {
   overflow-wrap: anywhere;
@@ -361,6 +365,33 @@
 /* Ограничение ширины преформатированного текста в пределах сообщения */
 .groq-container .groq-message__content pre {
   max-width: 100%;
+}
+
+/* Стили полосы прокрутки для соответствия теме Obsidian */
+.groq-react-window-list::-webkit-scrollbar,
+.groq-message__content::-webkit-scrollbar,
+.groq-container .groq-message__content pre::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+.groq-react-window-list::-webkit-scrollbar-track,
+.groq-message__content::-webkit-scrollbar-track,
+.groq-container .groq-message__content pre::-webkit-scrollbar-track {
+  background: var(--background-primary, #202020);
+}
+
+.groq-react-window-list::-webkit-scrollbar-thumb,
+.groq-message__content::-webkit-scrollbar-thumb,
+.groq-container .groq-message__content pre::-webkit-scrollbar-thumb {
+  background-color: var(--background-modifier-border, #444444);
+  border-radius: 4px;
+}
+
+.groq-react-window-list::-webkit-scrollbar-thumb:hover,
+.groq-message__content::-webkit-scrollbar-thumb:hover,
+.groq-container .groq-message__content pre::-webkit-scrollbar-thumb:hover {
+  background-color: var(--background-modifier-hover, #3a3a3a);
 }
 
 /* --- Код --- */
