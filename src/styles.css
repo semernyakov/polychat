@@ -116,6 +116,20 @@
 
 /* (удалены жесткие width/max-width для внутренних оберток react-window) */
 
+/* --- History separator for button-based load --- */
+.groq-history-separator {
+  height: 1px;
+  margin: 4px 0 8px 0;
+  background: var(--background-modifier-border, rgba(128, 128, 128, 0.35));
+}
+
+/* Optional CSS variables for scroll thresholds and reveal offset */
+.groq-chat__messages {
+  --near-bottom-threshold: 100px;
+  --near-top-threshold: 40px;
+  --load-reveal-offset: 80px;
+}
+
 /* --- Поле ввода --- */
 .groq-chat__input-container {
   padding: var(--spacing-medium) var(--spacing-large);

@@ -29,6 +29,8 @@ export const MessageList = React.memo(
       const DEFAULT_TAIL_LIMIT = Math.max(1, tailLimit ?? 10);
       const [limit, setLimit] = React.useState<number>(DEFAULT_TAIL_LIMIT);
       const STEP = Math.max(1, tailStep ?? 20);
+      // Индекс в пределах видимого массива, перед которым вставляем разделитель (только для клика по кнопке)
+      const [separatorIndex, setSeparatorIndex] = React.useState<number | null>(null);
 
       // Вычисляем хвост истории
       const visibleMessages = React.useMemo(() => {
@@ -162,11 +164,19 @@ export const MessageList = React.memo(
                     onClick={() => {
                       const el = containerRef.current;
                       if (!el) {
-                        setLimit(l => Math.min(l + STEP, messages.length));
+                        setLimit(prev => {
+                          const toAdd = Math.min(STEP, messages.length - prev);
+                          if (toAdd > 0) setSeparatorIndex(toAdd);
+                          return prev + toAdd;
+                        });
                         return;
                       }
                       const prevScrollHeight = el.scrollHeight;
-                      setLimit(l => Math.min(l + STEP, messages.length));
+                      setLimit(prev => {
+                        const toAdd = Math.min(STEP, messages.length - prev);
+                        if (toAdd > 0) setSeparatorIndex(toAdd);
+                        return prev + toAdd;
+                      });
                       // Компенсируем смещение после расширения истории
                       requestAnimationFrame(() => {
                         const newScrollHeight = el.scrollHeight;
@@ -183,12 +193,14 @@ export const MessageList = React.memo(
               )}
 
               {visibleMessages.map((message, idx) => (
-                <div
-                  className="groq-message-row"
-                  key={`${message.id ?? 'msg'}-${message.timestamp ?? '0'}-${messages.length - visibleMessages.length + idx}`}
-                >
-                  <MessageItem message={message} />
-                </div>
+                <React.Fragment key={`${message.id ?? 'msg'}-${message.timestamp ?? '0'}-${messages.length - visibleMessages.length + idx}`}>
+                  {separatorIndex !== null && idx === separatorIndex && (
+                    <div className="groq-history-separator" aria-hidden="true" />
+                  )}
+                  <div className="groq-message-row">
+                    <MessageItem message={message} />
+                  </div>
+                </React.Fragment>
               ))}
             </>
           ) : (

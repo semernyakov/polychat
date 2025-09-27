@@ -93,7 +93,6 @@ export const MessageInput: React.FC<MessageInputProps> = ({
           disabled={isSendDisabled}
           className="groq-button groq-button--primary groq-chat-input__send-button"
           aria-label={t('sendMessage', locale)}
-          title={t('sendTitle', locale)}
         >
           <FiSend className="groq-send-icon" />
         </button>

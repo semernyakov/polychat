@@ -50,7 +50,6 @@ export const MessageItem: React.FC<{ message: Message }> = React.memo(({ message
             <button
               onClick={toggleRawView}
               className="groq-icon-button"
-              title={showRaw ? t('showFormatted') : t('showRaw')}
               aria-label={showRaw ? t('showFormatted') : t('showRaw')}
             >
               <FiCode size={14} />
@@ -58,11 +57,10 @@ export const MessageItem: React.FC<{ message: Message }> = React.memo(({ message
             <button
               onClick={handleCopy}
               className="groq-icon-button"
-              title={t('copyMessage')}
               aria-label={t('copyMessage')}
             >
               {copyError ? (
-                <span className="groq-message__copy-error" title={t('copyError')}>
+                <span className="groq-message__copy-error">
                   !
                 </span>
               ) : isCopied ? (

@@ -317,7 +317,6 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
             <button
               onClick={() => setIsModelInfoOpen(true)}
               className="groq-icon-button groq-model-info-button"
-              title={t('modelInfo')}
               aria-label={t('modelInfo')}
             >
               <FiInfo size={16} />
@@ -326,7 +325,6 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
             <button
               onClick={toggleDisplayMode}
               className="groq-icon-button groq-display-mode-button"
-              title={displayMode === 'tab' ? t('showInSidepanel') : t('showInTab')}
               aria-label={displayMode === 'tab' ? t('showInSidepanel') : t('showInTab')}
             >
               {displayMode === 'tab' ? <FiSidebar size={16} /> : <FiSquare size={16} />}
@@ -334,7 +332,6 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
             <button
               onClick={() => setIsSupportOpen(true)}
               className="groq-icon-button groq-support-header-button"
-              title={t('supportDevHeader')}
               aria-label={t('supportDevHeader')}
             >
               <FiHeart size={16} />
@@ -342,7 +339,6 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
             <button
               onClick={handleScrollToTop}
               className="groq-icon-button groq-scroll-button"
-              title={t('scrollToTop')}
               aria-label={t('scrollToTop')}
               disabled={messages.length === 0}
             >
@@ -351,7 +347,6 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
             <button
               onClick={handleScrollToBottom}
               className="groq-icon-button groq-scroll-button"
-              title={t('scrollToBottom')}
               aria-label={t('scrollToBottom')}
               disabled={messages.length === 0}
             >
@@ -360,7 +355,6 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
             <button
               onClick={clearHistory}
               className="groq-icon-button groq-clear-button"
-              title={t('clearHistory')}
               aria-label={t('clearHistory')}
               disabled={messages.length === 0 || isLoading}
             >
