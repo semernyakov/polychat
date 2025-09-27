@@ -193,7 +193,9 @@ export const MessageList = React.memo(
               )}
 
               {visibleMessages.map((message, idx) => (
-                <React.Fragment key={`${message.id ?? 'msg'}-${message.timestamp ?? '0'}-${messages.length - visibleMessages.length + idx}`}>
+                <React.Fragment
+                  key={`${message.id ?? 'msg'}-${message.timestamp ?? '0'}-${messages.length - visibleMessages.length + idx}`}
+                >
                   {separatorIndex !== null && idx === separatorIndex && (
                     <div className="groq-history-separator" aria-hidden="true" />
                   )}

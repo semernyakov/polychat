@@ -45,7 +45,7 @@ const MESSAGES: Record<Lang, Record<string, string>> = {
   },
 };
 
-function t(key: keyof typeof MESSAGES['ru'], lang: Lang = 'ru'): string {
+function t(key: keyof (typeof MESSAGES)['ru'], lang: Lang = 'ru'): string {
   return MESSAGES[lang][key] || MESSAGES.ru[key] || key;
 }
 
@@ -322,7 +322,7 @@ if (isMain) {
   const pluginDataDirArg = args.find(arg => arg.startsWith('--plugin-data-dir='))?.split('=')[1];
   const listAll = args.includes('--list-all');
   const langArg = (args.find(arg => arg.startsWith('--lang='))?.split('=')[1] || '').toLowerCase();
-  const lang: Lang = (langArg === 'en' ? 'en' : 'ru');
+  const lang: Lang = langArg === 'en' ? 'en' : 'ru';
 
   let settingsPath: string | null = null;
   const configDir = process.env.OBSIDIAN_CONFIG_DIR || '.obsidian';

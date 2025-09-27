@@ -75,10 +75,15 @@ export class GroqChatSettingsTab extends PluginSettingTab {
     });
 
     createTextNode(tokenLink, t('settings.tokenGetPrefix', locale));
-    createLink(tokenLink, t('settings.tokenOfficialSiteText', locale), 'https://console.groq.com/keys', {
-      target: '_blank',
-      rel: 'noopener noreferrer',
-    });
+    createLink(
+      tokenLink,
+      t('settings.tokenOfficialSiteText', locale),
+      'https://console.groq.com/keys',
+      {
+        target: '_blank',
+        rel: 'noopener noreferrer',
+      },
+    );
     createTextNode(tokenLink, '.');
     this.addApiKeySetting(locale);
 

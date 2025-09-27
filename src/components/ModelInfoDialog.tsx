@@ -114,7 +114,9 @@ export const ModelInfoDialog: React.FC<ModelInfoDialogProps> = ({
             </div>
 
             {!isAvailable && (
-              <div className="groq-model-info__warning" role="alert" aria-live="polite">⚠️ {t('modelUnavailable')}</div>
+              <div className="groq-model-info__warning" role="alert" aria-live="polite">
+                ⚠️ {t('modelUnavailable')}
+              </div>
             )}
           </div>
         </div>

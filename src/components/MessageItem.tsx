@@ -54,15 +54,9 @@ export const MessageItem: React.FC<{ message: Message }> = React.memo(({ message
             >
               <FiCode size={14} />
             </button>
-            <button
-              onClick={handleCopy}
-              className="groq-icon-button"
-              aria-label={t('copyMessage')}
-            >
+            <button onClick={handleCopy} className="groq-icon-button" aria-label={t('copyMessage')}>
               {copyError ? (
-                <span className="groq-message__copy-error">
-                  !
-                </span>
+                <span className="groq-message__copy-error">!</span>
               ) : isCopied ? (
                 <FiCheck size={14} color="var(--text-success)" />
               ) : (

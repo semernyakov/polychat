@@ -28,7 +28,8 @@ export const translations: Record<Locale, Record<string, string>> = {
     'settings.tailLimitName': 'Последние сообщения при открытии',
     'settings.tailLimitDesc': 'Сколько последних сообщений показывать без прокрутки',
     'settings.loadStepName': 'Шаг подгрузки истории',
-    'settings.loadStepDesc': 'Сколько сообщений добавлять при нажатии на кнопку или прокрутке вверх',
+    'settings.loadStepDesc':
+      'Сколько сообщений добавлять при нажатии на кнопку или прокрутке вверх',
     'settings.historyHeading': '🕓 История чата',
     'settings.default10': 'По умолчанию: 10',
     'settings.default20': 'По умолчанию: 20',
@@ -42,7 +43,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     'settings.tokenGetPrefix': 'Получить токен Groq можно на ',
     'settings.tokenOfficialSiteText': 'официальном сайте Groq API',
     'settings.selectModelPlaceholder': 'Выберите модель',
-    'modelDesc': 'Выберите модель, которую плагин будет использовать для ответа',
+    modelDesc: 'Выберите модель, которую плагин будет использовать для ответа',
     supportDialogTitle: 'Поддержать разработку',
     supportDialogClose: 'Закрыть',
     supportDialogContent:
@@ -155,7 +156,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     'settings.tokenGetPrefix': 'You can get your Groq token at the ',
     'settings.tokenOfficialSiteText': 'official Groq API website',
     'settings.selectModelPlaceholder': 'Select a model',
-    'modelDesc': 'Choose the model the plugin will use to respond',
+    modelDesc: 'Choose the model the plugin will use to respond',
     supportDialogTitle: 'Support development',
     supportDialogClose: 'Close',
     supportDialogContent:
