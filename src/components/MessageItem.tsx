@@ -5,14 +5,14 @@ import { FiCopy, FiCheck, FiCode } from 'react-icons/fi';
 import '../styles.css';
 import { toast } from 'react-toastify';
 import { t, Locale } from '../localization';
+import { MessageUtils } from '../utils/messageUtils';
 
 export const MessageItem: React.FC<{ message: Message }> = React.memo(({ message }) => {
   const [isCopied, setIsCopied] = useState(false);
   const [copyError, setCopyError] = useState(false);
   const [showRaw, setShowRaw] = useState(false);
   const content = useMemo(() => message.content || '', [message.content]);
-  const appLang = (window as any)?.app?.getLanguage?.();
-  const language: Locale = (appLang && appLang.toLowerCase().startsWith('ru') ? 'ru' : 'en') as Locale;
+  // Language is handled by the t() function internally
 
   const handleCopy = useCallback(async () => {
     if (!content) return;
@@ -25,10 +25,10 @@ export const MessageItem: React.FC<{ message: Message }> = React.memo(({ message
     } catch (err) {
       console.error('Error copying:', err);
       setCopyError(true);
-      toast.error(t('copyError', language));
+      toast.error(t('copyError'));
       setTimeout(() => setCopyError(false), 2000);
     }
-  }, [content, language]);
+  }, [content]);
 
   const toggleRawView = useCallback(() => {
     setShowRaw(prev => !prev);
@@ -39,10 +39,10 @@ export const MessageItem: React.FC<{ message: Message }> = React.memo(({ message
       <div className="groq-message__header">
         <div className="groq-message__meta">
           <span className="groq-message__role">
-            {message.role === 'user' ? t('you', language) : t('assistant', language)}
+            {message.role === 'user' ? t('you') : t('assistant')}
           </span>
           <span className="groq-message__timestamp">
-            {new Date(message.timestamp).toLocaleTimeString()}
+            {MessageUtils.formatTime(message.timestamp || Date.now())}
           </span>
         </div>
         {message.role === 'assistant' && (
@@ -50,19 +50,19 @@ export const MessageItem: React.FC<{ message: Message }> = React.memo(({ message
             <button
               onClick={toggleRawView}
               className="groq-icon-button"
-              title={showRaw ? t('showFormatted', language) : t('showRaw', language)}
-              aria-label={showRaw ? t('showFormatted', language) : t('showRaw', language)}
+              title={showRaw ? t('showFormatted') : t('showRaw')}
+              aria-label={showRaw ? t('showFormatted') : t('showRaw')}
             >
               <FiCode size={14} />
             </button>
             <button
               onClick={handleCopy}
               className="groq-icon-button"
-              title={t('copyMessage', language)}
-              aria-label={t('copyMessage', language)}
+              title={t('copyMessage')}
+              aria-label={t('copyMessage')}
             >
               {copyError ? (
-                <span className="groq-message__copy-error" title={t('copyError', language)}>
+                <span className="groq-message__copy-error" title={t('copyError')}>
                   !
                 </span>
               ) : isCopied ? (
@@ -76,7 +76,7 @@ export const MessageItem: React.FC<{ message: Message }> = React.memo(({ message
       </div>
       <div className={`groq-message__content ${showRaw ? 'groq-message__content--raw' : ''}`}>
         {showRaw ? (
-          <pre aria-label={t('rawContent', language)}>
+          <pre aria-label={t('rawContent')}>
             <code>{content}</code>
           </pre>
         ) : (

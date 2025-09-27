@@ -65,7 +65,7 @@
 
 ## Разработка
 
-```bash
+````bash
 # Клонировать репозиторий
 git clone https://github.com/semernyakov/polychat.git
 
@@ -98,16 +98,18 @@ npm run check-models -- --plugin-data-dir=~/.config/obsidian/plugins/groq-chat-p
 
 # Проверить с указанием пути к настройкам плагина (Windows)
 npm run check-models -- --plugin-data-dir=%APPDATA%\\obsidian\\plugins\\groq-chat-plugin\\data
-```
+````
 
 ### Дополнительные опции
 
 1. **Указать каталог настроек Obsidian** (если известен путь к `.obsidian`):
+
    ```bash
    npm run check-models -- --config-dir=~/.config/obsidian
    ```
 
 2. **Использовать переменные окружения** (полезно для скриптов):
+
    ```bash
    OBSIDIAN_VAULT_PATH=~/.config/obsidian \
    npm run check-models

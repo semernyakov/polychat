@@ -3,9 +3,11 @@
 /* --- Переменные плагина (локально на контейнер) --- */
 .groq-container {
   /* Типографика */
-  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell,
+  --font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell,
     'Helvetica Neue', sans-serif;
-  --font-monospace: 'Fira Code', 'Source Code Pro', Menlo, Monaco, Consolas, 'Courier New', monospace;
+  --font-monospace:
+    'Fira Code', 'Source Code Pro', Menlo, Monaco, Consolas, 'Courier New', monospace;
   --font-size: 14px;
 
   /* Геометрия и интервалы (локальные для плагина) */
@@ -103,7 +105,7 @@
 
 .groq-react-window-list {
   overflow-y: auto;
-	overflow-x: hidden !important;
+  overflow-x: hidden !important;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
 }
@@ -171,7 +173,7 @@
 
 /* --- Сообщения --- */
 .groq-message {
-  margin-bottom: var(--spacing-large, 12px);
+  margin-bottom: 0; /* отступ перенесён на .groq-message-row */
   padding: var(--spacing-medium, 8px);
   border-radius: var(--border-radius, 3px);
   max-width: 80%;
@@ -217,6 +219,7 @@
 .groq-message__content {
   line-height: 1.6;
   user-select: text;
+  display: flow-root; /* предотвращает коллапс внешних отступов внутри, стабилизирует высоту */
 }
 /* (удалены дополнительные wrap-правила; базовые остаются ниже в код-блоках) */
 
@@ -289,13 +292,6 @@
   line-height: 1.25;
 }
 
-.groq-container .groq-message__content h1 { font-size: 1.4em; }
-.groq-container .groq-message__content h2 { font-size: 1.3em; }
-.groq-container .groq-message__content h3 { font-size: 1.2em; }
-.groq-container .groq-message__content h4 { font-size: 1.1em; }
-.groq-container .groq-message__content h5 { font-size: 1.05em; }
-.groq-container .groq-message__content h6 { font-size: 1em; opacity: 0.9; }
-
 .groq-container .groq-message__content a {
   color: var(--text-accent, #7e57c2);
   text-decoration: none;
@@ -312,7 +308,6 @@
 
 .groq-container .groq-message__content a {
   overflow-wrap: anywhere;
-  word-break: break-all;
 }
 
 .groq-container .groq-message__content img {
@@ -322,12 +317,22 @@
   display: block; /* стабилизируем расчёт высоты строки */
 }
 
+.groq-container .groq-message__content figure {
+  display: block;
+  margin: var(--spacing-medium, 8px) 0;
+}
+
+.groq-container .groq-message__content figcaption {
+  font-size: 0.9em;
+  color: var(--text-muted, #9e9e9e);
+  margin-top: var(--spacing-small, 4px);
+}
+
 .groq-container .groq-message__content table {
   width: 100%;
   max-width: 100%;
   border-collapse: collapse;
   margin: var(--spacing-medium, 8px) 0;
-  background-color: var(--background-primary, #202020);
   table-layout: fixed; /* фиксированная раскладка для предсказуемой ширины */
 }
 
@@ -336,7 +341,7 @@
   padding: var(--spacing-small, 4px) var(--spacing-medium, 8px);
   border: var(--border-width, 1px) solid var(--background-modifier-border, #444444);
   text-align: left;
-  word-break: break-word;
+  vertical-align: top;
   overflow-wrap: anywhere;
 }
 
@@ -349,8 +354,8 @@
 .groq-container .groq-message__content code,
 .groq-container .groq-message__content kbd,
 .groq-container .groq-message__content samp {
+  overflow-x: auto;
   overflow-wrap: anywhere;
-  word-break: break-word;
 }
 
 /* Ограничение ширины преформатированного текста в пределах сообщения */
@@ -371,9 +376,9 @@
 /* Общее правило для markdown-блоков кода, чтобы строки переносились и не вылезали за границы */
 .groq-container .groq-code-block,
 .groq-container .groq-code-block--no-highlight {
-  white-space: pre-wrap; /* переносить строки в <pre> */
-  overflow-wrap: anywhere;
-  word-break: break-word;
+  white-space: pre; /* избегать неверных расчётов высоты, позволяем горизонтальный скролл */
+  overflow-x: auto;
+  overflow-wrap: normal;
   max-width: 100%;
 }
 
@@ -395,6 +400,12 @@
   font-family: var(--font-monospace);
   font-size: 0.9em;
   position: relative;
+}
+
+/* Обёртка для Markdown, чтобы исключить margin-collapsing с контейнером строки */
+.groq-message__content-wrapper {
+  display: block;
+  width: 100%;
 }
 
 .groq-code-header {
@@ -447,7 +458,8 @@
   margin: 0;
   background-color: var(--background-secondary, #2a2a2a);
   color: var(--text-normal, #e0e0e0);
-  white-space: pre-wrap;
+  white-space: pre; /* синхронизировано с блоком */
+  overflow-x: auto;
   border-bottom-left-radius: var(--border-radius, 3px);
   border-bottom-right-radius: var(--border-radius, 3px);
 }
@@ -821,7 +833,7 @@
 /* Message List Styles */
 .groq-message-row {
   padding-bottom: 12px;
-  contain: layout paint; /* изоляция расчёта макета и отрисовки для стабильности строк */
+  /* Удалён contain: влияет на неверные измерения высоты при динамическом контенте */
 }
 
 /* Support Dialog Styles */

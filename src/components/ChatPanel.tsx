@@ -138,7 +138,9 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
     const containerRef = useRef<HTMLDivElement>(null);
     // Определяем язык из настроек Obsidian (App API). Требуется minAppVersion: 1.8.0
     const appLang = (plugin.app as any)?.getLanguage?.();
-    const locale: Locale = (appLang && appLang.toLowerCase().startsWith('ru') ? 'ru' : 'en') as Locale;
+    const locale: Locale = (
+      appLang && appLang.toLowerCase().startsWith('ru') ? 'ru' : 'en'
+    ) as Locale;
 
     const { messages, setMessages, isHistoryLoading, clearHistory } = useMessages(
       initialMessages,

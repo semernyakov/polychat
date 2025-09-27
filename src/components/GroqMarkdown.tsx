@@ -5,7 +5,15 @@ import rehypeRaw from 'rehype-raw';
 
 import { Highlight, themes, PrismTheme } from 'prism-react-renderer';
 import { FiCopy, FiCheck } from 'react-icons/fi';
-import { t, Locale } from '../localization';
+import { t, type Locale } from '../localization';
+
+declare global {
+  interface Window {
+    app?: {
+      getLanguage?: () => string;
+    };
+  }
+}
 import '../styles.css';
 
 const prismTheme: PrismTheme = themes.vsDark;
@@ -21,7 +29,9 @@ const CodeBlock = React.memo(({ language, code }: { language: string; code: stri
   const [copyError, setCopyError] = React.useState(false);
   const timeoutId = React.useRef<NodeJS.Timeout | null>(null);
   const appLang = (window as any)?.app?.getLanguage?.();
-  const locale: Locale = (appLang && appLang.toLowerCase().startsWith('ru') ? 'ru' : 'en') as Locale;
+  const locale: Locale = (
+    appLang && appLang.toLowerCase().startsWith('ru') ? 'ru' : 'en'
+  ) as Locale;
 
   const handleCopy = () => {
     setCopyError(false);
@@ -179,7 +189,7 @@ export const GroqMarkdown: React.FC<{ content: string }> = ({ content }) => {
   const components = useMemo(
     () => ({
       ...customComponents,
-      img({ src, alt, ...props }: React.ComponentProps<'img'> & { node?: any }) {
+      img({ src, alt, ...props }: React.ImgHTMLAttributes<HTMLImageElement>) {
         const isAbsolute = typeof src === 'string' && /^(https?:\/\/|\/)/.test(src);
         if (isAbsolute) {
           return (
@@ -203,8 +213,14 @@ export const GroqMarkdown: React.FC<{ content: string }> = ({ content }) => {
   );
 
   return (
-    <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={components}>
-      {content}
-    </ReactMarkdown>
+    <div className="groq-message__content-wrapper">
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        rehypePlugins={[rehypeRaw]}
+        components={components}
+      >
+        {content}
+      </ReactMarkdown>
+    </div>
   );
 };

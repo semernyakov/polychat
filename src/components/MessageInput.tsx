@@ -23,7 +23,9 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isComposing, setIsComposing] = useState(false);
   const appLang = (window as any)?.app?.getLanguage?.();
-  const locale: Locale = (appLang && appLang.toLowerCase().startsWith('ru') ? 'ru' : 'en') as Locale;
+  const locale: Locale = (
+    appLang && appLang.toLowerCase().startsWith('ru') ? 'ru' : 'en'
+  ) as Locale;
 
   useEffect(() => {
     const textarea = textareaRef.current;

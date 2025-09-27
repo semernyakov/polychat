@@ -3,6 +3,22 @@ export type Locale = 'ru' | 'en';
 
 export const defaultLocale: Locale = 'en';
 
+/**
+ * Gets the current locale from Obsidian App API (requires minAppVersion >= 1.8.0)
+ * Falls back to default locale if API is unavailable
+ */
+function getCurrentLocale(): Locale {
+  if (typeof window === 'undefined') {
+    return defaultLocale;
+  }
+  const appLang = (window as any)?.app?.getLanguage?.();
+  if (typeof appLang === 'string') {
+    const normalized = appLang.toLowerCase();
+    return (normalized.startsWith('ru') ? 'ru' : 'en') as Locale;
+  }
+  return defaultLocale;
+}
+
 export const translations: Record<Locale, Record<string, string>> = {
   ru: {
     supportDialogTitle: 'Поддержать разработку',
@@ -48,6 +64,9 @@ export const translations: Record<Locale, Record<string, string>> = {
     releaseDate: 'Дата выпуска',
     actualDate: 'Дата актуальности',
     releaseStatus: 'Статус релиза',
+    you: 'Вы',
+    assistant: 'Ассистент',
+    copyError: 'Ошибка при копировании',
     close: 'Закрыть',
     modelUnavailable: 'Эта модель временно недоступна',
     showInSidepanel: 'Показать в боковой панели',
@@ -56,9 +75,10 @@ export const translations: Record<Locale, Record<string, string>> = {
     scrollToBottom: 'К концу диалога',
     clearHistory: 'Очистить историю',
     showFormatting: 'Показать форматирование',
+    showFormatted: 'Показать форматированный текст',
     showRaw: 'Показать исходный код',
     copyMessage: 'Копировать сообщение',
-    copyError: 'Ошибка копирования',
+    rawContent: 'Исходное содержимое сообщения',
     chooseModel: 'Выберите модель Groq',
     copyCode: 'Копировать код',
     refreshModels: 'Обновить модели',
@@ -119,9 +139,12 @@ export const translations: Record<Locale, Record<string, string>> = {
     modelInfo: 'Model info',
     description: 'Description',
     developer: 'Developer',
-    releaseDate: 'Release date',
-    actualDate: 'Actual date',
-    releaseStatus: 'Release status',
+    releaseDate: 'Release Date',
+    actualDate: 'As of Date',
+    releaseStatus: 'Release Status',
+    you: 'You',
+    assistant: 'Assistant',
+    copyError: 'Error copying to clipboard',
     close: 'Close',
     modelUnavailable: 'This model is temporarily unavailable',
     showInSidepanel: 'Show in side panel',
@@ -130,9 +153,10 @@ export const translations: Record<Locale, Record<string, string>> = {
     scrollToBottom: 'Scroll to bottom',
     clearHistory: 'Clear history',
     showFormatting: 'Show formatting',
+    showFormatted: 'Show formatted text',
     showRaw: 'Show raw',
     copyMessage: 'Copy message',
-    copyError: 'Copy error',
+    rawContent: 'Raw message content',
     chooseModel: 'Choose Groq model',
     copyCode: 'Copy code',
     refreshModels: 'Refresh models',
@@ -153,21 +177,24 @@ export const translations: Record<Locale, Record<string, string>> = {
   },
 };
 
-function getCurrentLocale(): Locale {
-  try {
-    const appLang = (window as any)?.app?.getLanguage?.();
-    if (typeof appLang === 'string' && appLang.toLowerCase().startsWith('ru')) return 'ru';
-  } catch {}
-  return defaultLocale;
+/**
+ * Translates a key to the current or specified locale
+ * @param key - The translation key
+ * @param locale - Optional locale to use (defaults to current locale)
+ * @returns The translated string or the key if translation not found
+ */
+export function t(key: string, locale: Locale = getCurrentLocale()): string {
+  return translations[locale]?.[key] || translations[defaultLocale]?.[key] || key;
 }
 
-export function t(key: string, locale?: Locale): string {
-  const loc = locale ?? getCurrentLocale();
-  return translations[loc][key] || key;
-}
-
+/**
+ * Translates a key containing HTML to the current or specified locale
+ * @param key - The translation key
+ * @param locale - Optional locale to use (defaults to current locale)
+ * @returns An object with __html property containing the translated HTML string
+ */
 export function tHtml(key: string, locale?: Locale): { __html: string } {
   const loc = locale ?? getCurrentLocale();
-  const translation = translations[loc][key];
-  return { __html: translation || key };
+  const translation = translations[loc]?.[key] || translations[defaultLocale]?.[key] || key;
+  return { __html: translation };
 }

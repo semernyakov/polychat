@@ -1,17 +1,52 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
-import type { App } from 'obsidian';
 
 // Получаем путь к текущему файлу в формате ESM
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// NOTE: __dirname не используется; оставляем только __filename
 
 // Тип для опций запуска
 interface CheckOptions {
   configDir: string;
   pluginDataPath: string;
   listAll?: boolean;
+  lang?: 'ru' | 'en';
+}
+
+// Простейшая i18n-обвязка для сообщений CLI
+type Lang = 'ru' | 'en';
+const MESSAGES: Record<Lang, Record<string, string>> = {
+  ru: {
+    NO_PLUGIN_PATH: 'Ошибка: Не указан путь к настройкам плагина',
+    SETTINGS_LOAD_ERROR: 'Ошибка при загрузке настроек:',
+    SETTINGS_PATH: 'Путь к файлу настроек:',
+    ISSUES_FOUND: 'Обнаружены проблемы с настройками моделей.',
+    OK_SETTINGS: 'Настройки моделей в порядке.',
+    AUTO_PATH_FAIL: 'Ошибка: Не удалось автоматически определить путь к настройкам.',
+    SPECIFY_PARAMS: 'Пожалуйста, укажите один из параметров:',
+    SETTINGS_NOT_FOUND: 'Ошибка: Файл настроек не найден по пути:',
+    CHECK_PATHS: 'Проверьте правильность указанных путей и попробуйте снова.',
+    PATH_RESOLVE_FAIL: 'Ошибка: Не удалось определить путь к настройкам',
+    RUN_ERROR: 'Ошибка при выполнении проверки:',
+  },
+  en: {
+    NO_PLUGIN_PATH: 'Error: Plugin settings path is not specified',
+    SETTINGS_LOAD_ERROR: 'Error while loading settings:',
+    SETTINGS_PATH: 'Settings file path:',
+    ISSUES_FOUND: 'Issues detected with model settings.',
+    OK_SETTINGS: 'Model settings look good.',
+    AUTO_PATH_FAIL: 'Error: Failed to auto-detect settings path.',
+    SPECIFY_PARAMS: 'Please specify one of the parameters:',
+    SETTINGS_NOT_FOUND: 'Error: Settings file not found at path:',
+    CHECK_PATHS: 'Verify the provided paths and try again.',
+    PATH_RESOLVE_FAIL: 'Error: Failed to resolve settings path',
+    RUN_ERROR: 'Error while running the check:',
+  },
+};
+
+function t(key: keyof typeof MESSAGES['ru'], lang: Lang = 'ru'): string {
+  return MESSAGES[lang][key] || MESSAGES.ru[key] || key;
 }
 
 // Simplified model info type
@@ -91,19 +126,19 @@ interface PluginSettings {
 // Функция для вывода справки
 function showHelp() {
   // console.log(`
-// Проверка устаревших моделей для плагина Groq Chat
+  // Проверка устаревших моделей для плагина Groq Chat
 
-// Использование:
-//   1. С указанием каталога конфигурации:
-//      npm run check-models -- --config-dir=ваш_каталог_конфигурации
-//   2. С указанием полного пути к данным плагина:
-//      npm run check-models -- --plugin-data-dir=путь/к/плагину/data
+  // Использование:
+  //   1. С указанием каталога конфигурации:
+  //      npm run check-models -- --config-dir=ваш_каталог_конфигурации
+  //   2. С указанием полного пути к данным плагина:
+  //      npm run check-models -- --plugin-data-dir=путь/к/плагину/data
 
-// Переменные окружения:
-//   OBSIDIAN_VAULT_PATH - путь к корню хранилища Obsidian
-//   OBSIDIAN_CONFIG_DIR - имя каталога конфигурации (по умолчанию: .obsidian)
-//   NODE_ENV=development - использовать пути по умолчанию для разработки
-// `);
+  // Переменные окружения:
+  //   OBSIDIAN_VAULT_PATH - путь к корню хранилища Obsidian
+  //   OBSIDIAN_CONFIG_DIR - имя каталога конфигурации (по умолчанию: .obsidian)
+  //   NODE_ENV=development - использовать пути по умолчанию для разработки
+  // `);
   process.exit(1);
 }
 
@@ -161,14 +196,14 @@ function findSettingsFile(options: CheckOptions): string | null {
 
 // Функция для проверки устаревших моделей
 export async function checkObsoleteModels(options: CheckOptions) {
-  const { pluginDataPath, listAll = false } = options;
+  const { pluginDataPath, listAll = false, lang = 'ru' } = options;
   // console.log(`Проверка моделей в каталоге: ${options.configDir}`);
 
   // Загружаем настройки
   let settings: PluginSettings = {};
 
   if (!pluginDataPath) {
-    console.error('Ошибка: Не указан путь к настройкам плагина');
+    console.error(t('NO_PLUGIN_PATH', lang));
     return false;
   }
 
@@ -179,10 +214,10 @@ export async function checkObsoleteModels(options: CheckOptions) {
     settings = JSON.parse(settingsContent) as PluginSettings;
   } catch (error) {
     console.error(
-      'Ошибка при загрузке настроек:',
+      t('SETTINGS_LOAD_ERROR', lang),
       error instanceof Error ? error.message : String(error),
     );
-    console.error('Путь к файлу настроек:', pluginDataPath);
+    console.error(t('SETTINGS_PATH', lang), pluginDataPath);
     return false;
   }
 
@@ -264,10 +299,10 @@ export async function checkObsoleteModels(options: CheckOptions) {
   // Завершаем выполнение с соответствующим кодом выхода
   const hasIssues = deprecatedModels.length > 0 || obsoleteModels.length > 0;
   if (hasIssues) {
-    // console.log('\n❌ Обнаружены проблемы с настройками моделей.');
+    // console.log(`\n❌ ${t('ISSUES_FOUND', lang)}`);
     return false;
   } else {
-    // console.log('\n✅ Настройки моделей в порядке.');
+    // console.log(`\n✅ ${t('OK_SETTINGS', lang)}`);
     return true;
   }
 }
@@ -286,6 +321,8 @@ if (isMain) {
   const configDirArg = args.find(arg => arg.startsWith('--config-dir='))?.split('=')[1];
   const pluginDataDirArg = args.find(arg => arg.startsWith('--plugin-data-dir='))?.split('=')[1];
   const listAll = args.includes('--list-all');
+  const langArg = (args.find(arg => arg.startsWith('--lang='))?.split('=')[1] || '').toLowerCase();
+  const lang: Lang = (langArg === 'en' ? 'en' : 'ru');
 
   let settingsPath: string | null = null;
   const configDir = process.env.OBSIDIAN_CONFIG_DIR || '.obsidian';
@@ -319,26 +356,26 @@ if (isMain) {
     settingsPath = findSettingsFile({
       configDir: configDirArg || configDir,
       pluginDataPath: '', // Это значение не используется в findSettingsFile, но требуется по типу
-      listAll: false
+      listAll: false,
     });
 
     if (!settingsPath) {
-      console.error('Ошибка: Не удалось автоматически определить путь к настройкам.');
-      console.error('Пожалуйста, укажите один из параметров:');
+      console.error(t('AUTO_PATH_FAIL', lang));
+      console.error(t('SPECIFY_PARAMS', lang));
       showHelp();
     }
   }
 
   // Проверяем существование файла настроек
   if (settingsPath && !checkSettingsFile(settingsPath)) {
-    console.error(`\n❌ Ошибка: Файл настроек не найден по пути: ${settingsPath}`);
-    console.error('Проверьте правильность указанных путей и попробуйте снова.');
+    console.error(`\n❌ ${t('SETTINGS_NOT_FOUND', lang)} ${settingsPath}`);
+    console.error(t('CHECK_PATHS', lang));
     showHelp();
   }
 
   // Запускаем проверку
   if (!settingsPath) {
-    console.error('Ошибка: Не удалось определить путь к настройкам');
+    console.error(t('PATH_RESOLVE_FAIL', lang));
     process.exit(1);
   }
 
@@ -346,12 +383,13 @@ if (isMain) {
     configDir: configDirArg || configDir,
     pluginDataPath: settingsPath,
     listAll,
+    lang,
   })
     .then(success => {
       process.exit(success ? 0 : 1);
     })
     .catch(error => {
-      console.error('Ошибка при выполнении проверки:', error);
+      console.error(t('RUN_ERROR', lang), error);
       process.exit(1);
     });
 }

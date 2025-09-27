@@ -134,11 +134,13 @@ npm run check-models -- --plugin-data-dir=%APPDATA%\\obsidian\\plugins\\groq-cha
 ### Additional Options
 
 1. **Specify Obsidian config directory** (if you know the path to `.obsidian`):
+
    ```bash
    npm run check-models -- --config-dir=~/.config/obsidian
    ```
 
 2. **Use environment variables** (useful for scripts):
+
    ```bash
    OBSIDIAN_VAULT_PATH=~/.config/obsidian \
    npm run check-models

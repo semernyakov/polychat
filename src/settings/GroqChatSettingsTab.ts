@@ -21,14 +21,7 @@ export class GroqChatSettingsTab extends PluginSettingTab {
     const appLang = (this.app as any)?.getLanguage?.();
     const locale = (appLang && appLang.toLowerCase().startsWith('ru') ? 'ru' : 'en') as Locale;
     this.containerEl.empty();
-    // --- Красивый заголовок и приветствие ---
-    const title = this.containerEl.createEl('h2', {
-      text:
-        locale === 'ru'
-          ? '🚀 Добро пожаловать в настройки PolyChat Plugin!'
-          : '🚀 Welcome to PolyChat Plugin Settings!',
-      cls: 'groq-settings-title',
-    });
+    // --- Приветствие (без верхнего заголовка) ---
     const subtitle = this.containerEl.createEl('div', {
       text:
         locale === 'ru'
@@ -37,9 +30,9 @@ export class GroqChatSettingsTab extends PluginSettingTab {
       cls: 'groq-settings-subtitle',
     });
     // --- API ---
-    this.containerEl.createEl('h3', {
-      text: locale === 'ru' ? '🔑 Доступ к API' : '🔑 API Access',
-    });
+    new Setting(this.containerEl)
+      .setName(locale === 'ru' ? '🔑 Доступ к API' : '🔑 API Access')
+      .setHeading();
     // --- Ссылка на получение токена ---
     const tokenLink = this.containerEl.createEl('div', {
       cls: 'groq-settings-token-link',
@@ -62,21 +55,21 @@ export class GroqChatSettingsTab extends PluginSettingTab {
     }
     this.addApiKeySetting(locale);
 
-    this.containerEl.createEl('h3', {
-      text: locale === 'ru' ? '🤖 Выбор модели' : '🤖 Model Selection',
-    });
+    new Setting(this.containerEl)
+      .setName(locale === 'ru' ? '🤖 Выбор модели' : '🤖 Model Selection')
+      .setHeading();
     this.addModelSetting(locale);
     // --- Список моделей (отдельная строка) ---
     this.addModelListBlock(locale);
     // --- История ---
-    this.containerEl.createEl('h3', {
-      text: locale === 'ru' ? '🕓 История чата' : '🕓 Chat History',
-    });
+    new Setting(this.containerEl)
+      .setName(locale === 'ru' ? '🕓 История чата' : '🕓 Chat History')
+      .setHeading();
     this.addHistorySettings(locale);
     // --- Интерфейс ---
-    this.containerEl.createEl('h3', {
-      text: locale === 'ru' ? '👀 Интерфейс' : '👀 Interface',
-    });
+    new Setting(this.containerEl)
+      .setName(locale === 'ru' ? '👀 Интерфейс' : '👀 Interface')
+      .setHeading();
     // this.addDisplayModeSetting(locale); // Метод отсутствует
     // --- Температура и макс. токены в сетке ---
     const flexGrid = this.containerEl.createEl('div', { cls: 'groq-settings-flex-grid' });
