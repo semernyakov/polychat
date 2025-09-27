@@ -1,11 +1,30 @@
-import React, { useEffect, useRef, useImperativeHandle, forwardRef, useMemo } from 'react';
-import { VariableSizeList as List } from 'react-window';
+import React, { useEffect, useRef, useImperativeHandle, forwardRef, useMemo, useCallback, JSX } from 'react';
+import { VariableSizeList as List, ListOnItemsRenderedProps } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { Message } from '../types/types';
 import { MessageItem } from './MessageItem';
 import '../styles.css';
-import { Locale, translations, t } from '../localization';
+import { Locale, t } from '../localization';
+// import ReactMarkdown from 'react-markdown';
+// import remarkGfm from 'remark-gfm';
+// import rehypeRaw from 'rehype-raw';
 
+// Реальная реализация рендеринга Markdown вместо stub
+// const renderMarkdown = (content: string): JSX.Element => {
+//   return (
+//     <ReactMarkdown
+//       remarkPlugins={[remarkGfm]}
+//       rehypePlugins={[rehypeRaw]}
+//     >
+//       {content}
+//     </ReactMarkdown>
+//   );
+// };
+const renderMarkdown = (content: string): string => {
+  // Simple stub that returns the content as-is
+  // In a real implementation, this would parse and render markdown
+  return content;
+};
 interface MessageListProps {
   messages: Message[];
   isLoading: boolean;
@@ -22,169 +41,199 @@ export const MessageList = React.memo(
   forwardRef<MessageListHandles, MessageListProps>(
     ({ messages, isLoading, language = 'en' }, ref) => {
       const listRef = useRef<List>(null);
-      const sizeMap = useRef<Record<string, number>>({});
       const rowHeights = useRef<Record<string, number>>({});
-      const reversedMessages = useMemo(() => [...messages], [messages]);
+      const outerRef = useRef<HTMLDivElement>(null);
+      const prevMessageCountRef = useRef<number>(0);
+      const shouldScrollToBottomRef = useRef<boolean>(true);
+      const isAtBottomRef = useRef<boolean>(true);
 
-      const measureRow = (element: HTMLDivElement | null, index: number, id: string) => {
+      // Используем useMemo для копии сообщений, но без реверса (предполагаем порядок от старого к новому)
+      const messageList = useMemo(() => [...messages], [messages]);
+
+      // Функция для измерения высоты ряда
+      const measureRow = useCallback((element: HTMLDivElement | null, index: number, id: string) => {
         if (!element) return;
-        const rect = element.getBoundingClientRect();
-        const newHeight = Math.ceil(rect.height) + 4; // небольшой буфер
-        const prev = rowHeights.current[id] ?? 0;
-        // обновлять только при существенной разнице
-        if (newHeight > 0 && Math.abs(newHeight - prev) > 1) {
+        const newHeight = Math.ceil(element.getBoundingClientRect().height) + 8; // Увеличенный буфер для стабильности
+        const prevHeight = rowHeights.current[id] ?? 0;
+        if (Math.abs(newHeight - prevHeight) > 2) { // Порог для избежания частых обновлений
           rowHeights.current[id] = newHeight;
-          sizeMap.current[id] = newHeight;
-          // откладываем пересчёт до следующего кадра, чтобы избежать каскадных ре-рендеров
-          requestAnimationFrame(() => {
-            listRef.current?.resetAfterIndex(index, true);
-          });
+          listRef.current?.resetAfterIndex(index, false); // Без smooth для производительности
         }
-      };
+      }, []);
+
+      // Оптимизированная оценка размера элемента
+      const getItemSize = useCallback((index: number): number => {
+        const message = messageList[index];
+        const id = message.id || `msg-${index}`;
+        const cachedHeight = rowHeights.current[id];
+        if (cachedHeight) {
+          return cachedHeight;
+        }
+        // Улучшенная оценка: учитываем длину контента, наличие кода, переносы
+        const content = message.content || '';
+        const baseHeight = 64; // Базовая высота (мета + паддинги)
+        const lineHeight = 20; // Примерная высота строки
+        const avgCharsPerLine = 72; // Увеличено для лучшей точности (зависит от стилей, протестировать)
+        const estimatedLines = Math.max(1, Math.ceil(content.length / avgCharsPerLine) + content.split('\n').length - 1);
+        const codeBonus = content.includes('```') ? 96 : 0; // Бонус для код-блоков
+        const estimatedHeight = baseHeight + (estimatedLines * lineHeight) + codeBonus;
+        return Math.max(96, estimatedHeight); // Мин. высота для избежания обрезки
+      }, [messageList]);
+
+      // Хэндлер для onItemsRendered: проверяем, нужно ли скроллить
+      const handleItemsRendered = useCallback((props: ListOnItemsRenderedProps) => {
+        const { visibleStopIndex } = props;
+        if (shouldScrollToBottomRef.current && visibleStopIndex === messageList.length - 1) {
+          listRef.current?.scrollToItem(messageList.length - 1, 'end');
+          shouldScrollToBottomRef.current = false;
+        }
+      }, [messageList.length]);
 
       useEffect(() => {
-        if (reversedMessages.length > 0 && listRef.current) {
-          const timer = setTimeout(() => {
-            // Scroll to bottom when new messages arrive
-            listRef.current?.scrollToItem(reversedMessages.length - 1, 'end');
-          }, 50);
-          return () => clearTimeout(timer);
+        const prevCount = prevMessageCountRef.current;
+        prevMessageCountRef.current = messageList.length;
+
+        const added = messageList.length > prevCount;
+        if (added) {
+          // Автоскролл только если пользователь был у низа
+          shouldScrollToBottomRef.current = isAtBottomRef.current;
+          // Не сбрасываем все высоты; новые элементы получат оценку через getItemSize
+          // и будут измерены через ResizeObserver
+          // Минимальный сброс: пересчитать с последнего известного индекса
+          listRef.current?.resetAfterIndex(Math.max(0, messageList.length - 1), false);
+        } else if (messageList.length < prevCount) {
+          // Удаление: пересчёт, но без глобального сброса скролла
+          listRef.current?.resetAfterIndex(0, false);
+          shouldScrollToBottomRef.current = isAtBottomRef.current;
+        } else {
+          // Обновление существующих
+          shouldScrollToBottomRef.current = false;
         }
-      }, [reversedMessages]);
+      }, [messageList]);
 
       useImperativeHandle(ref, () => ({
         scrollToTop: () => {
           listRef.current?.scrollToItem(0, 'start');
+          shouldScrollToBottomRef.current = false;
         },
         scrollToBottom: () => {
-          if (reversedMessages.length > 0) {
-            listRef.current?.scrollToItem(reversedMessages.length - 1, 'end');
+          if (messageList.length > 0) {
+            listRef.current?.scrollToItem(messageList.length - 1, 'end');
+            shouldScrollToBottomRef.current = false;
           }
         },
         forceUpdate: () => {
           rowHeights.current = {};
-          sizeMap.current = {};
-          listRef.current?.resetAfterIndex(0, true);
+          listRef.current?.resetAfterIndex(0, false);
         },
       }));
 
-
+      // Компонент ряда с улучшенным ResizeObserver (debounce 100ms, disconnect cleanup)
       const Row = ({ index, style }: { index: number; style: React.CSSProperties }) => {
-        const message = reversedMessages[index];
+        const message = messageList[index];
         const id = message.id || `msg-${index}`;
-        const compositeKey = `message-${id}-${message.timestamp ?? 't0'}-${index}`;
+        const containerRef = useRef<HTMLDivElement>(null);
+        const resizeObserverRef = useRef<ResizeObserver | null>(null);
+        const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-        const containerRef = React.useRef<HTMLDivElement | null>(null);
-        const contentRef = React.useRef<HTMLDivElement | null>(null);
-        const resizeTimeoutRef = React.useRef<number | null>(null);
-
-        React.useEffect(() => {
+        useEffect(() => {
           const el = containerRef.current;
           if (!el) return;
-          // Первичное измерение
+
+          // Инициальное измерение
           measureRow(el, index, id);
-          // Наблюдаем за изменением размеров содержимого с дебаунсом
-          const ro = new ResizeObserver(() => {
-            if (resizeTimeoutRef.current) {
-              window.clearTimeout(resizeTimeoutRef.current);
+
+          // ResizeObserver с debounce
+          resizeObserverRef.current = new ResizeObserver(() => {
+            if (debounceTimeoutRef.current) {
+              clearTimeout(debounceTimeoutRef.current);
             }
-            resizeTimeoutRef.current = window.setTimeout(() => {
+            debounceTimeoutRef.current = setTimeout(() => {
               measureRow(el, index, id);
-            }, 50);
+            }, 100); // Увеличенный debounce для производительности
           });
-          ro.observe(el);
-          // Дополнительно слушаем изменения содержимого, если есть
-          if (contentRef.current) ro.observe(contentRef.current);
-          return () => ro.disconnect();
-        }, [index, id]);
+
+          resizeObserverRef.current.observe(el);
+
+          return () => {
+            if (resizeObserverRef.current) {
+              resizeObserverRef.current.disconnect();
+            }
+            if (debounceTimeoutRef.current) {
+              clearTimeout(debounceTimeoutRef.current);
+            }
+          };
+        }, [index, id, measureRow, message.content]); // Добавили dep на content для реакций на изменения
 
         return (
-          <div key={compositeKey} className="groq-message-row" style={style}>
+          <div className="groq-message-row" style={style}>
             <div ref={containerRef}>
-              <div ref={contentRef}>
-                <MessageItem message={message} />
-              </div>
+              <MessageItem message={message} />
             </div>
           </div>
         );
       };
 
-      useEffect(() => {
-        rowHeights.current = {};
-        sizeMap.current = {};
-        listRef.current?.resetAfterIndex(0, false);
-      }, [messages]);
-
-      const getItemSize = (index: number): number => {
-        const message = reversedMessages[index];
-        const id = message.id || `msg-${index}`;
-        if (rowHeights.current[id]) {
-          return rowHeights.current[id] + 12;
-        }
-        const estimate = () => {
-          const content = message.content || '';
-          const baseSize = 80; // базовая высота с запасом
-          const minHeight = 96; // минимальная высота побольше, чтобы не обрезало
-          if (!content) return minHeight;
-          const charsPerLine = 58;
-          const lineHeight = 22;
-          const numLines = Math.ceil(content.length / charsPerLine);
-          const codeBlockBonus = content.includes('```') ? 120 : 0;
-          return Math.max(minHeight, baseSize + numLines * lineHeight + codeBlockBonus);
-        };
-        const estimatedSize = Math.ceil(estimate()) + 4; // округление и буфер
-        sizeMap.current[id] = estimatedSize;
-        return estimatedSize + 12;
-      };
-
-      // Внутренний контейнер списка с дополнительным нижним отступом,
-      // чтобы последний элемент не обрезался визуально
-      const InnerElement = React.useMemo(
-        () =>
-          React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-            ({ style, children, ...rest }, ref) => (
-              <div
-                ref={ref}
-                style={{ ...style, paddingBottom: 16, boxSizing: 'border-box' }}
-                {...rest}
-              >
-                {children}
-              </div>
-            ),
-          ),
-        [],
+      // Inner элемент с динамическим padding (на основе стилей)
+      const InnerElement = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+        ({ style, children, ...rest }, ref) => (
+          <div
+            ref={ref}
+            style={{ ...style, paddingBottom: '24px', boxSizing: 'border-box' }} // Увеличен для лучшей видимости
+            {...rest}
+          >
+            {children}
+          </div>
+        ),
       );
 
+      // Отслеживаем положение прокрутки, чтобы понять, находится ли пользователь у низа
+      useEffect(() => {
+        const el = outerRef.current;
+        if (!el) return;
+        const handleScroll = () => {
+          const threshold = 40; // пикселей до низа
+          const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight <= threshold;
+          isAtBottomRef.current = atBottom;
+        };
+        handleScroll();
+        el.addEventListener('scroll', handleScroll, { passive: true });
+        return () => el.removeEventListener('scroll', handleScroll);
+      }, []);
+
+      // При изменении размеров контейнера (окна Obsidian) пересчитываем высоты элементов
+      const handleContainerResize = useCallback(({ height, width }: { height: number; width: number }) => {
+        const wasAtBottom = isAtBottomRef.current;
+        // Сбрасываем кэш высот, так как переносы строк меняются при изменении ширины
+        rowHeights.current = {};
+        // Полный пересчёт размеров без анимации
+        listRef.current?.resetAfterIndex(0, false);
+        // Сохраняем прилипание к низу, только если пользователь уже был внизу
+        shouldScrollToBottomRef.current = wasAtBottom;
+      }, []);
+
       return (
-        <div className="groq-chat__messages" key="message-list-container" aria-live="polite">
-          {reversedMessages.length > 0 ? (
-            <AutoSizer key="auto-sizer">
-              {({ height, width }) => {
-                if (height === 0 || width === 0) {
-                  return null;
-                }
-                return (
-                  <List
-                    ref={listRef}
-                    height={height}
-                    width={width}
-                    itemCount={reversedMessages.length}
-                    itemData={reversedMessages}
-                    itemSize={getItemSize}
-                    estimatedItemSize={140}
-                    overscanCount={8}
-                    innerElementType={InnerElement}
-                    itemKey={index => {
-                      const m = reversedMessages[index];
-                      const id = m.id || `msg-${index}`;
-                      return `item-${id}-${m.timestamp ?? 't0'}-${index}`;
-                    }}
-                    className="groq-react-window-list"
-                  >
-                    {Row}
-                  </List>
-                );
-              }}
+        <div className="groq-chat__messages" aria-live="polite">
+          {messageList.length > 0 ? (
+            <AutoSizer onResize={handleContainerResize}>
+              {({ height, width }) => (
+                <List
+                  ref={listRef}
+                  height={height || 0}
+                  width={width || 0}
+                  itemCount={messageList.length}
+                  itemSize={getItemSize}
+                  estimatedItemSize={128}
+                  overscanCount={5}
+                  innerElementType={InnerElement}
+                  outerRef={outerRef}
+                  onItemsRendered={handleItemsRendered}
+                  itemKey={index => messageList[index].id || `msg-${index}-${messageList[index].timestamp ?? '0'}`}
+                  className="groq-react-window-list"
+                >
+                  {Row}
+                </List>
+              )}
             </AutoSizer>
           ) : (
             !isLoading && <div className="groq-chat__empty">{t('noMessages', language)}</div>
@@ -193,7 +242,7 @@ export const MessageList = React.memo(
           {isLoading && (
             <div className="groq-loading-indicator">
               <div className="groq-spinner"></div>
-              <span>{translations[language]?.generatingResponse || 'Generating response...'}</span>
+              <span>{t('generatingResponse', language)}</span>
             </div>
           )}
         </div>

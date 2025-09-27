@@ -16,6 +16,25 @@ declare global {
 }
 import '../styles.css';
 
+// Rehype plugin to strip any `key` attributes coming from raw HTML to avoid
+// React warnings about duplicate keys (e.g., multiple elements with key="stub").
+// We don't rely on external packages; we recursively walk the HAST tree.
+function rehypeStripReactKey() {
+  return (tree: any) => {
+    const walk = (node: any) => {
+      if (node && typeof node === 'object') {
+        if (node.properties && Object.prototype.hasOwnProperty.call(node.properties, 'key')) {
+          delete node.properties.key;
+        }
+        if (Array.isArray(node.children)) {
+          for (const child of node.children) walk(child);
+        }
+      }
+    };
+    walk(tree);
+  };
+}
+
 const prismTheme: PrismTheme = themes.vsDark;
 
 type CodeProps = {
@@ -216,7 +235,7 @@ export const GroqMarkdown: React.FC<{ content: string }> = ({ content }) => {
     <div className="groq-message__content-wrapper">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeRaw]}
+        rehypePlugins={[rehypeRaw, rehypeStripReactKey]}
         components={components}
       >
         {content}
