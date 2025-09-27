@@ -20,12 +20,44 @@ export const MessageList = React.memo(
     ({ messages, isLoading, language = 'en' }, ref) => {
       const containerRef = useRef<HTMLDivElement>(null);
       const isAtBottomRef = useRef<boolean>(true);
+      const NEAR_BOTTOM_THRESHOLD_FALLBACK = 100; // px
+      const DEFAULT_TAIL_LIMIT = 1; // показываем только последнее сообщение для UX без стартовой прокрутки
+      const [limit, setLimit] = React.useState<number>(DEFAULT_TAIL_LIMIT);
 
-      // Инициализация: сразу прокручиваем к последнему сообщению
-      useLayoutEffect(() => {
+      // Вычисляем хвост истории
+      const visibleMessages = React.useMemo(() => {
+        if (!messages || messages.length === 0) return [];
+        const l = Math.max(1, Math.min(limit, messages.length));
+        return messages.slice(messages.length - l);
+      }, [messages, limit]);
+
+      const getNearBottomThreshold = (): number => {
         const el = containerRef.current;
-        if (!el) return;
-        el.scrollTop = el.scrollHeight;
+        if (!el) return NEAR_BOTTOM_THRESHOLD_FALLBACK;
+        const value = getComputedStyle(el).getPropertyValue('--near-bottom-threshold').trim();
+        if (!value) return NEAR_BOTTOM_THRESHOLD_FALLBACK;
+        const match = value.match(/^(\d+(?:\.\d+)?)(px)?$/i);
+        if (match) {
+          const n = parseFloat(match[1]);
+          return isNaN(n) ? NEAR_BOTTOM_THRESHOLD_FALLBACK : n;
+        }
+        return NEAR_BOTTOM_THRESHOLD_FALLBACK;
+      };
+
+      const withNoSmooth = (fn: () => void) => {
+        const el = containerRef.current;
+        if (!el) return fn();
+        el.classList.add('groq-chat__messages--no-smooth');
+        fn();
+        // Вернём smooth на следующий кадр
+        requestAnimationFrame(() => {
+          el.classList.remove('groq-chat__messages--no-smooth');
+        });
+      };
+
+      // Инициализация: скролл не требуется, т.к. показываем только хвост (последнее сообщение видно сразу)
+      useLayoutEffect(() => {
+        // no-op
       }, []);
 
       // Обновление: при добавлении новых сообщений прокручиваем вниз, если пользователь у низа
@@ -35,14 +67,14 @@ export const MessageList = React.memo(
         if (isAtBottomRef.current) {
           el.scrollTop = el.scrollHeight;
         }
-      }, [messages]);
+      }, [visibleMessages]);
 
       // Трекинг положения скролла
       useEffect(() => {
         const el = containerRef.current;
         if (!el) return;
         const handleScroll = () => {
-          const threshold = 100;
+          const threshold = getNearBottomThreshold();
           const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight <= threshold;
           isAtBottomRef.current = atBottom;
         };
@@ -54,12 +86,20 @@ export const MessageList = React.memo(
       useImperativeHandle(ref, () => ({
         scrollToTop: () => {
           const el = containerRef.current;
-          if (el) el.scrollTop = 0;
+          if (el) {
+            withNoSmooth(() => {
+              el.scrollTop = 0;
+            });
+          }
           isAtBottomRef.current = false;
         },
         scrollToBottom: () => {
           const el = containerRef.current;
-          if (el) el.scrollTop = el.scrollHeight;
+          if (el) {
+            withNoSmooth(() => {
+              el.scrollTop = el.scrollHeight;
+            });
+          }
           isAtBottomRef.current = true;
         },
         forceUpdate: () => {
@@ -70,11 +110,40 @@ export const MessageList = React.memo(
       return (
         <div className="groq-chat__messages" aria-live="polite" ref={containerRef}>
           {messages.length > 0 ? (
-            messages.map((message, index) => (
-              <div className="groq-message-row" key={`${message.id ?? 'msg'}-${message.timestamp ?? '0'}-${index}`}>
-                <MessageItem message={message} />
-              </div>
-            ))
+            <>
+              {messages.length > visibleMessages.length && (
+                <div style={{ marginBottom: '8px' }}>
+                  <button
+                    className="groq-button groq-dialog-secondary-button"
+                    onClick={() => {
+                      const el = containerRef.current;
+                      if (!el) {
+                        setLimit(l => Math.min(l + 20, messages.length));
+                        return;
+                      }
+                      const prevScrollHeight = el.scrollHeight;
+                      setLimit(l => Math.min(l + 20, messages.length));
+                      // Компенсируем смещение после расширения истории
+                      requestAnimationFrame(() => {
+                        const newScrollHeight = el.scrollHeight;
+                        el.scrollTop = newScrollHeight - prevScrollHeight + el.scrollTop;
+                      });
+                    }}
+                  >
+                    {`Показать предыдущие 20`}
+                  </button>
+                </div>
+              )}
+
+              {visibleMessages.map((message, idx) => (
+                <div
+                  className="groq-message-row"
+                  key={`${message.id ?? 'msg'}-${message.timestamp ?? '0'}-${messages.length - visibleMessages.length + idx}`}
+                >
+                  <MessageItem message={message} />
+                </div>
+              ))}
+            </>
           ) : (
             !isLoading && <div className="groq-chat__empty">{t('noMessages', language)}</div>
           )}

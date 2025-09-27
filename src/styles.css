@@ -911,6 +911,17 @@
   flex: 1;
 }
 
+/* Warning for unavailable model in ModelInfoDialog */
+.groq-model-info__warning {
+  margin-top: var(--spacing-medium, 8px);
+  padding: var(--spacing-medium, 8px);
+  border-radius: var(--border-radius, 3px);
+  background-color: var(--background-secondary, #2a2a2a);
+  border: var(--border-width, 1px) solid var(--text-error, #ef5350);
+  color: var(--text-error, #ef5350);
+  line-height: 1.5;
+}
+
 /* Table Styles for Settings */
 .groq-models-table thead tr {
   background: var(--background-modifier-hover, #f0f0f0);

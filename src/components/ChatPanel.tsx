@@ -125,7 +125,6 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
     const [selectedModel, setSelectedModel] = useState<string>(getInitialModel());
 
     // Если выбранная модель исчезла из списка, сбрасываем на первую доступную
-    // Если выбранная модель исчезла из списка, сбрасываем на первую доступную
     useEffect(() => {
       if (availableModels.length > 0 && !availableModels.find(m => m.id === selectedModel)) {
         setSelectedModel(availableModels[0].id);
@@ -288,9 +287,9 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
     );
 
     React.useEffect(() => {
-      // console.log('[DEBUG] selectedModel:', selectedModel);
-      // console.log('[DEBUG] availableModels:', availableModels);
-      // console.log('[DEBUG] selectedModelInfo:', selectedModelInfo);
+      console.log('[DEBUG] selectedModel:', selectedModel);
+      console.log('[DEBUG] availableModels:', availableModels);
+      console.log('[DEBUG] selectedModelInfo:', selectedModelInfo);
     }, [selectedModel, availableModels, selectedModelInfo]);
 
     if (!plugin.settings.apiKey) {
@@ -431,7 +430,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
           isOpen={isModelInfoOpen}
           onClose={() => setIsModelInfoOpen(false)}
           modelInfo={selectedModelInfo}
-          isAvailable={availableModels.some(m => m.id === selectedModelInfo.id)}
+          isAvailable={availableModels.some(m => m.id === selectedModel)}
         />
 
         <ToastContainer position="bottom-right" autoClose={3000} theme="dark" />

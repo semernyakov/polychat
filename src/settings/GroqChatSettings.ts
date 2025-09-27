@@ -43,6 +43,6 @@ export const DEFAULT_SETTINGS: Readonly<GroqChatSettings> = Object.freeze({
   maxTokens: 4096,
   historyStorageMethod: 'memory',
   maxHistoryLength: 20,
-  notePath: 'groq-chat-history.md',
+  notePath: 'polychat-history.md',
   displayMode: 'tab', // Значение по умолчанию
 });
