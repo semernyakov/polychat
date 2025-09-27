@@ -7,6 +7,10 @@ interface MessageListProps {
   messages: Message[];
   isLoading: boolean;
   language?: Locale;
+  /** Сколько последних сообщений показывать при открытии */
+  tailLimit?: number;
+  /** Шаг подгрузки истории */
+  tailStep?: number;
 }
 
 export interface MessageListHandles {
@@ -17,12 +21,14 @@ export interface MessageListHandles {
 
 export const MessageList = React.memo(
   forwardRef<MessageListHandles, MessageListProps>(
-    ({ messages, isLoading, language = 'en' }, ref) => {
+    ({ messages, isLoading, language = 'en', tailLimit, tailStep }, ref) => {
       const containerRef = useRef<HTMLDivElement>(null);
       const isAtBottomRef = useRef<boolean>(true);
       const NEAR_BOTTOM_THRESHOLD_FALLBACK = 100; // px
-      const DEFAULT_TAIL_LIMIT = 1; // показываем только последнее сообщение для UX без стартовой прокрутки
+      const NEAR_TOP_THRESHOLD_FALLBACK = 40; // px
+      const DEFAULT_TAIL_LIMIT = Math.max(1, tailLimit ?? 10);
       const [limit, setLimit] = React.useState<number>(DEFAULT_TAIL_LIMIT);
+      const STEP = Math.max(1, tailStep ?? 20);
 
       // Вычисляем хвост истории
       const visibleMessages = React.useMemo(() => {
@@ -44,6 +50,19 @@ export const MessageList = React.memo(
         return NEAR_BOTTOM_THRESHOLD_FALLBACK;
       };
 
+      const getNearTopThreshold = (): number => {
+        const el = containerRef.current;
+        if (!el) return NEAR_TOP_THRESHOLD_FALLBACK;
+        const value = getComputedStyle(el).getPropertyValue('--near-top-threshold').trim();
+        if (!value) return NEAR_TOP_THRESHOLD_FALLBACK;
+        const match = value.match(/^(\d+(?:\.\d+)?)(px)?$/i);
+        if (match) {
+          const n = parseFloat(match[1]);
+          return isNaN(n) ? NEAR_TOP_THRESHOLD_FALLBACK : n;
+        }
+        return NEAR_TOP_THRESHOLD_FALLBACK;
+      };
+
       const withNoSmooth = (fn: () => void) => {
         const el = containerRef.current;
         if (!el) return fn();
@@ -53,6 +72,19 @@ export const MessageList = React.memo(
         requestAnimationFrame(() => {
           el.classList.remove('groq-chat__messages--no-smooth');
         });
+      };
+
+      const getRevealOffset = (): number => {
+        const el = containerRef.current;
+        if (!el) return 80; // px
+        const raw = getComputedStyle(el).getPropertyValue('--load-reveal-offset').trim();
+        if (!raw) return 80;
+        const match = raw.match(/^(\d+(?:\.\d+)?)(px)?$/i);
+        if (match) {
+          const n = parseFloat(match[1]);
+          return isNaN(n) ? 80 : n;
+        }
+        return 80;
       };
 
       // Инициализация: скролл не требуется, т.к. показываем только хвост (последнее сообщение видно сразу)
@@ -77,6 +109,18 @@ export const MessageList = React.memo(
           const threshold = getNearBottomThreshold();
           const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight <= threshold;
           isAtBottomRef.current = atBottom;
+
+          // Автоподгрузка при прокрутке вверх (reverse infinite scroll)
+          const topThreshold = getNearTopThreshold();
+          if (el.scrollTop <= topThreshold && messages.length > visibleMessages.length) {
+            const prevHeight = el.scrollHeight;
+            setLimit(l => Math.min(l + STEP, messages.length));
+            requestAnimationFrame(() => {
+              const newHeight = el.scrollHeight;
+              // Компенсируем, чтобы контент не прыгнул вниз
+              el.scrollTop = el.scrollTop + (newHeight - prevHeight);
+            });
+          }
         };
         handleScroll();
         el.addEventListener('scroll', handleScroll, { passive: true });
@@ -118,19 +162,22 @@ export const MessageList = React.memo(
                     onClick={() => {
                       const el = containerRef.current;
                       if (!el) {
-                        setLimit(l => Math.min(l + 20, messages.length));
+                        setLimit(l => Math.min(l + STEP, messages.length));
                         return;
                       }
                       const prevScrollHeight = el.scrollHeight;
-                      setLimit(l => Math.min(l + 20, messages.length));
+                      setLimit(l => Math.min(l + STEP, messages.length));
                       // Компенсируем смещение после расширения истории
                       requestAnimationFrame(() => {
                         const newScrollHeight = el.scrollHeight;
-                        el.scrollTop = newScrollHeight - prevScrollHeight + el.scrollTop;
+                        const base = newScrollHeight - prevScrollHeight + el.scrollTop;
+                        const reveal = getRevealOffset();
+                        // Скроллим немного вверх, чтобы показать новую порцию
+                        el.scrollTop = Math.max(0, base - reveal);
                       });
                     }}
                   >
-                    {`Показать предыдущие 20`}
+                    {t('showPreviousN', language).replace('{{n}}', String(STEP))}
                   </button>
                 </div>
               )}

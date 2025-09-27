@@ -87,6 +87,8 @@ export const translations: Record<Locale, Record<string, string>> = {
     noModelsFound: 'Нет доступных моделей',
     imageNotice:
       '⚠️ Чат не поддерживает отображение изображений. Если модель возвращает абсолютную ссылку на изображение, будет показана только ссылка.',
+    // MessageList
+    showPreviousN: 'Показать предыдущие {{n}}',
     // Input (MessageInput)
     inputPlaceholder: 'Введите сообщение...',
     inputAriaLabel: 'Поле ввода сообщения',
@@ -165,6 +167,8 @@ export const translations: Record<Locale, Record<string, string>> = {
     noModelsFound: 'No available models',
     imageNotice:
       '⚠️ Chat does not support image rendering. If the model returns an absolute image link, only the link will be shown.',
+    // MessageList
+    showPreviousN: 'Show previous {{n}}',
     // Input (MessageInput)
     inputPlaceholder: 'Type a message...',
     inputAriaLabel: 'Message input field',

@@ -71,6 +71,7 @@ export class GroqChatSettingsTab extends PluginSettingTab {
       .setName(locale === 'ru' ? '👀 Интерфейс' : '👀 Interface')
       .setHeading();
     // this.addDisplayModeSetting(locale); // Метод отсутствует
+    this.addTailSettings(locale);
     // --- Температура и макс. токены в сетке ---
     const flexGrid = this.containerEl.createEl('div', { cls: 'groq-settings-flex-grid' });
     const tempDiv = this.containerEl.createEl('div', { cls: 'groq-settings-flex-item' });
@@ -586,4 +587,56 @@ export class GroqChatSettingsTab extends PluginSettingTab {
   }
 
   // Удалён выбор языка из настроек. Локаль берётся из Obsidian.
+
+  // --- Дополнительные настройки интерфейса (хвост истории) ---
+  private addTailSettings(locale: Locale): void {
+    const plugin = this.plugin as any;
+    // Сколько последних сообщений показывать при открытии
+    new Setting(this.containerEl)
+      .setName(locale === 'ru' ? 'Последние сообщения при открытии' : 'Last messages at startup')
+      .setDesc(
+        locale === 'ru'
+          ? 'Сколько последних сообщений показывать без прокрутки'
+          : 'How many last messages to show without initial scrolling',
+      )
+      .addText(text =>
+        text
+          .setPlaceholder(locale === 'ru' ? 'Например: 10' : 'e.g. 10')
+          .setValue(String(plugin.settings.messageTailLimit ?? 10))
+          .onChange(async (value: string) => {
+            const num = Math.max(1, Math.min(1000, parseInt(value) || 10));
+            plugin.settings.messageTailLimit = num;
+            await this.plugin.saveSettings();
+            // Визуальная отметка сохранения
+            const input = text.inputEl as HTMLElement;
+            const icon = input.createEl('span', { text: '✓', cls: 'groq-saved-icon' });
+            setTimeout(() => {
+              icon.classList.add('groq-saved-icon--fade-out');
+              setTimeout(() => icon.remove(), 500);
+            }, 1200);
+          }),
+      )
+      .settingEl.setAttribute('title', locale === 'ru' ? 'По умолчанию: 10' : 'Default: 10');
+
+    // Шаг подгрузки истории
+    new Setting(this.containerEl)
+      .setName(locale === 'ru' ? 'Шаг подгрузки истории' : 'History load step')
+      .setDesc(
+        locale === 'ru'
+          ? 'Сколько сообщений добавлять при нажатии на кнопку или прокрутке вверх'
+          : 'How many messages to load when clicking the button or scrolling up',
+      )
+      .addDropdown(dd => {
+        const stepOptions = [10, 20, 50, 100];
+        stepOptions.forEach(n => dd.addOption(String(n), String(n)));
+        const current = String(plugin.settings.messageLoadStep ?? 20);
+        dd.setValue(current);
+        dd.onChange(async (value: string) => {
+          const num = Math.max(1, Math.min(1000, parseInt(value) || 20));
+          plugin.settings.messageLoadStep = num;
+          await this.plugin.saveSettings();
+        });
+      })
+      .settingEl.setAttribute('title', locale === 'ru' ? 'По умолчанию: 20' : 'Default: 20');
+  }
 }

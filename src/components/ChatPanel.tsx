@@ -215,6 +215,8 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
         const assistantMessage = await plugin.groqService.sendMessage(trimmedValue, selectedModel);
 
         setMessages(prev => [...prev, userMessage, assistantMessage]);
+        // После добавления нового сообщения — мгновенно к низу
+        requestAnimationFrame(() => messageListRef.current?.scrollToBottom());
 
         await plugin.historyService.addMessage(assistantMessage).catch(err => {
           console.error('Error saving assistant message:', err);
@@ -248,6 +250,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
         toast.error(`${t('error')}: ${errorMsg}`);
         const errorMessage = MessageUtils.create('assistant', `${t('error')}: ${errorMsg}`);
         setMessages(prev => [...prev, userMessage, errorMessage]);
+        requestAnimationFrame(() => messageListRef.current?.scrollToBottom());
         setIsLoading(false);
         return;
       } finally {
@@ -404,6 +407,8 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
               messages={messages}
               isLoading={isLoading}
               language={locale}
+              tailLimit={plugin.settings.messageTailLimit ?? 10}
+              tailStep={plugin.settings.messageLoadStep ?? 20}
             />
             {isHistoryLoading && (
               <div className="groq-chat__loading-history">

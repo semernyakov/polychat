@@ -31,6 +31,10 @@ export interface GroqChatSettings {
   displayMode: 'tab' | 'sidepanel'; // Новое поле
   groqAvailableModels?: GroqModelInfo[];
   groqRateLimits?: RateLimitsType;
+  /** Сколько последних сообщений показывать при открытии */
+  messageTailLimit?: number;
+  /** Шаг подгрузки истории (кнопка и автоподгрузка при прокрутке вверх) */
+  messageLoadStep?: number;
 }
 
 /**
@@ -45,4 +49,6 @@ export const DEFAULT_SETTINGS: Readonly<GroqChatSettings> = Object.freeze({
   maxHistoryLength: 20,
   notePath: 'polychat-history.md',
   displayMode: 'tab', // Значение по умолчанию
+  messageTailLimit: 10,
+  messageLoadStep: 20,
 });
