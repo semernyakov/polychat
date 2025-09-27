@@ -68,7 +68,7 @@ export const MessageList = React.memo(
       }));
 
       return (
-        <div className="groq-chat__messages" aria-live="polite" ref={containerRef} style={{ height: '100%', overflowY: 'auto', scrollBehavior: 'smooth' }}>
+        <div className="groq-chat__messages" aria-live="polite" ref={containerRef}>
           {messages.length > 0 ? (
             messages.map((message, index) => (
               <div className="groq-message-row" key={`${message.id ?? 'msg'}-${message.timestamp ?? '0'}-${index}`}>

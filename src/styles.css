@@ -100,7 +100,11 @@
 .groq-chat__messages {
   height: 100%;
   padding: var(--spacing-large, 12px);
-  overflow: hidden;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 
 .groq-react-window-list {
