@@ -953,6 +953,7 @@
 /* Small text styles */
 .groq-small-text {
   font-size: var(--font-ui-smaller, 0.85em);
+  padding: 0.5em;
 }
 
 .groq-margin-left {

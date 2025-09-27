@@ -17,59 +17,80 @@ export class GroqChatSettingsTab extends PluginSettingTab {
     super(app, plugin);
   }
 
-  display(): void {
+  hide(): void {
+    // Очистим монитор языка при закрытии вкладки настроек
+    if (this._langMonitorId) {
+      window.clearInterval(this._langMonitorId);
+      this._langMonitorId = null;
+    }
+  }
+
+  // Небольшой монитор смены языка Obsidian для авто-перерисовки настроек
+  private _langMonitorId: number | null = null;
+  private _lastLocale: Locale | null = null;
+
+  private getObsidianLocale(): Locale {
     const appLang = (this.app as any)?.getLanguage?.();
-    const locale = (appLang && appLang.toLowerCase().startsWith('ru') ? 'ru' : 'en') as Locale;
+    if (typeof appLang === 'string') {
+      const val = appLang.toLowerCase();
+      return (val.startsWith('ru') ? 'ru' : 'en') as Locale;
+    }
+    const htmlLang = document?.documentElement?.getAttribute('lang');
+    if (typeof htmlLang === 'string') {
+      const val = htmlLang.toLowerCase();
+      return (val.startsWith('ru') ? 'ru' : 'en') as Locale;
+    }
+    return 'en';
+  }
+
+  display(): void {
+    const locale = this.getObsidianLocale();
+
+    // Перезапускаем монитор языка: если язык изменился в Obsidian при открытой вкладке настроек,
+    // автоматически перерисуем UI без ручного закрытия/открытия.
+    if (this._langMonitorId) {
+      window.clearInterval(this._langMonitorId);
+      this._langMonitorId = null;
+    }
+    this._lastLocale = locale;
+    this._langMonitorId = window.setInterval(() => {
+      const nextLocale = this.getObsidianLocale();
+      if (nextLocale !== this._lastLocale) {
+        this._lastLocale = nextLocale;
+        // Полная перерисовка
+        this.display();
+      }
+    }, 1000);
     this.containerEl.empty();
     // --- Приветствие (без верхнего заголовка) ---
     const subtitle = this.containerEl.createEl('div', {
-      text:
-        locale === 'ru'
-          ? 'Настройте плагин под себя, чтобы общение с ИИ было максимально удобным и приятным! 😊'
-          : 'Make your AI chat experience as friendly and delightful as possible! 😊',
+      text: t('settings.subtitle', locale),
       cls: 'groq-settings-subtitle',
     });
     // --- API ---
-    new Setting(this.containerEl)
-      .setName(locale === 'ru' ? '🔑 Доступ к API' : '🔑 API Access')
-      .setHeading();
+    new Setting(this.containerEl).setName(t('settings.apiHeading', locale)).setHeading();
     // --- Ссылка на получение токена ---
     const tokenLink = this.containerEl.createEl('div', {
       cls: 'groq-settings-token-link',
     });
 
-    if (locale === 'ru') {
-      createTextNode(tokenLink, 'Получить токен Groq можно на ');
-      createLink(tokenLink, 'официальном сайте Groq API', 'https://console.groq.com/keys', {
-        target: '_blank',
-        rel: 'noopener noreferrer',
-      });
-      createTextNode(tokenLink, '.');
-    } else {
-      createTextNode(tokenLink, 'You can get your Groq token at the ');
-      createLink(tokenLink, 'official Groq API website', 'https://console.groq.com/keys', {
-        target: '_blank',
-        rel: 'noopener noreferrer',
-      });
-      createTextNode(tokenLink, '.');
-    }
+    createTextNode(tokenLink, t('settings.tokenGetPrefix', locale));
+    createLink(tokenLink, t('settings.tokenOfficialSiteText', locale), 'https://console.groq.com/keys', {
+      target: '_blank',
+      rel: 'noopener noreferrer',
+    });
+    createTextNode(tokenLink, '.');
     this.addApiKeySetting(locale);
 
-    new Setting(this.containerEl)
-      .setName(locale === 'ru' ? '🤖 Выбор модели' : '🤖 Model Selection')
-      .setHeading();
+    new Setting(this.containerEl).setName(t('settings.modelSelection', locale)).setHeading();
     this.addModelSetting(locale);
     // --- Список моделей (отдельная строка) ---
     this.addModelListBlock(locale);
     // --- История ---
-    new Setting(this.containerEl)
-      .setName(locale === 'ru' ? '🕓 История чата' : '🕓 Chat History')
-      .setHeading();
+    new Setting(this.containerEl).setName(t('settings.historyHeading', locale)).setHeading();
     this.addHistorySettings(locale);
     // --- Интерфейс ---
-    new Setting(this.containerEl)
-      .setName(locale === 'ru' ? '👀 Интерфейс' : '👀 Interface')
-      .setHeading();
+    new Setting(this.containerEl).setName(t('settings.interface', locale)).setHeading();
     // this.addDisplayModeSetting(locale); // Метод отсутствует
     this.addTailSettings(locale);
     // --- Температура и макс. токены в сетке ---
@@ -86,22 +107,21 @@ export class GroqChatSettingsTab extends PluginSettingTab {
     // --- Кнопки "Сохранить все настройки" и "Сбросить настройки по умолчанию" ---
     const actionsBlock = this.containerEl.createEl('div', { cls: 'groq-settings-actions' });
     const btnSave = document.createElement('button');
-    btnSave.textContent = locale === 'ru' ? '✅ Сохранить все настройки' : '✅ Save all settings';
+    btnSave.textContent = t('settings.saveAll', locale);
     btnSave.className = 'mod-cta';
     btnSave.onclick = async () => {
       await this.plugin.saveSettings();
-      new Notice(locale === 'ru' ? 'Настройки сохранены' : 'Settings saved');
+      new Notice(t('settings.settingsSaved', locale));
     };
     const btnReset = document.createElement('button');
-    btnReset.textContent =
-      locale === 'ru' ? '♻️ Сбросить настройки по умолчанию' : '♻️ Reset to default';
+    btnReset.textContent = t('settings.resetToDefault', locale);
     btnReset.onclick = async () => {
       if (typeof this.plugin.resetSettingsToDefault === 'function') {
         await this.plugin.resetSettingsToDefault();
-        new Notice(locale === 'ru' ? 'Настройки сброшены' : 'Settings reset');
+        new Notice(t('settings.settingsReset', locale));
         this.display();
       } else {
-        new Notice(locale === 'ru' ? 'Метод сброса не реализован' : 'Reset method not implemented');
+        new Notice(t('settings.resetNotImplemented', locale));
       }
     };
     actionsBlock.appendChild(btnSave);
@@ -119,32 +139,27 @@ export class GroqChatSettingsTab extends PluginSettingTab {
 
     // Add strong text
     const strong = thanksBlock.createEl('strong');
-    strong.textContent =
-      locale === 'ru' ? 'Спасибо за использование плагина!' : 'Thank you for using the plugin!';
+    strong.textContent = t('thanks.title', locale);
 
     // Add space after strong
     createTextNode(thanksBlock, ' ');
 
     // Add link text before and after the link
-    const linkText = locale === 'ru' ? 'оставьте отзыв на GitHub' : 'leave a review on GitHub';
-    const textBeforeLink =
-      locale === 'ru'
-        ? 'Если вам нравится Groq Chat, пожалуйста, '
-        : 'If you like Groq Chat, please ';
-    const textAfterLink = locale === 'ru' ? '.' : '.';
+    const linkText = t('thanks.reviewLink', locale);
+    const textBeforeLink = t('thanks.reviewBefore', locale);
+    const textAfterLink = t('thanks.reviewAfter', locale);
 
     createTextNode(thanksBlock, textBeforeLink);
-    createLink(thanksBlock, linkText, 'https://github.com/semernyakov/groq-chat-obsidian', {
+    createLink(thanksBlock, linkText, 'https://github.com/semernyakov/polychat', {
       target: '_blank',
       rel: 'noopener noreferrer',
     });
     createTextNode(thanksBlock, textAfterLink);
 
     // Add link to Telegram
-    const telegramLinkText =
-      locale === 'ru' ? 'связаться со мной в Telegram' : 'contact with autor in Telegram';
-    const telegramTextBeforeLink = locale === 'ru' ? ' или ' : ' or ';
-    const telegramTextAfterLink = locale === 'ru' ? ' ❤️' : ' ❤️';
+    const telegramLinkText = t('thanks.telegramLink', locale);
+    const telegramTextBeforeLink = t('thanks.telegramBefore', locale);
+    const telegramTextAfterLink = t('thanks.telegramAfter', locale);
 
     createTextNode(thanksBlock, telegramTextBeforeLink);
     createLink(thanksBlock, telegramLinkText, 'https://t.me/semernyakov', {
@@ -154,10 +169,9 @@ export class GroqChatSettingsTab extends PluginSettingTab {
     createTextNode(thanksBlock, telegramTextAfterLink);
 
     // Add link to YooMoney
-    const yoomoneyLinkText =
-      locale === 'ru' ? 'поддержать разработку на YooMoney' : 'support the author on YooMoney';
-    const yoomoneyTextBeforeLink = locale === 'ru' ? ' Вы можете ' : ' You can ';
-    const yoomoneyTextAfterLink = locale === 'ru' ? '.' : '.';
+    const yoomoneyLinkText = t('thanks.yoomoneyLink', locale);
+    const yoomoneyTextBeforeLink = t('thanks.yoomoneyBefore', locale);
+    const yoomoneyTextAfterLink = t('thanks.yoomoneyAfter', locale);
 
     createTextNode(thanksBlock, yoomoneyTextBeforeLink);
     createLink(thanksBlock, yoomoneyLinkText, 'https://yoomoney.ru/fundraise/194GT5A5R07.250321', {
@@ -593,15 +607,11 @@ export class GroqChatSettingsTab extends PluginSettingTab {
     const plugin = this.plugin as any;
     // Сколько последних сообщений показывать при открытии
     new Setting(this.containerEl)
-      .setName(locale === 'ru' ? 'Последние сообщения при открытии' : 'Last messages at startup')
-      .setDesc(
-        locale === 'ru'
-          ? 'Сколько последних сообщений показывать без прокрутки'
-          : 'How many last messages to show without initial scrolling',
-      )
+      .setName(t('settings.tailLimitName', locale))
+      .setDesc(t('settings.tailLimitDesc', locale))
       .addText(text =>
         text
-          .setPlaceholder(locale === 'ru' ? 'Например: 10' : 'e.g. 10')
+          .setPlaceholder(t('settings.example10', locale))
           .setValue(String(plugin.settings.messageTailLimit ?? 10))
           .onChange(async (value: string) => {
             const num = Math.max(1, Math.min(1000, parseInt(value) || 10));
@@ -616,16 +626,12 @@ export class GroqChatSettingsTab extends PluginSettingTab {
             }, 1200);
           }),
       )
-      .settingEl.setAttribute('title', locale === 'ru' ? 'По умолчанию: 10' : 'Default: 10');
+      .settingEl.setAttribute('title', t('settings.default10', locale));
 
     // Шаг подгрузки истории
     new Setting(this.containerEl)
-      .setName(locale === 'ru' ? 'Шаг подгрузки истории' : 'History load step')
-      .setDesc(
-        locale === 'ru'
-          ? 'Сколько сообщений добавлять при нажатии на кнопку или прокрутке вверх'
-          : 'How many messages to load when clicking the button or scrolling up',
-      )
+      .setName(t('settings.loadStepName', locale))
+      .setDesc(t('settings.loadStepDesc', locale))
       .addDropdown(dd => {
         const stepOptions = [10, 20, 50, 100];
         stepOptions.forEach(n => dd.addOption(String(n), String(n)));
@@ -637,6 +643,6 @@ export class GroqChatSettingsTab extends PluginSettingTab {
           await this.plugin.saveSettings();
         });
       })
-      .settingEl.setAttribute('title', locale === 'ru' ? 'По умолчанию: 20' : 'Default: 20');
+      .settingEl.setAttribute('title', t('settings.default20', locale));
   }
 }
