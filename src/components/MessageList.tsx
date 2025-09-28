@@ -265,9 +265,9 @@ export const MessageList = React.memo(
             <div className="groq-new-message-notice">
               <button
                 onClick={handleNewMessageNoticeClick}
-                className="groq-button groq-button--primary"
+                className="groq-button groq-button--primary groq-new-message-button"
               >
-                {t('newMessages')}
+                {t('newMessages', language)}
               </button>
             </div>
           )}

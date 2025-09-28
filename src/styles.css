@@ -1339,6 +1339,113 @@
 /* Гарантируем что новые сообщения не вызывают перерасчет layout */
 .groq-new-message-notice {
   position: sticky;
+  bottom: 16px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 var(--spacing-large, 12px);
+  z-index: 100;
+  pointer-events: none; /* Позволяет кликать сквозь пустые области */
+  animation: groq-notice-slide-up 0.2s ease-out;
+  will-change: transform, opacity;
+}
+
+.groq-new-message-button {
+  pointer-events: auto; /* Включаем клики только на кнопке */
+  min-width: 140px;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 18px;
+  font-size: 0.9em;
+  font-weight: 500;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  transition: all 0.2s ease;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--text-on-accent, #ffffff);
+  background-color: var(--interactive-accent, #7e57c2);
+}
+
+.groq-new-message-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 
+    0 6px 16px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+  background-color: var(--interactive-accent-hover, #9575cd);
+}
+
+.groq-new-message-button:active {
+  transform: translateY(0);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+}
+
+/* Анимация появления уведомления */
+@keyframes groq-notice-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Анимация исчезновения уведомления */
+.groq-new-message-notice--exiting {
+  animation: groq-notice-slide-down 0.15s ease-in;
+}
+
+@keyframes groq-notice-slide-down {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+}
+
+/* Иконка для кнопки (опционально) */
+.groq-new-message-button::before {
+  content: "↓";
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+/* Адаптивность */
+@media (max-width: 600px) {
+  .groq-new-message-notice {
+    bottom: 12px;
+    padding: 0 var(--spacing-medium, 8px);
+  }
+  
+  .groq-new-message-button {
+    min-width: 120px;
+    height: 32px;
+    padding: 0 12px;
+    font-size: 0.85em;
+  }
+}
+
+/* Гарантируем что уведомление не перекрывает важные элементы */
+.groq-chat__messages {
+  position: relative;
+}
+
+/* Гарантируем что новые сообщения не вызывают перерасчет layout */
+.groq-new-message-notice {
+  position: sticky;
   bottom: 12px;
   z-index: 10;
 }
