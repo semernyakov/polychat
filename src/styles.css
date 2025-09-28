@@ -655,7 +655,6 @@
 .groq-icon-button svg {
   width: var(--icon-size);
   height: var(--icon-size);
-  color: var(--icon-color);
 }
 
 /* --- Специфические кнопки --- */
@@ -1339,102 +1338,87 @@
 /* Гарантируем что новые сообщения не вызывают перерасчет layout */
 .groq-new-message-notice {
   position: sticky;
-  bottom: 16px;
+  bottom: 8px; /* Уменьшено с 12px */
   left: 0;
   right: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 0 var(--spacing-large, 12px);
+  padding: 0 var(--spacing-small, 4px);
   z-index: 100;
-  pointer-events: none; /* Позволяет кликать сквозь пустые области */
+  pointer-events: none;
   animation: groq-notice-slide-up 0.2s ease-out;
   will-change: transform, opacity;
 }
 
 .groq-new-message-button {
-  pointer-events: auto; /* Включаем клики только на кнопке */
-  min-width: 140px;
-  height: 36px;
-  padding: 0 16px;
-  border-radius: 18px;
+  pointer-events: auto;
+  min-width: 110px;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: var(--border-radius, 3px);
   font-size: 0.9em;
-  font-weight: 500;
-  box-shadow: 
-    0 4px 12px rgba(0, 0, 0, 0.15),
-    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-  transition: all 0.2s ease;
-  border: none;
+  font-weight: 400;
+  opacity: 0.85;
+  background-color: var(--interactive-accent, var(--text-accent, #7e57c2));
+  color: var(--text-on-accent, #ffffff);
+  border: var(--border-width) solid var(--background-modifier-border);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  color: var(--text-on-accent, #ffffff);
-  background-color: var(--interactive-accent, #7e57c2);
+  gap: 4px;
+  transition: 
+    opacity 0.2s ease-out,
+    background-color 0.2s ease-out;
+  will-change: opacity, background-color;
+  box-shadow: none;
 }
 
 .groq-new-message-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 
-    0 6px 16px rgba(0, 0, 0, 0.2),
-    0 0 0 1px rgba(255, 255, 255, 0.15) inset;
-  background-color: var(--interactive-accent-hover, #9575cd);
+  opacity: 1;
+  background-color: var(--interactive-accent-hover, var(--text-accent-hover, #9575cd));
 }
 
 .groq-new-message-button:active {
-  transform: translateY(0);
-  box-shadow: 
-    0 2px 8px rgba(0, 0, 0, 0.15),
-    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  opacity: 0.9;
+  transition-duration: 0.1s;
 }
 
-/* Анимация появления уведомления */
-@keyframes groq-notice-slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Анимация исчезновения уведомления */
-.groq-new-message-notice--exiting {
-  animation: groq-notice-slide-down 0.15s ease-in;
-}
-
-@keyframes groq-notice-slide-down {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-}
-
-/* Иконка для кнопки (опционально) */
 .groq-new-message-button::before {
   content: "↓";
-  font-size: 1.1em;
-  font-weight: bold;
+  font-size: 0.9em;
+  font-weight: 400;
+  line-height: 1;
+  opacity: 0.9;
+}
+
+@media (max-width: 600px) {
+  .groq-new-message-notice {
+    bottom: 6px;
+    padding: 0 var(--spacing-small, 4px);
+  }
+  
+  .groq-new-message-button {
+    min-width: 110px;
+    height: 24px;
+    padding: 0 8px;
+    font-size: 0.75em;
+    border-radius: 12px;
+  }
 }
 
 /* Адаптивность */
 @media (max-width: 600px) {
   .groq-new-message-notice {
-    bottom: 12px;
-    padding: 0 var(--spacing-medium, 8px);
+    bottom: 8px;
+    padding: 0 var(--spacing-small, 4px);
   }
   
   .groq-new-message-button {
-    min-width: 120px;
-    height: 32px;
-    padding: 0 12px;
-    font-size: 0.85em;
+    min-width: 100px;
+    height: 28px;
+    padding: 0 10px;
+    font-size: 0.8em;
   }
 }
 
@@ -1446,6 +1430,6 @@
 /* Гарантируем что новые сообщения не вызывают перерасчет layout */
 .groq-new-message-notice {
   position: sticky;
-  bottom: 12px;
+  bottom: 8px;
   z-index: 10;
 }

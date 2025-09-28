@@ -128,6 +128,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     thinkContent: 'Рассуждения модели',
     // MessageList
     showPreviousN: 'Показать предыдущие {{n}}',
+    newMessages: 'Новые сообщения',
     // Input (MessageInput)
     inputPlaceholder: 'Введите сообщение...',
     inputAriaLabel: 'Поле ввода сообщения',
@@ -246,6 +247,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     thinkContent: 'Model reasoning',
     // MessageList
     showPreviousN: 'Show previous {{n}}',
+    newMessages: 'New messages',
     // Input (MessageInput)
     inputPlaceholder: 'Type a message...',
     inputAriaLabel: 'Message input field',
