@@ -7,6 +7,7 @@ export interface Message {
   role: MessageRole;
   content: string;
   timestamp: number;
+  hasThinkContent?: boolean;
   usage?: {
     prompt_tokens: number;
     completion_tokens: number;

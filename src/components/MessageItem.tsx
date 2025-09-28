@@ -1,11 +1,10 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { GroqMarkdown } from './GroqMarkdown';
-import { FiCopy, FiCheck, FiCode } from 'react-icons/fi';
+import { FiCopy, FiCheck, FiCode, FiEye, FiEyeOff } from 'react-icons/fi';
 import '../styles.css';
 import { toast } from 'react-toastify';
 import { t, Locale } from '../localization';
 import { Message } from '../types/types';
-import '@/types/window';
 
 interface MessageItemProps {
   message: Message;
@@ -14,6 +13,17 @@ interface MessageItemProps {
   isLastMessage?: boolean;
   onRenderComplete?: () => void;
 }
+
+// Функция для извлечения think-контента
+const extractThinkContent = (content: string): { thinkContent: string; mainContent: string } => {
+  const thinkMatch = content.match(/<think>([\s\S]*?)<\/think>/i);
+  if (thinkMatch) {
+    const thinkContent = thinkMatch[1].trim();
+    const mainContent = content.replace(/<think>[\s\S]*?<\/think>/i, '').trim();
+    return { thinkContent, mainContent };
+  }
+  return { thinkContent: '', mainContent: content };
+};
 
 export const MessageItem: React.FC<MessageItemProps> = React.memo(
   ({
@@ -26,12 +36,23 @@ export const MessageItem: React.FC<MessageItemProps> = React.memo(
     const [copyError, setCopyError] = useState(false);
     const [isCopied, setIsCopied] = useState(false);
     const [showRaw, setShowRaw] = useState(false);
+    const [showThink, setShowThink] = useState(false); // Новое состояние для отображения think
+    
     const content = useMemo(() => message.content || '', [message.content]);
+    
+    // Извлекаем think-контент
+    const { thinkContent, mainContent } = useMemo(() => 
+      extractThinkContent(content), 
+      [content]
+    );
+
+    const hasThinkContent = thinkContent.length > 0;
 
     const handleCopy = useCallback(async () => {
       setCopyError(false);
       try {
-        await navigator.clipboard.writeText(content);
+        // Копируем основной контент без think-тегов
+        await navigator.clipboard.writeText(mainContent);
         setIsCopied(true);
         setTimeout(() => setIsCopied(false), 2000);
       } catch (err) {
@@ -40,10 +61,14 @@ export const MessageItem: React.FC<MessageItemProps> = React.memo(
         toast.error(t('copyError'));
         setTimeout(() => setCopyError(false), 2000);
       }
-    }, [content]);
+    }, [mainContent]);
 
     const toggleRawView = useCallback(() => {
       setShowRaw(prev => !prev);
+    }, []);
+
+    const toggleThinkView = useCallback(() => {
+      setShowThink(prev => !prev);
     }, []);
 
     const handleMarkdownRender = useCallback(() => {
@@ -66,20 +91,40 @@ export const MessageItem: React.FC<MessageItemProps> = React.memo(
                 minute: '2-digit',
               })}
             </span>
+            {hasThinkContent && (
+              <span className="groq-message__think-badge">
+                {t('hasThinking')}
+              </span>
+            )}
           </div>
           {message.role === 'assistant' && (
             <div className="groq-message__actions">
+              {/* Кнопка показа think-контента */}
+              {hasThinkContent && (
+                <button
+                  onClick={toggleThinkView}
+                  className="groq-icon-button"
+                  aria-label={showThink ? t('hideThinking') : t('showThinking')}
+                  title={showThink ? t('hideThinking') : t('showThinking')}
+                >
+                  {showThink ? <FiEyeOff size={14} /> : <FiEye size={14} />}
+                </button>
+              )}
+              {/* Кнопка raw view */}
               <button
                 onClick={toggleRawView}
                 className="groq-icon-button"
                 aria-label={showRaw ? t('showFormatted') : t('showRaw')}
+                title={showRaw ? t('showFormatted') : t('showRaw')}
               >
                 <FiCode size={14} />
               </button>
+              {/* Кнопка копирования */}
               <button
                 onClick={handleCopy}
                 className="groq-icon-button"
                 aria-label={t('copyMessage')}
+                title={t('copyMessage')}
               >
                 {copyError ? (
                   <span className="groq-message__copy-error">!</span>
@@ -93,18 +138,43 @@ export const MessageItem: React.FC<MessageItemProps> = React.memo(
           )}
         </div>
 
+        {/* Think-контент (раскрываемая секция) */}
+        {hasThinkContent && showThink && (
+          <div className="groq-think-content">
+            <div className="groq-think-content__header">
+              <span className="groq-think-content__title">
+                {t('thinkingProcess')}
+              </span>
+            </div>
+            <div className="groq-think-content__body">
+              {showRaw ? (
+                <pre className="groq-think-raw">
+                  <code>{thinkContent}</code>
+                </pre>
+              ) : (
+                <GroqMarkdown
+                  content={thinkContent}
+                  onRenderComplete={isLastMessage ? handleMarkdownRender : undefined}
+                  app={window.app || undefined}
+                />
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Основной контент сообщения */}
         <div className={`groq-message__content ${showRaw ? 'groq-message__content--raw' : ''}`}>
-            {showRaw ? (
+          {showRaw ? (
             <pre aria-label={t('rawContent')}>
-              <code>{content}</code>
+              <code>{mainContent}</code>
             </pre>
-            ) : (
+          ) : (
             <GroqMarkdown
-              content={content}
-              onRenderComplete={handleMarkdownRender}
-              app={(window as any).app}
+              content={mainContent}
+              onRenderComplete={isLastMessage ? handleMarkdownRender : undefined}
+              app={window.app || undefined}
             />
-            )}
+          )}
         </div>
       </div>
     );

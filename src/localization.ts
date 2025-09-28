@@ -121,6 +121,11 @@ export const translations: Record<Locale, Record<string, string>> = {
     noModelsFound: 'Нет доступных моделей',
     imageNotice:
       '⚠️ Чат не поддерживает отображение изображений. Если модель возвращает абсолютную ссылку на изображение, будет показана только ссылка.',
+    hasThinking: 'Есть размышления',
+    showThinking: 'Показать ход мыслей',
+    hideThinking: 'Скрыть ход мыслей',
+    thinkingProcess: 'Ход мыслей модели',
+    thinkContent: 'Рассуждения модели',
     // MessageList
     showPreviousN: 'Показать предыдущие {{n}}',
     // Input (MessageInput)
@@ -234,6 +239,11 @@ export const translations: Record<Locale, Record<string, string>> = {
     noModelsFound: 'No available models',
     imageNotice:
       '⚠️ Chat does not support image rendering. If the model returns an absolute image link, only the link will be shown.',
+    hasThinking: 'Has thinking',
+    showThinking: 'Show thinking process',
+    hideThinking: 'Hide thinking process',
+    thinkingProcess: 'Thinking Process',
+    thinkContent: 'Model reasoning',
     // MessageList
     showPreviousN: 'Show previous {{n}}',
     // Input (MessageInput)
