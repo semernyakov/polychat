@@ -34,9 +34,7 @@ export const MessageList = React.memo(
       const prevMessagesLengthRef = useRef<number>(messages.length);
       const isInitialRenderRef = useRef<boolean>(true);
       const resizeObserverRef = useRef<ResizeObserver | null>(null);
-      // Новый ref для отслеживания, было ли уже применено initial scroll
       const initialScrollDoneRef = useRef<boolean>(false);
-      // Ref для блокировки скролла во время добавления новых сообщений
       const scrollLockRef = useRef<boolean>(false);
 
       const NEAR_BOTTOM_THRESHOLD = 100; // px
@@ -46,6 +44,7 @@ export const MessageList = React.memo(
 
       const [separatorIndex, setSeparatorIndex] = useState<number | null>(null);
       const [showNewMessageNotice, setShowNewMessageNotice] = useState<boolean>(false);
+      const [isNoticeExiting, setIsNoticeExiting] = useState<boolean>(false);
 
       // Вычисляем видимую "хвостовую" часть
       const visibleMessages = React.useMemo(() => {
@@ -206,7 +205,13 @@ export const MessageList = React.memo(
       }, [STEP, messages.length]);
 
       const handleNewMessageNoticeClick = useCallback(() => {
-        scrollToBottom({ smooth: true, force: true });
+        // Запускаем анимацию исчезновения
+        setIsNoticeExiting(true);
+        setTimeout(() => {
+          scrollToBottom({ smooth: true, force: true });
+          setShowNewMessageNotice(false);
+          setIsNoticeExiting(false);
+        }, 150); // Длительность анимации
       }, [scrollToBottom]);
 
       const handleLastMessageRender = useCallback(() => {
@@ -262,7 +267,7 @@ export const MessageList = React.memo(
           )}
 
           {showNewMessageNotice && (
-            <div className="groq-new-message-notice">
+            <div className={`groq-new-message-notice ${isNoticeExiting ? 'groq-new-message-notice--exiting' : ''}`}>
               <button
                 onClick={handleNewMessageNoticeClick}
                 className="groq-button groq-button--primary groq-new-message-button"
