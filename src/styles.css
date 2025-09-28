@@ -1,5 +1,7 @@
 /* styles.css */
 
+/* ===== ПЕРЕМЕННЫЕ И БАЗОВЫЕ СТИЛИ ===== */
+
 /* --- Переменные плагина (локально на контейнер) --- */
 .groq-container {
   /* Типографика */
@@ -10,127 +12,22 @@
     'Fira Code', 'Source Code Pro', Menlo, Monaco, Consolas, 'Courier New', monospace;
   --font-size: 14px;
 
-  /* Геометрия и интервалы (локальные для плагина) */
+  /* Геометрия и интервалы */
   --border-radius: 3px;
   --border-width: 1px;
   --spacing-unit: 8px;
   --spacing-small: calc(var(--spacing-unit) * 0.5);
   --spacing-medium: var(--spacing-unit);
   --spacing-large: calc(var(--spacing-unit) * 1.5);
-  --button-size: 2em; /* Единый размер для кнопок, масштабируется от шрифта */
-  --icon-size: 1em; /* Размер иконок относительно шрифта родителя */
+  --button-size: 2em;
+  --icon-size: 1em;
 
-  /* Служебные переменные плагина */
+  /* Цвета */
   --icon-color: var(--text-muted, #9e9e9e);
-  --size-4-2: 8px; /* Используется для позиционирования кнопок */
-}
-/* --- Auto-height textarea --- */
-.groq-textarea-auto {
-  resize: none;
-  overflow-y: hidden;
-  min-height: var(--input-height, 40px);
-  max-height: 200px; /* Prevent textarea from growing too much */
+  --size-4-2: 8px;
 }
 
-/* --- Стили для think-контента --- */
-.groq-message__think-badge {
-  background-color: var(--background-modifier-hover);
-  color: var(--text-muted);
-  padding: 2px 6px !important;
-  border-radius: 4px;
-  font-size: 0.75em;
-  font-weight: 500;
-  margin-left: 8px !important;
-  display: block;
-  height: 19px;
-}
-.groq-think-content {
-  margin: 8px 0;
-  border: 1px solid var(--background-modifier-border);
-  border-radius: var(--border-radius);
-  background-color: var(--background-secondary);
-  overflow: hidden;
-}
-
-.groq-think-content__header {
-  padding: 8px 12px !important;
-  background-color: var(--background-modifier-hover);
-  border-bottom: 1px solid var(--background-modifier-border);
-  font-size: 0.85em;
-  font-weight: 600;
-  color: var(--text-muted);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.groq-think-content__title {
-  font-weight: 600;
-}
-
-.groq-think-content__body {
-  padding: 12px;
-}
-
-.groq-think-content__body .groq-markdown-content {
-  font-size: 0.9em;
-  line-height: 1.4;
-  color: var(--text-muted);
-  padding: 0 12px;
-}
-
-.groq-think-raw {
-  background-color: var(--background-primary);
-  padding: 8px;
-  border-radius: 4px;
-  font-size: 0.8em;
-  line-height: 1.3;
-  color: var(--text-muted);
-  white-space: pre-wrap;
-  word-break: break-word;
-  max-height: 300px;
-  overflow-y: auto;
-}
-
-/* Анимация для раскрытия think-контента */
-.groq-think-content {
-  animation: groq-think-slide-down 0.2s ease-out;
-}
-
-@keyframes groq-think-slide-down {
-  from {
-    opacity: 0;
-    max-height: 0;
-  }
-  to {
-    opacity: 1;
-    max-height: 500px;
-  }
-}
-
-/* Улучшаем отступы когда think-контент показан */
-.groq-message:has(.groq-think-content) {
-  margin-bottom: 16px;
-}
-
-/* Адаптивность для think-контента */
-@media (max-width: 600px) {
-  .groq-think-content__body {
-    padding: 8px;
-  }
-  
-  .groq-think-raw {
-    font-size: 0.75em;
-    max-height: 200px;
-  }
-}
-
-/* --- Body overflow control --- */
-.body-overflow-hidden {
-  overflow: hidden !important;
-}
-
-/* --- Сброс и базовые стили (только внутри плагина) --- */
+/* --- Сброс и базовые стили --- */
 .groq-container,
 .groq-container *,
 .groq-container *::before,
@@ -153,6 +50,8 @@
   line-height: 1.5;
   overflow: hidden;
 }
+
+/* ===== КОМПОНЕНТЫ ЧАТА ===== */
 
 /* --- Шапка чата --- */
 .groq-chat__header {
@@ -197,28 +96,9 @@
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
   overflow-anchor: none;
-  /* Гарантируем что контейнер правильно рассчитывает высоту */
   contain: layout style;
-}
-
-.groq-react-window-list {
-  overflow-y: auto;
-  overflow-x: hidden !important;
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* (удалены жесткие width/max-width для внутренних оберток react-window) */
-
-/* --- History separator for button-based load --- */
-.groq-history-separator {
-  height: 1px;
-  margin: 4px 0 8px 0;
-  background: var(--background-modifier-border, rgba(128, 128, 128, 0.35));
-}
-
-/* Optional CSS variables for scroll thresholds and reveal offset */
-.groq-chat__messages {
+  
+  /* Переменные для скролла */
   --near-bottom-threshold: 100px;
   --near-top-threshold: 40px;
   --load-reveal-offset: 80px;
@@ -271,26 +151,25 @@
   color: var(--text-muted);
 }
 
-.groq-message-input__hint kbd {
-  background-color: var(--background-modifier-border);
-  padding: 2px 4px;
-  border-radius: 3px;
-  font-family: var(--font-monospace);
+/* ===== СООБЩЕНИЯ ===== */
+
+/* --- Строка сообщения --- */
+.groq-message-row {
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  contain: layout style;
 }
 
-.groq-message-input__counter[style*='--text-error'] {
-  color: var(--text-error);
-  font-weight: bold;
-}
-
-/* --- Сообщения --- */
+/* --- Базовые стили сообщения --- */
 .groq-message {
-  margin-bottom: 0; /* отступ перенесён на .groq-message-row */
+  margin-bottom: 0;
   padding: var(--spacing-medium, 8px);
   border-radius: var(--border-radius, 3px);
-  /* Используем min() для гибкой ширины сообщений */
   max-width: min(80%, 900px);
   transform: translateZ(0); /* Аппаратное ускорение */
+  opacity: 0;
+  transform: translateY(10px);
+  animation: groq-message-fade-in 0.3s ease-out forwards;
 }
 
 .groq-message--user {
@@ -305,6 +184,7 @@
   border: var(--border-width) solid var(--background-modifier-border);
 }
 
+/* --- Заголовок сообщения --- */
 .groq-message__header {
   display: flex;
   justify-content: space-between;
@@ -315,6 +195,7 @@
   display: flex;
   gap: var(--spacing-small, 4px);
   font-size: 0.9em;
+  align-items: center;
 }
 
 .groq-message__role {
@@ -330,63 +211,14 @@
   gap: var(--spacing-small);
 }
 
+/* --- Контент сообщения --- */
 .groq-message__content {
   line-height: 1.6;
   user-select: text;
-  display: flow-root; /* предотвращает коллапс внешних отступов внутри, стабилизирует высоту */
-  /* Контент не должен выпадать: разрешаем горизонтальный скролл при переполнении */
+  display: flow-root;
   overflow-x: auto;
-  /* Усиление переносов слов для общего текста */
   overflow-wrap: anywhere;
   word-break: break-word;
-}
-/* (удалены дополнительные wrap-правила; базовые остаются ниже в код-блоках) */
-
-.groq-message__content p {
-  margin: var(--spacing-medium, 8px) 0;
-}
-
-.groq-message__content ul,
-.groq-message__content ol {
-  margin: var(--spacing-medium, 8px) 0;
-  padding-left: calc(var(--spacing-large, 12px) * 1.5);
-  color: var(--text-normal, #e0e0e0);
-  list-style-position: outside;
-}
-
-.groq-message__content ul {
-  list-style-type: disc;
-}
-
-.groq-message__content ol {
-  list-style-type: decimal;
-}
-
-.groq-message__content li {
-  margin-bottom: var(--spacing-small, 4px);
-}
-
-.groq-message__content ul ul,
-.groq-message__content ol ol,
-.groq-message__content ul ol,
-.groq-message__content ol ul {
-  margin: var(--spacing-small, 4px) 0;
-  padding-left: calc(var(--spacing-large, 12px) * 1.5);
-}
-
-.groq-message__content ul ul {
-  list-style-type: circle;
-}
-
-.groq-message__content ul ul ul {
-  list-style-type: square;
-}
-
-.groq-message__content blockquote {
-  border-left: 3px solid var(--background-modifier-border, #444444);
-  padding-left: var(--spacing-medium, 8px);
-  margin: var(--spacing-medium, 8px) 0;
-  color: var(--text-muted, #9e9e9e);
 }
 
 .groq-message__content--raw pre {
@@ -399,115 +231,176 @@
   white-space: pre-wrap;
 }
 
-/* --- Markdown: заголовки, ссылки, изображения, таблицы --- */
-.groq-container .groq-message__content h1,
-.groq-container .groq-message__content h2,
-.groq-container .groq-message__content h3,
-.groq-container .groq-message__content h4,
-.groq-container .groq-message__content h5,
-.groq-container .groq-message__content h6 {
-  margin: var(--spacing-medium, 8px) 0 var(--spacing-small, 4px);
-  color: var(--text-normal, #e0e0e0);
-  line-height: 1.25;
+/* --- Think-контент --- */
+.groq-message__think-badge {
+  background-color: var(--background-modifier-hover);
+  color: var(--text-muted);
+  padding: 2px 6px !important;
+  border-radius: 4px;
+  font-size: 0.75em;
+  font-weight: 500;
+  margin-left: 8px !important;
+  display: inline-block;
+  height: auto;
 }
 
-.groq-container .groq-message__content a {
-  color: var(--text-accent, #7e57c2);
-  text-decoration: none;
-}
-.groq-container .groq-message__content a:hover,
-.groq-container .groq-message__content a:focus {
-  text-decoration: underline;
-}
-
-/* Минимальная защита от переполнения длинными словами/URL */
-/* Усиление переносов остаётся, но теперь задано выше на .groq-message__content */
-
-.groq-container .groq-message__content a {
-  overflow-wrap: anywhere;
+.groq-think-content {
+  margin: 8px 0;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--border-radius);
+  background-color: var(--background-secondary);
+  overflow: hidden;
+  animation: groq-think-slide-down 0.2s ease-out;
 }
 
-.groq-container .groq-message__content img {
+.groq-think-content__header {
+  padding: 8px 12px !important;
+  background-color: var(--background-modifier-hover);
+  border-bottom: 1px solid var(--background-modifier-border);
+  font-size: 0.85em;
+  font-weight: 600;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.groq-think-content__title {
+  font-weight: 600;
+}
+
+.groq-think-content__body {
+  padding: 12px;
+}
+
+.groq-think-content__body .groq-markdown-content {
+  font-size: 0.9em;
+  line-height: 1.4;
+  color: var(--text-muted);
+  padding: 0 12px;
+}
+
+.groq-think-raw {
+  background-color: var(--background-primary);
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 0.8em;
+  line-height: 1.3;
+  color: var(--text-muted);
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* ===== MARKDOWN СТИЛИ ===== */
+
+/* --- Базовые стили Markdown --- */
+.groq-markdown-content {
+  max-width: 100%;
+  line-height: 1.5;
+}
+
+/* Заголовки */
+.groq-markdown-content h1,
+.groq-markdown-content h2,
+.groq-markdown-content h3,
+.groq-markdown-content h4,
+.groq-markdown-content h5,
+.groq-markdown-content h6 {
+  margin: 0.5em 0 0.25em 0;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.groq-markdown-content h1 { font-size: 1.4em; }
+.groq-markdown-content h2 { font-size: 1.3em; }
+.groq-markdown-content h3 { font-size: 1.2em; }
+.groq-markdown-content h4 { font-size: 1.1em; }
+.groq-markdown-content h5 { font-size: 1.05em; }
+.groq-markdown-content h6 { font-size: 1em; opacity: 0.9; }
+
+/* Текст и списки */
+.groq-markdown-content p {
+  margin: 0.5em 0;
+}
+
+.groq-markdown-content ul,
+.groq-markdown-content ol {
+  margin: 0.5em 0;
+  padding-left: 1.5em;
+}
+
+.groq-markdown-content li {
+  margin: 0.25em 0;
+}
+
+/* Цитаты и код */
+.groq-markdown-content blockquote {
+  margin: 0.5em 0;
+  padding: 0.5em 1em;
+  border-left: 3px solid var(--interactive-accent);
+  background-color: var(--background-secondary);
+  border-radius: 0 4px 4px 0;
+}
+
+.groq-markdown-content code {
+  background-color: var(--background-secondary);
+  padding: 0.1em 0.3em;
+  border-radius: 3px;
+  font-size: 0.9em;
+  font-family: var(--font-monospace);
+}
+
+.groq-markdown-content pre {
+  background-color: var(--background-secondary);
+  padding: 0.75em;
+  border-radius: 4px;
+  overflow-x: auto;
+  margin: 0.5em 0;
+  font-size: inherit;
+}
+
+.groq-markdown-content pre code {
+  background: none;
+  padding: 0;
+  font-size: 12px;
+  font-family: var(--font-monospace);
+}
+
+/* Таблицы и изображения */
+.groq-markdown-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.5em 0;
+  font-size: 0.9em;
+}
+
+.groq-markdown-content th,
+.groq-markdown-content td {
+  padding: 0.5em;
+  border: 1px solid var(--background-modifier-border);
+  text-align: left;
+}
+
+.groq-markdown-content th {
+  background-color: var(--background-secondary);
+}
+
+.groq-markdown-content a {
+  color: var(--interactive-accent);
+}
+
+.groq-markdown-content img {
   max-width: 100%;
   height: auto;
-  border-radius: var(--border-radius, 3px);
-  display: block; /* стабилизируем расчёт высоты строки */
-}
-
-.groq-container .groq-message__content figure {
-  display: block;
-  margin: var(--spacing-medium, 8px) 0;
-}
-
-.groq-container .groq-message__content figcaption {
-  font-size: 0.9em;
-  color: var(--text-muted, #9e9e9e);
-  margin-top: var(--spacing-small, 4px);
-}
-
-.groq-container .groq-message__content table {
-  width: 100%;
-  max-width: 100%;
-  border-collapse: collapse;
-  margin: var(--spacing-medium, 8px) 0;
-  table-layout: fixed; /* фиксированная раскладка для предсказуемой ширины */
-}
-
-.groq-container .groq-message__content th,
-.groq-container .groq-message__content td {
-  padding: var(--spacing-small, 4px) var(--spacing-medium, 8px);
-  border: var(--border-width, 1px) solid var(--background-modifier-border, #444444);
-  text-align: left;
-  vertical-align: top;
-  overflow-wrap: anywhere;
-}
-
-.groq-container .groq-message__content thead tr {
-  background-color: var(--background-modifier-border, #444444);
-}
-
-/* Переносы для длинных строк в коде/преформатированном тексте внутри сообщений */
-.groq-container .groq-message__content pre,
-.groq-container .groq-message__content code,
-.groq-container .groq-message__content kbd,
-.groq-container .groq-message__content samp {
-  overflow-x: auto;
-  overflow-wrap: anywhere;
-}
-
-/* Ограничение ширины преформатированного текста в пределах сообщения */
-.groq-container .groq-message__content pre {
-  max-width: 100%;
-}
-
-/* Стили полосы прокрутки для соответствия теме Obsidian */
-.groq-react-window-list::-webkit-scrollbar,
-.groq-message__content::-webkit-scrollbar,
-.groq-container .groq-message__content pre::-webkit-scrollbar {
-  height: 8px;
-  width: 8px;
-}
-
-.groq-react-window-list::-webkit-scrollbar-track,
-.groq-message__content::-webkit-scrollbar-track,
-.groq-container .groq-message__content pre::-webkit-scrollbar-track {
-  background: var(--background-primary, #202020);
-}
-
-.groq-react-window-list::-webkit-scrollbar-thumb,
-.groq-message__content::-webkit-scrollbar-thumb,
-.groq-container .groq-message__content pre::-webkit-scrollbar-thumb {
-  background-color: var(--background-modifier-border, #444444);
   border-radius: 4px;
+  margin: 0.5em 0;
 }
 
-.groq-react-window-list::-webkit-scrollbar-thumb:hover,
-.groq-message__content::-webkit-scrollbar-thumb:hover,
-.groq-container .groq-message__content pre::-webkit-scrollbar-thumb:hover {
-  background-color: var(--background-modifier-hover, #3a3a3a);
-}
+/* ===== КОДОВЫЕ БЛОКИ ===== */
 
-/* --- Код --- */
+/* --- Inline код --- */
 .groq-inline-code {
   padding: 0.2em 0.4em;
   background-color: var(--background-secondary, #2a2a2a);
@@ -517,25 +410,7 @@
   font-size: 0.9em;
 }
 
-/* Общее правило для markdown-блоков кода, чтобы строки переносились и не вылезали за границы */
-.groq-container .groq-code-block,
-.groq-container .groq-code-block--no-highlight {
-  white-space: pre; /* избегать неверных расчётов высоты, позволяем горизонтальный скролл */
-  overflow-x: auto;
-  overflow-wrap: normal;
-  max-width: 100%;
-}
-
-.groq-container .groq-code-block code,
-.groq-container .groq-code-block--no-highlight code {
-  white-space: inherit; /* наследовать переносы от родителя */
-}
-
-/* Скрыть служебный тег <think> по умолчанию */
-.groq-container .groq-think {
-  display: none !important;
-}
-
+/* --- Контейнер кодового блока --- */
 .groq-code-container {
   margin: var(--spacing-medium, 8px) 0;
   border: var(--border-width, 1px) solid var(--background-modifier-border, #444444);
@@ -544,6 +419,8 @@
   font-family: var(--font-monospace);
   font-size: inherit;
   position: relative;
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 .groq-code-header {
@@ -557,6 +434,7 @@
   border-top-right-radius: var(--border-radius, 3px);
   color: var(--text-muted, #9e9e9e);
   font-size: inherit;
+  position: relative;
 }
 
 .groq-code-actions {
@@ -565,58 +443,10 @@
   align-items: center;
 }
 
-.groq-code-button {
-  width: var(--button-size);
-  height: var(--button-size);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: none;
-  border: none;
-  color: var(--text-muted, #9e9e9e);
-  cursor: pointer;
-  transition: background-color 0.2s, color 0.2s;
-  border-radius: var(--border-radius);
-}
-
-.groq-code-button:hover {
-  background-color: var(--background-modifier-hover);
-  color: var(--text-normal);
-}
-
-.groq-code-button svg {
-  width: var(--icon-size);
-  height: var(--icon-size);
-}
-
 .groq-code-language {
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-}
-
-.groq-code-copy {
-  width: var(--button-size);
-  height: var(--button-size);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: none;
-  border: none;
-  color: var(--text-muted, #9e9e9e);
-  cursor: pointer;
-  transition: background-color 0.2s, color 0.2s;
-  border-radius: var(--border-radius, 3px);
-}
-
-.groq-code-copy:hover {
-  background-color: var(--background-modifier-hover, #3a3a3a);
-  color: var(--text-normal, #e0e0e0);
-}
-
-.groq-code-copy svg {
-  width: var(--icon-size);
-  height: var(--icon-size);
 }
 
 .groq-code-container pre {
@@ -630,7 +460,60 @@
   border-bottom-right-radius: var(--border-radius, 3px);
 }
 
-/* --- Кнопки и иконки --- */
+/* --- Кнопки кодового блока --- */
+.groq-code-button,
+.groq-code-copy {
+  width: var(--button-size);
+  height: var(--button-size);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--text-muted, #9e9e9e);
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+  border-radius: var(--border-radius);
+}
+
+.groq-code-button:hover,
+.groq-code-copy:hover {
+  background-color: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+.groq-code-button svg,
+.groq-code-copy svg {
+  width: var(--icon-size);
+  height: var(--icon-size);
+}
+
+/* Фидбек для копирования */
+.groq-code-header .groq-code-copy.is-copied::after {
+  content: 'Copied';
+  position: absolute;
+  top: -8px;
+  right: 0;
+  transform: translateY(-100%);
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.75em;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.groq-code-copy.is-active {
+  background-color: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+/* ===== КНОПКИ И ИКОНКИ ===== */
+
+/* --- Базовые стили кнопок --- */
 .groq-button,
 .groq-icon-button {
   display: inline-flex;
@@ -643,9 +526,7 @@
   border: none;
   color: var(--text-muted, #9e9e9e);
   cursor: pointer;
-  transition:
-    background-color 0.2s,
-    color 0.2s;
+  transition: background-color 0.2s, color 0.2s;
 }
 
 .groq-button:hover,
@@ -679,49 +560,34 @@
 }
 
 /* --- Специфические кнопки --- */
-.groq-chat-input__send-button,
-.groq-display-mode-button,
-.groq-support-header-button,
-.groq-model-info-button,
-.groq-scroll-button,
-.groq-clear-button,
-.groq-code-copy,
-.groq-dialog-close,
-.groq-support-button {
-  width: var(--button-size);
-  height: var(--button-size);
-  /* box-shadow: none !important; */
-  /* border: var(--border-width) solid var(--background-modifier-border); */
-}
-
 .groq-chat-input__send-button {
   width: 42px;
   height: 42px;
-  /* box-shadow: none !important; */
-  /* border: var(--border-width, 1px) solid var(--background-modifier-border, #444444); */
 }
+
 .groq-chat-input__send-button svg {
   width: 21px;
   height: 21px;
 }
-/* --- Выбор модели --- */
-.groq-select {
-  padding: var(--spacing-small, 4px) var(--spacing-medium, 8px);
-  border: var(--border-width, 1px) solid var(--background-modifier-border, #444444);
+
+.groq-dialog-secondary-button,
+.groq-support-button {
+  width: auto;
+  height: 26px;
+  padding: 0 9px;
   border-radius: var(--border-radius, 3px);
-  background-color: var(--background-primary, #202020);
-  color: var(--text-normal, #e0e0e0);
-  font-size: 0.9em;
-  cursor: pointer;
-  box-shadow: none !important;
+  text-decoration: none !important;
 }
 
-.groq-select:focus {
-  outline: none;
-  border-color: var(--interactive-accent, var(--text-accent, #7e57c2));
+.groq-support-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
-/* --- Индикаторы загрузки --- */
+/* ===== ИНДИКАТОРЫ И СОСТОЯНИЯ ===== */
+
+/* --- Индикатор загрузки --- */
 .groq-loading-indicator,
 .groq-chat__loading-history {
   position: absolute;
@@ -753,24 +619,12 @@
   border: 2px solid var(--text-muted, #9e9e9e);
   border-top-color: transparent;
   border-radius: 50%;
-  /* Animation removed */
 }
 
-/* Стили для индикатора формирования ответа */
+/* --- Индикатор стриминга --- */
 .groq-streaming-indicator {
   opacity: 0;
   animation: groq-streaming-fade-in 0.3s ease-out forwards;
-}
-
-@keyframes groq-streaming-fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 .groq-streaming-indicator__message {
@@ -848,100 +702,57 @@
   animation: groq-streaming-bounce 1.4s ease-in-out infinite both;
 }
 
-.groq-streaming-indicator__dot:nth-child(1) {
-  animation-delay: -0.32s;
-}
+.groq-streaming-indicator__dot:nth-child(1) { animation-delay: -0.32s; }
+.groq-streaming-indicator__dot:nth-child(2) { animation-delay: -0.16s; }
+.groq-streaming-indicator__dot:nth-child(3) { animation-delay: 0s; }
 
-.groq-streaming-indicator__dot:nth-child(2) {
-  animation-delay: -0.16s;
-}
-
-.groq-streaming-indicator__dot:nth-child(3) {
-  animation-delay: 0s;
-}
-
-@keyframes groq-streaming-fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes groq-streaming-bounce {
-  0%, 80%, 100% {
-    transform: scale(0.8);
-    opacity: 0.5;
-  }
-  40% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-.groq-streaming-indicator__body::before {
-  content: '';
-  position: absolute;
-  top: 0;
+/* --- Уведомление о новых сообщениях --- */
+.groq-new-message-notice {
+  position: sticky;
+  bottom: 8px;
   left: 0;
   right: 0;
-  bottom: 0;
-  border-radius: var(--border-radius);
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(var(--interactive-accent-rgb, 126, 87, 194), 0.05),
-    transparent
-  );
-  animation: groq-streaming-pulse 2s ease-in-out infinite;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 var(--spacing-small, 4px);
+  z-index: 100;
   pointer-events: none;
+  animation: groq-notice-slide-up 0.2s ease-out;
+  will-change: transform, opacity;
 }
 
-@keyframes groq-streaming-pulse {
-  0%, 100% {
-    opacity: 0;
-  }
-  50% {
-    opacity: 1;
-  }
+.groq-new-message-button {
+  pointer-events: auto;
+  min-width: 110px;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: var(--border-radius, 3px);
+  font-size: 0.9em;
+  font-weight: 400;
+  opacity: 0.85;
+  background-color: var(--interactive-accent, var(--text-accent, #7e57c2));
+  color: var(--text-on-accent, #ffffff);
+  border: var(--border-width) solid var(--background-modifier-border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: opacity 0.2s ease-out, background-color 0.2s ease-out;
+  will-change: opacity, background-color;
 }
 
-@media (max-width: 600px) {
-  .groq-streaming-indicator__message {
-    max-width: 95%;
-    gap: 8px;
-  }
-  
-  .groq-streaming-indicator__avatar {
-    width: 28px;
-    height: 28px;
-  }
-  
-  .groq-streaming-indicator__body {
-    padding: 10px 12px;
-  }
-  
-  .groq-streaming-indicator__text {
-    font-size: 0.9em;
-  }
+.groq-new-message-button:hover {
+  opacity: 1;
+  background-color: var(--interactive-accent-hover, var(--text-accent-hover, #9575cd));
 }
 
-.groq-streaming-indicator--exiting {
-  animation: groq-streaming-fade-out 0.2s ease-in forwards;
-}
-
-@keyframes groq-streaming-fade-out {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
+.groq-new-message-button::before {
+  content: "↓";
+  font-size: 0.9em;
+  font-weight: 400;
+  line-height: 1;
+  opacity: 0.9;
 }
 
 /* --- Пустое состояние и ошибки --- */
@@ -964,7 +775,13 @@
   text-align: center;
 }
 
-/* --- Диалоги --- */
+.groq-message__copy-error {
+  color: var(--text-error, #ef5350);
+}
+
+/* ===== ДИАЛОГИ ===== */
+
+/* --- Базовые стили диалогов --- */
 .groq-support-dialog-overlay {
   position: fixed;
   inset: 0;
@@ -998,38 +815,6 @@
   padding: var(--spacing-large, 12px);
 }
 
-.groq-dialog-content ul,
-.groq-dialog-content ol {
-  margin: var(--spacing-medium, 8px) 0;
-  padding-left: calc(var(--spacing-large, 12px) * 1.5);
-  color: var(--text-normal, #e0e0e0);
-  list-style-position: outside;
-}
-
-.groq-dialog-content ul {
-  list-style-type: disc;
-}
-
-.groq-dialog-content ol {
-  list-style-type: decimal;
-}
-
-.groq-dialog-content ul ul,
-.groq-dialog-content ol ol,
-.groq-dialog-content ul ol,
-.groq-dialog-content ol ul {
-  margin: var(--spacing-small, 4px) 0;
-  padding-left: calc(var(--spacing-large, 12px) * 1.5);
-}
-
-.groq-dialog-content ul ul {
-  list-style-type: circle;
-}
-
-.groq-dialog-content ul ul ul {
-  list-style-type: square;
-}
-
 .groq-dialog-actions {
   padding: var(--spacing-medium, 8px) var(--spacing-large, 12px);
   background-color: var(--background-secondary, #2a2a2a);
@@ -1039,178 +824,13 @@
   gap: var(--spacing-medium, 8px);
 }
 
-.groq-dialog-secondary-button {
-  width: auto;
-  height: 26px;
-  padding: 0 9px;
-  border-radius: var(--border-radius, 3px);
-  text-decoration: none !important;
-  color: var(--text-normal, #e0e0e0);
-}
-
-.groq-support-button {
-  width: auto;
-  height: 26px;
-  text-decoration: none !important;
-  border-radius: var(--border-radius);
-  padding: 0 9px;
-}
-
-/* Кнопка закрытия диалога (иконка) */
 .groq-dialog-close {
-  /* Наследует .groq-icon-button */
   position: absolute;
   top: var(--size-4-2);
   right: var(--size-4-2);
 }
 
-/* --- Таблицы и лимиты --- */
-
-.groq-settings-title {
-  margin-top: 0.5em;
-  font-size: 2em !important;
-  font-weight: bold;
-}
-
-.groq-models-table,
-/* Settings Tab Styles */
-.groq-settings-title {
-  margin-top: 0.5em;
-  font-size: 2em;
-  font-weight: bold;
-}
-
-.groq-settings-subtitle {
-  margin-bottom: 1.5em;
-  font-size: 1.15em;
-  color: var(--text-muted, #9e9e9e);
-}
-
-.groq-settings-token-link {
-  margin-bottom: 1em;
-}
-
-/* Settings Tab Components */
-.groq-settings-flex-grid {
-  display: flex;
-  gap: 16px;
-  align-items: flex-end;
-}
-
-.groq-settings-flex-item {
-  flex: 1;
-}
-
-.groq-settings-actions {
-  margin: 32px 0 0 0;
-  display: flex;
-  gap: 16px;
-  justify-content: flex-end;
-}
-
-.groq-thanks-spacer {
-  height: 32px;
-}
-
-.groq-thanks-block {
-  margin-top: 16px;
-  padding: 16px;
-  border-radius: 8px;
-  background-color: var(--background-modifier-hover);
-  font-size: 0.9em;
-  line-height: 1.5;
-}
-
-.groq-settings-thanks {
-  margin: 2em 0 1em 0;
-  padding: 1em;
-  border-radius: 8px;
-  text-align: center;
-  transition:
-    background 0.3s,
-    color 0.3s;
-  background: linear-gradient(
-    90deg,
-    var(--background-modifier-box-hover, #f2f3f5) 0%,
-    var(--background-secondary, #fcb69f) 100%
-  );
-  color: var(--text-normal, #222);
-  border: 1px solid var(--background-modifier-border, #ddd);
-}
-
-.theme-dark .groq-settings-thanks {
-  background: linear-gradient(
-    90deg,
-    var(--background-modifier-box-hover, #2a2a2a) 0%,
-    var(--background-secondary, #3a3a3a) 100%
-  );
-  color: var(--text-normal, #eee);
-  border: 1px solid var(--background-modifier-border, #333);
-}
-
-.groq-saved-icon {
-  color: #3cb371;
-  margin-left: 8px;
-  font-weight: bold;
-  font-size: 16px;
-  transition: opacity 0.5s;
-}
-
-.groq-models-select-all {
-  margin: 8px 0 8px 0;
-  display: flex;
-  gap: 8px;
-}
-
-.groq-models-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-  margin: 24px 0 24px 0;
-}
-
-.groq-model-toggle {
-  transform: scale(1.2);
-}
-
-/* Message Item Styles */
-.groq-message__copy-error {
-  color: var(--text-error, #ef5350);
-}
-
-/* Message List Styles */
-.groq-message-row {
-  padding-bottom: 12px;
-  /* Удалён contain: влияет на неверные измерения высоты при динамическом контенте */
-  contain: layout style;
-  margin-bottom: 12px;
-}
-
-/* Support Dialog Styles */
-.groq-support-thanks {
-  margin: 2em 0 1em 0;
-  padding: 1em;
-  border-radius: 8px;
-  text-align: center;
-  transition:
-    background 0.3s,
-    color 0.3s;
-  background: linear-gradient(
-    90deg,
-    var(--background-modifier-box-hover, #f2f3f5) 0%,
-    var(--background-secondary, #fcb69f) 100%
-  );
-  color: var(--text-normal, #222);
-  border: 1px solid var(--background-modifier-border, #ddd);
-}
-
-.theme-dark .groq-support-thanks {
-  background: linear-gradient(90deg, var(--background-secondary, #23272e) 0%, #3a3f4b 100%);
-  color: var(--text-normal, #eee);
-  border: 1px solid var(--background-modifier-border, #333);
-}
-
-/* Model Info Dialog Styles */
+/* --- Информация о модели --- */
 .groq-model-info__detail {
   margin-bottom: 10px;
   display: flex;
@@ -1226,7 +846,6 @@
   flex: 1;
 }
 
-/* Warning for unavailable model in ModelInfoDialog */
 .groq-model-info__warning {
   margin-top: var(--spacing-medium, 8px);
   padding: var(--spacing-medium, 8px);
@@ -1237,412 +856,87 @@
   line-height: 1.5;
 }
 
-/* Table Styles for Settings */
-.groq-models-table thead tr {
-  background: var(--background-modifier-hover, #f0f0f0);
-}
+/* ===== АНИМАЦИИ ===== */
 
-.groq-models-table th {
-  text-align: left;
-  padding: 4px 8px;
-}
-
-.groq-models-table td {
-  padding: 4px 8px;
-}
-
-/* Small text styles */
-.groq-small-text {
-  font-size: var(--font-ui-smaller, 0.85em);
-  padding: 0.5em;
-}
-
-.groq-margin-left {
-  margin-left: 5px;
-}
-
-.groq-margin-top {
-  margin-top: 5px;
-}
-
-/* Code Block Styles */
-.groq-code-error {
-  color: var(--text-error);
-}
-
-.groq-limits-block {
-  margin: var(--spacing-medium, 8px) 0;
-  padding: var(--spacing-medium, 8px);
-  background-color: var(--background-secondary, #2a2a2a);
-  border: var(--border-width, 1px) solid var(--background-modifier-border, #444444);
-  border-radius: var(--border-radius, 3px);
-  font-size: 0.9em;
-}
-
-.groq-models-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.groq-models-table th,
-.groq-models-table td {
-  padding: var(--spacing-small, 4px) var(--spacing-medium, 8px);
-  border-bottom: var(--border-width, 1px) solid var(--background-modifier-border, #444444);
-}
-
-.groq-models-table th {
-  background-color: var(--background-modifier-border, #444444);
-  font-weight: 600;
-}
-
-.groq-models-table tr:hover {
-  background-color: var(--background-modifier-hover, #3a3a3a);
-}
-
-/* --- Адаптивность --- */
-@media (max-width: 600px) {
-  .groq-chat__header {
-    flex-direction: column;
-    gap: var(--spacing-medium, 8px);
-    padding: var(--spacing-medium, 8px);
+/* --- Анимации сообщений --- */
+@keyframes groq-message-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
-
-  .groq-message {
-    max-width: 95%;
-  }
-
-  .groq-chat__messages,
-  .groq-chat__input-container {
-    padding: var(--spacing-medium, 8px);
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-/* Стили для MessageInput */
-.groq-textarea-overflow {
-  overflow-y: auto !important;
-}
-
-.groq-send-icon {
-  width: 18px;
-  height: 18px;
-}
-
-/* Стили для SupportDialog */
-.groq-dialog-open {
-  overflow: hidden !important;
-}
-
-/* Стили для иконки сохранения */
-.groq-saved-icon {
-  color: var(--text-success);
-  margin-left: var(--spacing-small);
-  transition: opacity 0.3s ease;
-}
-
-.groq-saved-icon--fade-out {
-  opacity: 0;
-}
-
-/* Стили для спиннера */
-.groq-spinner {
-  display: none;
-  margin-left: var(--spacing-small);
-  vertical-align: middle;
-}
-.groq-spinner--visible {
-  display: inline-block;
-}
-
-.groq-support-thanks__text,
-.groq-dialog-content__text {
-  line-height: 1.6;
-  margin: var(--spacing-medium) 0;
-}
-
-/* --- GroqMarkdown: essential markdown styles inside chat --- */
-.groq-markdown-content {
-  max-width: 100%;
-  line-height: 1.5;
-}
-
-.groq-markdown-content h1,
-.groq-markdown-content h2,
-.groq-markdown-content h3,
-.groq-markdown-content h4,
-.groq-markdown-content h5,
-.groq-markdown-content h6 {
-  margin: 0.5em 0 0.25em 0;
-  font-weight: 600;
-  line-height: 1.3;
-}
-
-.groq-markdown-content h1 {
-  font-size: 1.4em;
-}
-.groq-markdown-content h2 {
-  font-size: 1.3em;
-}
-.groq-markdown-content h3 {
-  font-size: 1.2em;
-}
-.groq-markdown-content h4 {
-  font-size: 1.1em;
-}
-.groq-markdown-content h5 {
-  font-size: 1.05em;
-}
-.groq-markdown-content h6 {
-  font-size: 1em;
-  opacity: 0.9;
-}
-
-.groq-markdown-content p {
-  margin: 0.5em 0;
-}
-
-.groq-markdown-content ul,
-.groq-markdown-content ol {
-  margin: 0.5em 0;
-  padding-left: 1.5em;
-}
-
-.groq-markdown-content li {
-  margin: 0.25em 0;
-}
-
-.groq-markdown-content blockquote {
-  margin: 0.5em 0;
-  padding: 0.5em 1em;
-  border-left: 3px solid var(--interactive-accent);
-  background-color: var(--background-secondary);
-  border-radius: 0 4px 4px 0;
-}
-
-.groq-markdown-content code {
-  background-color: var(--background-secondary);
-  padding: 0.1em 0.3em;
-  border-radius: 3px;
-  font-size: 0.9em;
-  font-family: var(--font-monospace);
-}
-
-.groq-markdown-content pre {
-  background-color: var(--background-secondary);
-  padding: 0.75em;
-  border-radius: 4px;
-  overflow-x: auto;
-  margin: 0.5em 0;
-  font-size: inherit; /* использовать размер шрифта как у обычного текста */
-}
-
-.groq-markdown-content pre code {
-  background: none;
-  padding: 0;
-  font-size: 12px; /* не уменьшать шрифт внутри pre */
-  font: var(--dsw-font-markdown-code-block);
-  font-family: var(--ds-font-family-code);
-}
-
-.groq-markdown-content table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 0.5em 0;
-  font-size: 0.9em;
-}
-
-.groq-markdown-content th,
-.groq-markdown-content td {
-  padding: 0.5em;
-  border: 1px solid var(--background-modifier-border);
-  text-align: left;
-}
-
-.groq-markdown-content th {
-  background-color: var (--background-secondary);
-  /* font-weight: 600; */
-}
-
-.groq-markdown-content a {
-  color: var(--interactive-accent);
-}
-
-.groq-markdown-content img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 4px;
-  margin: 0.5em 0;
-}
-
-.groq-markdown-content hr {
-  border: none;
-  border-top: 1px solid var(--background-modifier-border);
-  margin: 1em 0;
-}
-
-@media (max-width: 768px) {
-  .groq-markdown-content {
-    font-size: 0.95em;
+@keyframes groq-think-slide-down {
+  from {
+    opacity: 0;
+    max-height: 0;
   }
-  .groq-markdown-content table {
-    font-size: 0.85em;
+  to {
+    opacity: 1;
+    max-height: 500px;
   }
 }
 
-/* --- GroqMarkdown code buttons feedback --- */
-.groq-code-header {
-  position: relative;
-}
-
-.groq-code-header .groq-code-copy.is-copied::after {
-  content: 'Copied';
-  position: absolute;
-  top: -8px;
-  right: 0;
-  transform: translateY(-100%);
-  background: var(--background-secondary);
-  color: var(--text-normal);
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 4px;
-  padding: 2px 6px;
-  font-size: 0.75em;
-  white-space: nowrap;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.groq-code-copy.is-active {
-  background-color: var(--background-modifier-hover);
-  color: var(--text-normal);
-}
-
-/* Полностью отключаем браузерный auto-scroll поведение */
-.groq-chat__messages {
-  overflow-anchor: none;
-  /* Гарантируем что контейнер правильно рассчитывает высоту */
-  contain: layout style;
-}
-
-/* Улучшаем производительность скролла */
-.groq-message-row {
-  contain: layout style;
-  margin-bottom: 12px;
-}
-
-/* Предотвращаем любые скачки при анимациях */
-.groq-message {
-  transform: translateZ(0); /* Аппаратное ускорение */
-}
-
-/* Специальный класс для блокировки скролла */
-.groq-chat__messages--scroll-locked {
-  scroll-behavior: auto !important;
-}
-
-/* Улучшаем плавность скролла */
-.groq-chat__messages {
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* Гарантируем что новые сообщения не вызывают перерасчет layout */
-.groq-new-message-notice {
-  position: sticky;
-  bottom: 8px; /* Уменьшено с 12px */
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0 var(--spacing-small, 4px);
-  z-index: 100;
-  pointer-events: none;
-  animation: groq-notice-slide-up 0.2s ease-out;
-  will-change: transform, opacity;
-}
-
-.groq-new-message-button {
-  pointer-events: auto;
-  min-width: 110px;
-  height: 28px;
-  padding: 0 10px;
-  border-radius: var(--border-radius, 3px);
-  font-size: 0.9em;
-  font-weight: 400;
-  opacity: 0.85;
-  background-color: var(--interactive-accent, var(--text-accent, #7e57c2));
-  color: var(--text-on-accent, #ffffff);
-  border: var(--border-width) solid var(--background-modifier-border);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  transition: 
-    opacity 0.2s ease-out,
-    background-color 0.2s ease-out;
-  will-change: opacity, background-color;
-  box-shadow: none !important;
-}
-
-.groq-new-message-button:hover {
-  opacity: 1;
-  background-color: var(--interactive-accent-hover, var(--text-accent-hover, #9575cd));
-}
-
-.groq-new-message-button:active {
-  opacity: 0.9;
-  transition-duration: 0.1s;
-}
-
-.groq-new-message-button::before {
-  content: "↓";
-  font-size: 0.9em;
-  font-weight: 400;
-  line-height: 1;
-  opacity: 0.9;
-}
-
-@media (max-width: 600px) {
-  .groq-new-message-notice {
-    bottom: 6px;
-    padding: 0 var(--spacing-small, 4px);
+/* --- Анимации стриминга --- */
+@keyframes groq-streaming-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
-  
-  .groq-new-message-button {
-    min-width: 110px;
-    height: 24px;
-    padding: 0 8px;
-    font-size: 0.75em;
-    border-radius: 12px;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-/* Адаптивность */
-@media (max-width: 600px) {
-  .groq-new-message-notice {
-    bottom: 8px;
-    padding: 0 var(--spacing-small, 4px);
+@keyframes groq-streaming-bounce {
+  0%, 80%, 100% {
+    transform: scale(0.8);
+    opacity: 0.5;
   }
-  
-  .groq-new-message-button {
-    min-width: 100px;
-    height: 28px;
-    padding: 0 10px;
-    font-size: 0.8em;
+  40% {
+    transform: scale(1);
+    opacity: 1;
   }
 }
 
-/* Гарантируем что уведомление не перекрывает важные элементы */
-.groq-chat__messages {
-  position: relative;
+@keyframes groq-streaming-pulse {
+  0%, 100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
-/* Гарантируем что новые сообщения не вызывают перерасчет layout */
-.groq-new-message-notice {
-  position: sticky;
-  bottom: 8px;
-  z-index: 10;
+@keyframes groq-streaming-fade-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
 }
 
+/* --- Анимации уведомлений --- */
+@keyframes groq-notice-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- Пульсация streaming сообщений --- */
 .groq-message--streaming {
   position: relative;
 }
@@ -1661,33 +955,126 @@
     rgba(var(--interactive-accent-rgb, 126, 87, 194), 0.05),
     transparent
   );
-  animation: groq-message-streaming-pulse 2s ease-in-out infinite;
+  animation: groq-streaming-pulse 2s ease-in-out infinite;
   pointer-events: none;
 }
 
-@keyframes groq-message-streaming-pulse {
-  0%, 100% {
-    opacity: 0;
+/* ===== УТИЛИТЫ И ВСПОМОГАТЕЛЬНЫЕ СТИЛИ ===== */
+
+/* --- Auto-height textarea --- */
+.groq-textarea-auto {
+  resize: none;
+  overflow-y: hidden;
+  min-height: var(--input-height, 40px);
+  max-height: 200px;
+}
+
+.groq-textarea-overflow {
+  overflow-y: auto !important;
+}
+
+/* --- Body overflow control --- */
+.body-overflow-hidden {
+  overflow: hidden !important;
+}
+
+.groq-dialog-open {
+  overflow: hidden !important;
+}
+
+/* --- Спинер --- */
+.groq-spinner--visible {
+  display: inline-block;
+}
+
+/* --- История --- */
+.groq-history-separator {
+  height: 1px;
+  margin: 4px 0 8px 0;
+  background: var(--background-modifier-border, rgba(128, 128, 128, 0.35));
+}
+
+/* --- Специальные классы для скролла --- */
+.groq-chat__messages--scroll-locked {
+  scroll-behavior: auto !important;
+}
+
+/* ===== АДАПТИВНОСТЬ ===== */
+
+@media (max-width: 768px) {
+  .groq-markdown-content {
+    font-size: 0.95em;
   }
-  50% {
-    opacity: 1;
+  .groq-markdown-content table {
+    font-size: 0.85em;
   }
 }
 
-/* Анимация появления нового сообщения */
-.groq-message {
-  opacity: 0;
-  transform: translateY(10px);
-  animation: groq-message-fade-in 0.3s ease-out forwards;
+@media (max-width: 600px) {
+  .groq-chat__header {
+    flex-direction: column;
+    gap: var(--spacing-medium, 8px);
+    padding: var(--spacing-medium, 8px);
+  }
+
+  .groq-message {
+    max-width: 95%;
+  }
+
+  .groq-chat__messages,
+  .groq-chat__input-container {
+    padding: var(--spacing-medium, 8px);
+  }
+
+  .groq-streaming-indicator__message {
+    max-width: 95%;
+    gap: 8px;
+  }
+  
+  .groq-streaming-indicator__avatar {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .groq-streaming-indicator__body {
+    padding: 10px 12px;
+  }
+  
+  .groq-streaming-indicator__text {
+    font-size: 0.9em;
+  }
+
+  .groq-think-content__body {
+    padding: 8px;
+  }
+  
+  .groq-think-raw {
+    font-size: 0.75em;
+    max-height: 200px;
+  }
+
+  .groq-new-message-notice {
+    bottom: 6px;
+    padding: 0 var(--spacing-small, 4px);
+  }
+  
+  .groq-new-message-button {
+    min-width: 110px;
+    height: 24px;
+    padding: 0 8px;
+    font-size: 0.75em;
+    border-radius: 12px;
+  }
 }
 
-@keyframes groq-message-fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+/* ===== УДАЛЕННЫЕ/НЕНУЖНЫЕ СТИЛИ ===== */
+
+/*
+ УДАЛЕНО:
+ - .groq-react-window-list (не используется)
+ - Дублирующие анимации
+ - Неиспользуемые селекторы таблиц
+ - Лишние !important
+ - Дублирующие медиа-запросы
+ - Неиспользуемые утилитные классы
+*/
