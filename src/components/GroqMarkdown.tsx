@@ -6,10 +6,11 @@ import '../styles.css';
 interface GroqMarkdownProps {
   content: string;
   app?: App;
+  onRenderComplete?: () => void; // Добавляем коллбэк завершения рендера
 }
 
 // Основной компонент: полноценный рендер Markdown силами Obsidian
-export const GroqMarkdown: React.FC<GroqMarkdownProps> = ({ content, app }) => {
+export const GroqMarkdown: React.FC<GroqMarkdownProps> = ({ content, app, onRenderComplete }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const mdComponentRef = useRef<Component | null>(null);
   const lastRenderedRef = useRef<string>('');
@@ -104,13 +105,7 @@ export const GroqMarkdown: React.FC<GroqMarkdownProps> = ({ content, app }) => {
         const sourcePath =
           effectiveApp.workspace.getActiveFile()?.path ?? effectiveApp.vault.getName() ?? '';
 
-        await MarkdownRenderer.render(
-          effectiveApp,
-          content,
-          container,
-          sourcePath,
-          mdComponent
-        );
+        await MarkdownRenderer.render(effectiveApp, content, container, sourcePath, mdComponent);
 
         // Гарантируем безопасность внешних ссылок
         container.querySelectorAll('a:not(.internal-link)').forEach(link => {
@@ -122,6 +117,11 @@ export const GroqMarkdown: React.FC<GroqMarkdownProps> = ({ content, app }) => {
         enhanceCodeBlocks(container);
 
         lastRenderedRef.current = content;
+
+        // Вызываем коллбэк после завершения рендеринга
+        if (onRenderComplete) {
+          onRenderComplete();
+        }
       } catch (err) {
         console.error('Error rendering markdown:', err);
         (container as any).setText?.(content);
@@ -167,7 +167,8 @@ export const GroqMarkdown: React.FC<GroqMarkdownProps> = ({ content, app }) => {
       copyBtn.className = 'groq-icon-button groq-code-copy';
       copyBtn.type = 'button';
       copyBtn.setAttribute('aria-label', 'Скопировать');
-      copyBtn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v12h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>';
+      copyBtn.innerHTML =
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v12h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>';
 
       copyBtn.addEventListener('click', async () => {
         try {
@@ -184,7 +185,11 @@ export const GroqMarkdown: React.FC<GroqMarkdownProps> = ({ content, app }) => {
       wrapBtn.className = 'groq-icon-button groq-code-copy'; // используем те же стили кнопок
       wrapBtn.type = 'button';
       wrapBtn.setAttribute('aria-label', 'Переключить перенос строк');
-      wrapBtn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 7h10a4 4 0 010 8H9v3l-5-4 5-4v3h5a2 2 0 100-4H4V7z"/></svg>'.replace('л','l');
+      wrapBtn.innerHTML =
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 7h10a4 4 0 010 8H9v3l-5-4 5-4v3h5a2 2 0 100-4H4V7z"/></svg>'.replace(
+          'л',
+          'l',
+        );
 
       let wrapped = false;
       wrapBtn.addEventListener('click', () => {
@@ -199,7 +204,8 @@ export const GroqMarkdown: React.FC<GroqMarkdownProps> = ({ content, app }) => {
       rawBtn.className = 'groq-icon-button groq-code-copy';
       rawBtn.type = 'button';
       rawBtn.setAttribute('aria-label', 'Показать сырой текст');
-      rawBtn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 5h18v2H3V5zm0 6h18v2H3v-2zm0 6h18v2H3v-2z"/></svg>';
+      rawBtn.innerHTML =
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 5h18v2H3V5zm0 6h18v2H3v-2zm0 6h18v2H3v-2z"/></svg>';
 
       // Создаём textarea для «сырого» вида (readonly), изначально скрытую
       const rawArea = document.createElement('textarea');
@@ -211,7 +217,8 @@ export const GroqMarkdown: React.FC<GroqMarkdownProps> = ({ content, app }) => {
       rawArea.style.resize = 'vertical';
       rawArea.style.background = 'var(--background-secondary)';
       rawArea.style.color = 'var(--text-normal)';
-      rawArea.style.border = 'var(--border-width, 1px) solid var(--background-modifier-border, #444444)';
+      rawArea.style.border =
+        'var(--border-width, 1px) solid var(--background-modifier-border, #444444)';
       rawArea.style.borderTop = 'none';
       rawArea.style.fontFamily = 'var(--font-monospace)';
       rawArea.style.fontSize = '0.9em';
@@ -299,7 +306,7 @@ const simpleMarkdownRender = (text: string): string => {
     .replace(/_(.*?)_/g, '<em>$1</em>')
     .replace(/`(.*?)`/g, '<code>$1</code>')
     .replace(/~~(.*?)~~/g, '<del>$1</del>')
-    .replace(/\[(.*?)\]\((.*?)\)/g, '<a href=\"$2\" target=\"_blank\" rel=\"noopener noreferrer\">$1</a>')
+    .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
     .replace(/\n/g, '<br>');
 };
 

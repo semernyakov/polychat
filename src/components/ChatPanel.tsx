@@ -290,9 +290,9 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
     );
 
     React.useEffect(() => {
-      console.log('[DEBUG] selectedModel:', selectedModel);
-      console.log('[DEBUG] availableModels:', availableModels);
-      console.log('[DEBUG] selectedModelInfo:', selectedModelInfo);
+      // console.log('[DEBUG] selectedModel:', selectedModel);
+      // console.log('[DEBUG] availableModels:', availableModels);
+      // console.log('[DEBUG] selectedModelInfo:', selectedModelInfo);
     }, [selectedModel, availableModels, selectedModelInfo]);
 
     if (!plugin.settings.apiKey) {

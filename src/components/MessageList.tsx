@@ -1,21 +1,28 @@
-import React, { useEffect, useRef, useImperativeHandle, forwardRef, useLayoutEffect } from 'react';
+import React, {
+  useEffect,
+  useRef,
+  useImperativeHandle,
+  forwardRef,
+  useLayoutEffect,
+  useCallback,
+  useState,
+} from 'react';
 import { Message } from '../types/types';
 import { MessageItem } from './MessageItem';
 import '../styles.css';
 import { Locale, t } from '../localization';
+
 interface MessageListProps {
   messages: Message[];
   isLoading: boolean;
   language?: Locale;
-  /** Сколько последних сообщений показывать при открытии */
   tailLimit?: number;
-  /** Шаг подгрузки истории */
   tailStep?: number;
 }
 
 export interface MessageListHandles {
   scrollToTop: () => void;
-  scrollToBottom: () => void;
+  scrollToBottom: (opts?: { smooth?: boolean }) => void;
   forceUpdate: () => void;
 }
 
@@ -24,168 +31,179 @@ export const MessageList = React.memo(
     ({ messages, isLoading, language = 'en', tailLimit, tailStep }, ref) => {
       const containerRef = useRef<HTMLDivElement>(null);
       const isAtBottomRef = useRef<boolean>(true);
-      const NEAR_BOTTOM_THRESHOLD_FALLBACK = 100; // px
-      const NEAR_TOP_THRESHOLD_FALLBACK = 40; // px
-      const DEFAULT_TAIL_LIMIT = Math.max(1, tailLimit ?? 10);
-      const [limit, setLimit] = React.useState<number>(DEFAULT_TAIL_LIMIT);
-      const STEP = Math.max(1, tailStep ?? 20);
-      // Индекс в пределах видимого массива, перед которым вставляем разделитель (только для клика по кнопке)
-      const [separatorIndex, setSeparatorIndex] = React.useState<number | null>(null);
+      const prevMessagesLengthRef = useRef<number>(messages.length);
+      const isInitialRenderRef = useRef<boolean>(true);
+      const resizeObserverRef = useRef<ResizeObserver | null>(null);
 
-      // Вычисляем хвост истории
+      const NEAR_BOTTOM_THRESHOLD = 100; // px
+      const DEFAULT_TAIL_LIMIT = Math.max(1, tailLimit ?? 10);
+      const [limit, setLimit] = useState<number>(DEFAULT_TAIL_LIMIT);
+      const STEP = Math.max(1, tailStep ?? 20);
+
+      const [separatorIndex, setSeparatorIndex] = useState<number | null>(null);
+      const [showNewMessageNotice, setShowNewMessageNotice] = useState<boolean>(false);
+
+      // Вычисляем видимую "хвостовую" часть
       const visibleMessages = React.useMemo(() => {
         if (!messages || messages.length === 0) return [];
-        const l = Math.max(1, Math.min(limit, messages.length));
-        return messages.slice(messages.length - l);
+        const currentLimit = Math.max(1, Math.min(limit, messages.length));
+        return messages.slice(messages.length - currentLimit);
       }, [messages, limit]);
 
-      const getNearBottomThreshold = (): number => {
+      // Проверка находится ли пользователь near bottom
+      const checkIsNearBottom = useCallback((): boolean => {
         const el = containerRef.current;
-        if (!el) return NEAR_BOTTOM_THRESHOLD_FALLBACK;
-        const value = getComputedStyle(el).getPropertyValue('--near-bottom-threshold').trim();
-        if (!value) return NEAR_BOTTOM_THRESHOLD_FALLBACK;
-        const match = value.match(/^(\d+(?:\.\d+)?)(px)?$/i);
-        if (match) {
-          const n = parseFloat(match[1]);
-          return isNaN(n) ? NEAR_BOTTOM_THRESHOLD_FALLBACK : n;
-        }
-        return NEAR_BOTTOM_THRESHOLD_FALLBACK;
-      };
-
-      const getNearTopThreshold = (): number => {
-        const el = containerRef.current;
-        if (!el) return NEAR_TOP_THRESHOLD_FALLBACK;
-        const value = getComputedStyle(el).getPropertyValue('--near-top-threshold').trim();
-        if (!value) return NEAR_TOP_THRESHOLD_FALLBACK;
-        const match = value.match(/^(\d+(?:\.\d+)?)(px)?$/i);
-        if (match) {
-          const n = parseFloat(match[1]);
-          return isNaN(n) ? NEAR_TOP_THRESHOLD_FALLBACK : n;
-        }
-        return NEAR_TOP_THRESHOLD_FALLBACK;
-      };
-
-      const withNoSmooth = (fn: () => void) => {
-        const el = containerRef.current;
-        if (!el) return fn();
-        el.classList.add('groq-chat__messages--no-smooth');
-        fn();
-        // Вернём smooth на следующий кадр
-        requestAnimationFrame(() => {
-          el.classList.remove('groq-chat__messages--no-smooth');
-        });
-      };
-
-      const getRevealOffset = (): number => {
-        const el = containerRef.current;
-        if (!el) return 80; // px
-        const raw = getComputedStyle(el).getPropertyValue('--load-reveal-offset').trim();
-        if (!raw) return 80;
-        const match = raw.match(/^(\d+(?:\.\d+)?)(px)?$/i);
-        if (match) {
-          const n = parseFloat(match[1]);
-          return isNaN(n) ? 80 : n;
-        }
-        return 80;
-      };
-
-      // Инициализация: скролл не требуется, т.к. показываем только хвост (последнее сообщение видно сразу)
-      useLayoutEffect(() => {
-        // no-op
+        if (!el) return true;
+        return el.scrollHeight - el.scrollTop - el.clientHeight <= NEAR_BOTTOM_THRESHOLD;
       }, []);
 
-      // Обновление: при добавлении новых сообщений прокручиваем вниз, если пользователь у низа
-      useEffect(() => {
+      // Прокрутка вниз с опциями
+      const scrollToBottom = useCallback((opts?: { smooth?: boolean; force?: boolean }) => {
         const el = containerRef.current;
         if (!el) return;
-        if (isAtBottomRef.current) {
-          el.scrollTop = el.scrollHeight;
-        }
-      }, [visibleMessages]);
 
-      // Трекинг положения скролла
-      useEffect(() => {
-        const el = containerRef.current;
-        if (!el) return;
-        const handleScroll = () => {
-          const threshold = getNearBottomThreshold();
-          const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight <= threshold;
-          isAtBottomRef.current = atBottom;
+        const smooth = opts?.smooth ?? true;
+        const force = opts?.force ?? false;
 
-          // Автоподгрузка при прокрутке вверх (reverse infinite scroll)
-          const topThreshold = getNearTopThreshold();
-          if (el.scrollTop <= topThreshold && messages.length > visibleMessages.length) {
-            const prevHeight = el.scrollHeight;
-            setLimit(l => Math.min(l + STEP, messages.length));
-            requestAnimationFrame(() => {
-              const newHeight = el.scrollHeight;
-              // Компенсируем, чтобы контент не прыгнул вниз
-              el.scrollTop = el.scrollTop + (newHeight - prevHeight);
+        // Если принудительно или пользователь near bottom
+        if (force || isAtBottomRef.current) {
+          if (!smooth) {
+            el.scrollTop = el.scrollHeight;
+          } else {
+            el.scrollTo({
+              top: el.scrollHeight,
+              behavior: 'smooth',
             });
           }
+          isAtBottomRef.current = true;
+          setShowNewMessageNotice(false);
+        }
+      }, []);
+
+      // Initial scroll - только при первом рендере
+      useLayoutEffect(() => {
+        if (isInitialRenderRef.current && messages.length > 0) {
+          // Небольшая задержка для гарантии что DOM готов
+          requestAnimationFrame(() => {
+            scrollToBottom({ smooth: false, force: true });
+            isInitialRenderRef.current = false;
+          });
+        }
+      }, [messages.length, scrollToBottom]);
+
+      // Обработка новых сообщений
+      useEffect(() => {
+        const prevLength = prevMessagesLengthRef.current;
+        const currentLength = messages.length;
+        const hasNewMessages = currentLength > prevLength;
+
+        if (hasNewMessages && !isInitialRenderRef.current) {
+          scrollToBottom({ smooth: true });
+        }
+
+        prevMessagesLengthRef.current = currentLength;
+      }, [messages.length, scrollToBottom]);
+
+      // Отслеживание положения скролла
+      useEffect(() => {
+        const el = containerRef.current;
+        if (!el) return;
+
+        const handleScroll = () => {
+          isAtBottomRef.current = checkIsNearBottom();
+          
+          if (isAtBottomRef.current) {
+            setShowNewMessageNotice(false);
+          } else if (messages.length > visibleMessages.length) {
+            setShowNewMessageNotice(true);
+          }
         };
-        handleScroll();
+
+        handleScroll(); // Initial check
         el.addEventListener('scroll', handleScroll, { passive: true });
         return () => el.removeEventListener('scroll', handleScroll);
-      }, []);
+      }, [checkIsNearBottom, messages.length, visibleMessages.length]);
+
+      // Resize observer для пересчета макета
+      useEffect(() => {
+        const el = containerRef.current;
+        if (!el) return;
+
+        resizeObserverRef.current = new ResizeObserver(() => {
+          // При изменении размера контейнера, если были near bottom - остаемся там
+          if (isAtBottomRef.current) {
+            scrollToBottom({ smooth: false });
+          }
+        });
+
+        resizeObserverRef.current.observe(el);
+        return () => {
+          resizeObserverRef.current?.disconnect();
+        };
+      }, [scrollToBottom]);
 
       useImperativeHandle(ref, () => ({
         scrollToTop: () => {
           const el = containerRef.current;
           if (el) {
-            withNoSmooth(() => {
-              el.scrollTop = 0;
-            });
+            el.scrollTop = 0;
           }
           isAtBottomRef.current = false;
         },
-        scrollToBottom: () => {
-          const el = containerRef.current;
-          if (el) {
-            withNoSmooth(() => {
-              el.scrollTop = el.scrollHeight;
-            });
-          }
-          isAtBottomRef.current = true;
+        scrollToBottom: (opts?: { smooth?: boolean }) => {
+          scrollToBottom({ ...opts, force: true });
         },
         forceUpdate: () => {
-          // no-op в упрощённой версии
+          // trigger re-render if needed
         },
       }));
 
+      const handleLoadMore = useCallback(() => {
+        const el = containerRef.current;
+        const prevScrollHeight = el?.scrollHeight || 0;
+
+        setLimit(prev => {
+          const newLimit = Math.min(prev + STEP, messages.length);
+          if (newLimit > prev) {
+            setSeparatorIndex(prev); // Показываем разделитель после старых сообщений
+          }
+          return newLimit;
+        });
+
+        // Сохраняем позицию прокрутки после загрузки
+        requestAnimationFrame(() => {
+          if (el && prevScrollHeight > 0) {
+            const newScrollHeight = el.scrollHeight;
+            el.scrollTop = el.scrollTop + (newScrollHeight - prevScrollHeight);
+          }
+        });
+      }, [STEP, messages.length]);
+
+      const handleNewMessageNoticeClick = useCallback(() => {
+        scrollToBottom({ smooth: true, force: true });
+      }, [scrollToBottom]);
+
+      const handleLastMessageRender = useCallback(() => {
+        // Только для streaming сообщений - плавно скроллим вниз
+        if (!isInitialRenderRef.current && isAtBottomRef.current) {
+          scrollToBottom({ smooth: true });
+        }
+      }, [scrollToBottom]);
+
       return (
-        <div className="groq-chat__messages" aria-live="polite" ref={containerRef}>
+        <div 
+          className="groq-chat__messages" 
+          aria-live="polite" 
+          ref={containerRef}
+          style={{ overflowAnchor: 'none' }} // Предотвращаем браузерный auto-scroll
+        >
           {messages.length > 0 ? (
             <>
               {messages.length > visibleMessages.length && (
-                <div style={{ marginBottom: '8px' }}>
+                <div style={{ marginBottom: '12px', textAlign: 'center' }}>
                   <button
                     className="groq-button groq-dialog-secondary-button"
-                    onClick={() => {
-                      const el = containerRef.current;
-                      if (!el) {
-                        setLimit(prev => {
-                          const toAdd = Math.min(STEP, messages.length - prev);
-                          if (toAdd > 0) setSeparatorIndex(toAdd);
-                          return prev + toAdd;
-                        });
-                        return;
-                      }
-                      const prevScrollHeight = el.scrollHeight;
-                      setLimit(prev => {
-                        const toAdd = Math.min(STEP, messages.length - prev);
-                        if (toAdd > 0) setSeparatorIndex(toAdd);
-                        return prev + toAdd;
-                      });
-                      // Компенсируем смещение после расширения истории
-                      requestAnimationFrame(() => {
-                        const newScrollHeight = el.scrollHeight;
-                        const base = newScrollHeight - prevScrollHeight + el.scrollTop;
-                        const reveal = getRevealOffset();
-                        // Скроллим немного вверх, чтобы показать новую порцию
-                        el.scrollTop = Math.max(0, base - reveal);
-                      });
-                    }}
+                    onClick={handleLoadMore}
                   >
                     {t('showPreviousN', language).replace('{{n}}', String(STEP))}
                   </button>
@@ -194,13 +212,20 @@ export const MessageList = React.memo(
 
               {visibleMessages.map((message, idx) => (
                 <React.Fragment
-                  key={`${message.id ?? 'msg'}-${message.timestamp ?? '0'}-${messages.length - visibleMessages.length + idx}`}
+                  key={`${message.id ?? 'msg'}-${message.timestamp ?? '0'}-${idx}`}
                 >
                   {separatorIndex !== null && idx === separatorIndex && (
                     <div className="groq-history-separator" aria-hidden="true" />
                   )}
                   <div className="groq-message-row">
-                    <MessageItem message={message} />
+                    <MessageItem
+                      message={message}
+                      isCurrentUser={message.role === 'user'}
+                      isLastMessage={idx === visibleMessages.length - 1}
+                      onRenderComplete={
+                        idx === visibleMessages.length - 1 ? handleLastMessageRender : undefined
+                      }
+                    />
                   </div>
                 </React.Fragment>
               ))}
@@ -209,10 +234,14 @@ export const MessageList = React.memo(
             !isLoading && <div className="groq-chat__empty">{t('noMessages', language)}</div>
           )}
 
-          {isLoading && (
-            <div className="groq-loading-indicator">
-              <div className="groq-spinner"></div>
-              <span>{t('generatingResponse', language)}</span>
+          {showNewMessageNotice && (
+            <div className="groq-new-message-notice">
+              <button
+                onClick={handleNewMessageNoticeClick}
+                className="groq-button groq-button--primary"
+              >
+                {t('newMessages')}
+              </button>
             </div>
           )}
         </div>
@@ -222,3 +251,5 @@ export const MessageList = React.memo(
 );
 
 MessageList.displayName = 'MessageList';
+
+export default MessageList;

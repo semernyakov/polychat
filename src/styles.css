@@ -88,8 +88,6 @@
   overflow: hidden;
 }
 
-/* (удалено правило для .groq-chat, не требуется) */
-
 /* --- Контейнер сообщений --- */
 .groq-chat__messages-container {
   flex: 1;
@@ -105,6 +103,9 @@
   overflow-x: hidden;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
+  overflow-anchor: none;
+  /* Гарантируем что контейнер правильно рассчитывает высоту */
+  contain: layout style;
 }
 
 .groq-react-window-list {
@@ -196,6 +197,7 @@
   border-radius: var(--border-radius, 3px);
   /* Используем min() для гибкой ширины сообщений */
   max-width: min(80%, 900px);
+  transform: translateZ(0); /* Аппаратное ускорение */
 }
 
 .groq-message--user {
@@ -879,6 +881,8 @@
 .groq-message-row {
   padding-bottom: 12px;
   /* Удалён contain: влияет на неверные измерения высоты при динамическом контенте */
+  contain: layout style;
+  margin-bottom: 12px;
 }
 
 /* Support Dialog Styles */
@@ -1071,14 +1075,29 @@
   line-height: 1.3;
 }
 
-.groq-markdown-content h1 { font-size: 1.4em; }
-.groq-markdown-content h2 { font-size: 1.3em; }
-.groq-markdown-content h3 { font-size: 1.2em; }
-.groq-markdown-content h4 { font-size: 1.1em; }
-.groq-markdown-content h5 { font-size: 1.05em; }
-.groq-markdown-content h6 { font-size: 1em; opacity: 0.9; }
+.groq-markdown-content h1 {
+  font-size: 1.4em;
+}
+.groq-markdown-content h2 {
+  font-size: 1.3em;
+}
+.groq-markdown-content h3 {
+  font-size: 1.2em;
+}
+.groq-markdown-content h4 {
+  font-size: 1.1em;
+}
+.groq-markdown-content h5 {
+  font-size: 1.05em;
+}
+.groq-markdown-content h6 {
+  font-size: 1em;
+  opacity: 0.9;
+}
 
-.groq-markdown-content p { margin: 0.5em 0; }
+.groq-markdown-content p {
+  margin: 0.5em 0;
+}
 
 .groq-markdown-content ul,
 .groq-markdown-content ol {
@@ -1086,7 +1105,9 @@
   padding-left: 1.5em;
 }
 
-.groq-markdown-content li { margin: 0.25em 0; }
+.groq-markdown-content li {
+  margin: 0.25em 0;
+}
 
 .groq-markdown-content blockquote {
   margin: 0.5em 0;
@@ -1140,7 +1161,9 @@
   /* font-weight: 600; */
 }
 
-.groq-markdown-content a { color: var(--interactive-accent); }
+.groq-markdown-content a {
+  color: var(--interactive-accent);
+}
 
 .groq-markdown-content img {
   max-width: 100%;
@@ -1156,8 +1179,12 @@
 }
 
 @media (max-width: 768px) {
-  .groq-markdown-content { font-size: 0.95em; }
-  .groq-markdown-content table { font-size: 0.85em; }
+  .groq-markdown-content {
+    font-size: 0.95em;
+  }
+  .groq-markdown-content table {
+    font-size: 0.85em;
+  }
 }
 
 /* --- GroqMarkdown code buttons feedback --- */
@@ -1166,7 +1193,7 @@
 }
 
 .groq-code-header .groq-code-copy.is-copied::after {
-  content: "Copied";
+  content: 'Copied';
   position: absolute;
   top: -8px;
   right: 0;
@@ -1185,4 +1212,40 @@
 .groq-code-copy.is-active {
   background-color: var(--background-modifier-hover);
   color: var(--text-normal);
+}
+
+/* Полностью отключаем браузерный auto-scroll поведение */
+.groq-chat__messages {
+  overflow-anchor: none;
+  /* Гарантируем что контейнер правильно рассчитывает высоту */
+  contain: layout style;
+}
+
+/* Улучшаем производительность скролла */
+.groq-message-row {
+  contain: layout style;
+  margin-bottom: 12px;
+}
+
+/* Предотвращаем любые скачки при анимациях */
+.groq-message {
+  transform: translateZ(0); /* Аппаратное ускорение */
+}
+
+/* Специальный класс для блокировки скролла */
+.groq-chat__messages--scroll-locked {
+  scroll-behavior: auto !important;
+}
+
+/* Улучшаем плавность скролла */
+.groq-chat__messages {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Гарантируем что новые сообщения не вызывают перерасчет layout */
+.groq-new-message-notice {
+  position: sticky;
+  bottom: 12px;
+  z-index: 10;
 }

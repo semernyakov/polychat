@@ -61,6 +61,7 @@
   "dependencies": {
     "@types/react-virtualized-auto-sizer": "^1.0.8",
     "@types/react-window": "^1.8.8",
+    "date-fns": "^4.1.0",
     "groq-sdk": "^0.19.0",
     "hast-util-to-jsx-runtime": "^2.3.6",
     "prism-react-renderer": "^2.4.1",
