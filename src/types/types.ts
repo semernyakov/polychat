@@ -8,6 +8,7 @@ export interface Message {
   content: string;
   timestamp: number;
   hasThinkContent?: boolean;
+  isStreaming?: boolean;
   usage?: {
     prompt_tokens: number;
     completion_tokens: number;

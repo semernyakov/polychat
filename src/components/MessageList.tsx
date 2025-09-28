@@ -9,12 +9,14 @@ import React, {
 } from 'react';
 import { Message } from '../types/types';
 import { MessageItem } from './MessageItem';
+import { StreamingIndicator } from './StreamingIndicator';
 import '../styles.css';
 import { Locale, t } from '../localization';
 
 interface MessageListProps {
   messages: Message[];
   isLoading: boolean;
+  isStreaming?: boolean; // Добавляем новый проп
   language?: Locale;
   tailLimit?: number;
   tailStep?: number;
@@ -28,7 +30,7 @@ export interface MessageListHandles {
 
 export const MessageList = React.memo(
   forwardRef<MessageListHandles, MessageListProps>(
-    ({ messages, isLoading, language = 'en', tailLimit, tailStep }, ref) => {
+    ({ messages, isLoading, isStreaming = false, language = 'en', tailLimit, tailStep }, ref) => {
       const containerRef = useRef<HTMLDivElement>(null);
       const isAtBottomRef = useRef<boolean>(true);
       const prevMessagesLengthRef = useRef<number>(messages.length);
@@ -261,13 +263,20 @@ export const MessageList = React.memo(
                   </div>
                 </React.Fragment>
               ))}
+
+              {/* Показываем индикатор стриминга */}
+              {isStreaming && (
+                <div className="groq-message-row">
+                  <StreamingIndicator language={language} />
+                </div>
+              )}
             </>
           ) : (
             !isLoading && <div className="groq-chat__empty">{t('noMessages', language)}</div>
           )}
 
           {showNewMessageNotice && (
-            <div className={`groq-new-message-notice ${isNoticeExiting ? 'groq-new-message-notice--exiting' : ''}`}>
+            <div className={`groq-new-message-notice ${isNoticeExiting ? 'is-exiting' : ''}`}>
               <button
                 onClick={handleNewMessageNoticeClick}
                 className="groq-button groq-button--primary groq-new-message-button"

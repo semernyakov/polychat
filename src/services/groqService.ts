@@ -17,7 +17,7 @@ export type RateLimitsType = {
 interface GroqServiceMethods {
   updateApiKey: (apiKey: string) => void;
   validateApiKey: (apiKey: string) => Promise<boolean>;
-  sendMessage: (content: string, model: string) => Promise<Message>;
+  sendMessage: (content: string, model: string, onChunk?: (chunk: string) => void) => Promise<Message>;
   getAvailableModels: () => Promise<{ id: string; name: string; description?: string }[]>;
   getAvailableModelsWithLimits: (forceRefresh?: boolean) => Promise<{
     models: GroqModelInfo[];
@@ -71,44 +71,56 @@ export class GroqService implements GroqServiceMethods {
     }
   }
 
-  public async sendMessage(content: string, model: string): Promise<Message> {
+  public async sendMessage(content: string, model: string, onChunk?: (chunk: string) => void): Promise<Message> {
     if (!content.trim()) throw new Error('Сообщение не может быть пустым');
     if (!model || !this.plugin.settings.groqAvailableModels?.some(m => m.id === model)) {
       throw new Error(`Модель "${model}" не доступна`);
     }
     try {
-      // Проверка лимитов перед запросом
       if (this.rateLimits.remainingRequests === 0 || this.rateLimits.remainingTokens === 0) {
         new Notice('Превышен лимит запросов или токенов. Попробуйте позже.');
         throw new Error('Лимиты запросов исчерпаны');
       }
-      const response = await this.retryRequest(() =>
+
+      const streamResponse = await this.retryRequest(() =>
         this.client.chat.completions.create({
           model,
-          messages: [
-            {
-              role: 'user',
-              content: content,
-            },
-          ],
+          messages: [{ role: 'user', content }],
           temperature: this.plugin.settings.temperature,
           max_tokens: Math.min(this.plugin.settings.maxTokens, this.getModelMaxTokens(model)),
+          stream: true,
         }),
       );
-      if (!response.choices[0]?.message?.content) throw new Error('Empty response from API');
+
+      let fullContent = '';
+      let messageId = '';
+
+      for await (const chunk of streamResponse) {
+        if (!messageId && chunk.id) {
+          messageId = chunk.id;
+        }
+        if (chunk.choices[0]?.delta?.content) {
+          const chunkContent = chunk.choices[0].delta.content;
+          fullContent += chunkContent;
+          if (onChunk) {
+            onChunk(chunkContent);
+          }
+        }
+      }
+
+      if (!fullContent) {
+        throw new Error('Empty response from API');
+      }
+
       return {
-        id: response.id,
+        id: messageId || Date.now().toString(),
         role: 'assistant',
-        content: response.choices[0].message.content,
+        content: fullContent,
         timestamp: Date.now(),
-        usage: response.usage
-          ? {
-              prompt_tokens: response.usage.prompt_tokens,
-              completion_tokens: response.usage.completion_tokens,
-              total_tokens: response.usage.total_tokens,
-            }
-          : undefined,
+        isStreaming: false,
+        hasThinkContent: false
       };
+
     } catch (error) {
       throw this.handleApiError(error);
     }

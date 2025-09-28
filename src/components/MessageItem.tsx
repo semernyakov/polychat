@@ -78,8 +78,17 @@ export const MessageItem: React.FC<MessageItemProps> = React.memo(
       }
     }, [isLastMessage, onRenderComplete]);
 
+    // Добавляем эффект пульсации для streaming сообщений
+    const messageClassName = React.useMemo(() => {
+      const classes = ['groq-message', `groq-message--${message.role}`];
+      if (message.isStreaming) {
+        classes.push('groq-message--streaming');
+      }
+      return classes.join(' ');
+    }, [message.role, message.isStreaming]);
+
     return (
-      <div className={`groq-message groq-message--${message.role} ${className}`}>
+      <div className={messageClassName}>
         <div className="groq-message__header">
           <div className="groq-message__meta">
             <span className="groq-message__role">

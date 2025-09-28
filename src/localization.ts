@@ -139,6 +139,8 @@ export const translations: Record<Locale, Record<string, string>> = {
     inputCounterTitle:
       'Текущее кол-во символов / Макс. кол-во токенов для модели (приблизительное сравнение)',
     symbolsTokens: 'символы/токены',
+    'modelIsThinking': 'Модель думает',
+    'generatingResponse': 'Формирую ответ',
   },
   en: {
     // Settings
@@ -257,6 +259,8 @@ export const translations: Record<Locale, Record<string, string>> = {
       '<kbd>Ctrl</kbd>+<kbd>Enter</kbd> — send, <kbd>Shift</kbd>+<kbd>Enter</kbd> — new line',
     inputCounterTitle: 'Current character count / Max model tokens (approximate)',
     symbolsTokens: 'chars/tokens',
+    'modelIsThinking': 'Model is thinking',
+    'generatingResponse': 'Generating response',
   },
 };
 

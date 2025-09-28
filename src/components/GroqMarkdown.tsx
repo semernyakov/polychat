@@ -1,6 +1,7 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { MarkdownRenderer, Component } from 'obsidian';
 import type { App } from 'obsidian';
+import { FiClipboard, FiCode, FiAlignLeft } from 'react-icons/fi';
 import '../styles.css';
 
 interface GroqMarkdownProps {
@@ -8,6 +9,46 @@ interface GroqMarkdownProps {
   app?: App;
   onRenderComplete?: () => void;
 }
+
+interface CodeBlockProps {
+  language: string;
+  value: string;
+  className?: string;
+}
+
+const CodeBlock: React.FC<CodeBlockProps> = ({ language, value, className = '' }) => {
+  const [isCopied, setIsCopied] = useState(false);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
+
+  return (
+    <div className="groq-code-container">
+      <div className="groq-code-header">
+        <span className="groq-code-language">{language}</span>
+        <div className="groq-code-actions">
+          <button
+            onClick={handleCopy}
+            className={`groq-code-button ${isCopied ? 'is-copied' : ''}`}
+            title="Copy"
+          >
+            <FiClipboard />
+          </button>
+        </div>
+      </div>
+      <pre className={className}>
+        <code>{value}</code>
+      </pre>
+    </div>
+  );
+};
 
 export const GroqMarkdown: React.FC<GroqMarkdownProps> = ({ content, app, onRenderComplete }) => {
   const containerRef = useRef<HTMLDivElement>(null);

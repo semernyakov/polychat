@@ -108,6 +108,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
     const { plugin, displayMode, initialMessages = [], onDisplayModeChange } = props;
     const [inputValue, setInputValue] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isStreaming, setIsStreaming] = useState(false);
     // Только активные модели
     const initialModels: LocalDynamicModelInfo[] = (plugin.settings.groqAvailableModels || [])
       .filter((m: any) => m.isActive !== false)
@@ -201,60 +202,62 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
     const handleSendMessage = useCallback(async () => {
       const trimmedValue = inputValue.trim();
       if (!trimmedValue || isLoading) return;
-
-      const userMessage: Message = MessageUtils.create('user', trimmedValue);
+    
+      const userMessage = MessageUtils.create('user', trimmedValue);
       setInputValue('');
       setIsLoading(true);
-
+    
       try {
-        await plugin.historyService.addMessage(userMessage).catch(err => {
-          console.error('Error saving user message:', err);
-          toast.warn(t('messageSaveError'));
-        });
-
-        const assistantMessage = await plugin.groqService.sendMessage(trimmedValue, selectedModel);
-
-        setMessages(prev => [...prev, userMessage, assistantMessage]);
-        // После добавления нового сообщения — мгновенно к низу
+        await plugin.historyService.addMessage(userMessage);
+        
+        // Создаем временное сообщение ассистента для стриминга
+        const tempAssistantMessage: Message = {
+          id: 'temp-' + Date.now().toString(),
+          role: 'assistant',
+          content: '',
+          timestamp: Date.now(),
+          isStreaming: true
+        };
+        
+        setMessages(prev => [...prev, userMessage, tempAssistantMessage]);
+        setIsStreaming(true);
         requestAnimationFrame(() => messageListRef.current?.scrollToBottom());
-
-        await plugin.historyService.addMessage(assistantMessage).catch(err => {
-          console.error('Error saving assistant message:', err);
-          toast.warn(t('assistantMessageSaveError'));
-        });
+    
+        // Обработчик для потоковых чанков
+        let streamContent = '';
+        const handleChunk = (chunk: string) => {
+          streamContent += chunk;
+          setMessages(prev => prev.map(msg => 
+            msg.id === tempAssistantMessage.id 
+              ? { ...msg, content: streamContent }
+              : msg
+          ));
+          requestAnimationFrame(() => messageListRef.current?.scrollToBottom());
+        };
+    
+        const assistantMessage = await plugin.groqService.sendMessage(
+          trimmedValue, 
+          selectedModel,
+          handleChunk
+        );
+    
+        // Заменяем временное сообщение на финальное
+        setMessages(prev => prev.map(msg => 
+          msg.id === tempAssistantMessage.id ? assistantMessage : msg
+        ));
+        setIsStreaming(false);
+        requestAnimationFrame(() => messageListRef.current?.scrollToBottom());
+    
+        await plugin.historyService.addMessage(assistantMessage);
       } catch (error: any) {
-        console.error('Error sending message:', error);
-        // Обработка ошибки terms acceptance
-        if (
-          error?.code === 'model_terms_required' ||
-          error?.message?.includes('requires terms acceptance')
-        ) {
-          const link = `https://console.groq.com/playground?model=${selectedModel}`;
-          toast.error(
-            t('termsRequired', locale) +
-              `\n${error?.message || ''}\n` +
-              t('acceptTermsHere', locale) +
-              `: ` +
-              link,
-            { autoClose: false },
-          );
-          const errorMessage = MessageUtils.create(
-            'assistant',
-            `${t('termsRequired', locale)}\n${error?.message || ''}\n${t('acceptTermsHere', locale)}: ${link}`,
-          );
-          setMessages(prev => [...prev, userMessage, errorMessage]);
-          setIsLoading(false);
-          return;
-        }
+        console.error('Error:', error);
         const errorMsg = error instanceof Error ? error.message : String(error);
         toast.error(`${t('error')}: ${errorMsg}`);
         const errorMessage = MessageUtils.create('assistant', `${t('error')}: ${errorMsg}`);
-        setMessages(prev => [...prev, userMessage, errorMessage]);
-        requestAnimationFrame(() => messageListRef.current?.scrollToBottom());
-        setIsLoading(false);
-        return;
+        setMessages(prev => [...prev, errorMessage]);
       } finally {
         setIsLoading(false);
+        setIsStreaming(false);
       }
     }, [inputValue, isLoading, plugin, selectedModel]);
 
@@ -400,6 +403,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
               ref={messageListRef}
               messages={messages}
               isLoading={isLoading}
+              isStreaming={isStreaming}
               language={locale}
               tailLimit={plugin.settings.messageTailLimit ?? 10}
               tailStep={plugin.settings.messageLoadStep ?? 20}
