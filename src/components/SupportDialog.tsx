@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { FiExternalLink } from 'react-icons/fi';
+import { FiExternalLink, FiStar, FiMessageCircle, FiDollarSign } from 'react-icons/fi';
 import '../styles.css'; // Используем единый style.css
 import { t, tHtml } from '../localization';
 
@@ -12,39 +12,37 @@ interface SupportDialogProps {
 
 // Красивый блок благодарности с темизацией
 const SupportThanksBlock: React.FC<{ locale: import('../localization').Locale }> = ({ locale }) => {
+  const openLink = (url: string) => {
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
   return (
     <div className="groq-support-thanks">
       <div className="groq-support-thanks__text">
         {t('supportDialogThanksTitle', locale)}
       </div>
-      <div className="groq-support-thanks__links">
-        <a
-          href="https://yoomoney.ru/fundraise/194GT5A5R07.250321"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="groq-support-thanks__link"
+      <div className="groq-support-thanks__buttons">
+        <button
+          onClick={() => openLink('https://yoomoney.ru/fundraise/194GT5A5R07.250321')}
+          className="groq-support-thanks__button groq-support-thanks__button--primary"
         >
+          <FiDollarSign size={16} />
           {t('supportDialogThanksSupport', locale)}
-        </a>
-        <br />
-        <a
-          href="https://github.com/semernyakov"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="groq-support-thanks__link"
+        </button>
+        <button
+          onClick={() => openLink('https://github.com/semernyakov/polychat')}
+          className="groq-support-thanks__button"
         >
+          <FiStar size={16} />
           {t('supportDialogThanksReview', locale)}
-        </a>{' '}
-        {t('supportDialogThanksContact', locale)}{' '}
-        <a
-          href="https://t.me/semernyakov"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="groq-support-thanks__link"
+        </button>
+        <button
+          onClick={() => openLink('https://t.me/semernyakov')}
+          className="groq-support-thanks__button"
         >
-          Telegram
-        </a>{' '}
-        ❤️
+          <FiMessageCircle size={16} />
+          {t('supportDialogThanksContact', locale)}
+        </button>
       </div>
     </div>
   );

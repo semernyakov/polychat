@@ -1484,6 +1484,19 @@
   }
 }
 
+/* Адаптивность для диалоговых кнопок */
+@media (max-width: 600px) {
+  .groq-support-thanks__buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .groq-support-thanks__button {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
 /* ===== БЛОК БЛАГОДАРНОСТИ В ДИАЛОГАХ ===== */
 
 .groq-support-thanks {
@@ -1502,18 +1515,47 @@
   font-weight: 500;
 }
 
-.groq-support-thanks__links {
-  text-align: center;
-  line-height: 1.6;
+.groq-support-thanks__buttons {
+  display: flex;
+  gap: 0.5em;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
-.groq-support-thanks__link {
-  color: var(--link-color, var(--interactive-accent));
-  text-decoration: none;
+.groq-support-thanks__button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375em;
+  padding: 0.5em 0.75em;
+  border-radius: var(--border-radius, 3px);
+  font-size: 0.85em;
   font-weight: 500;
+  font-family: var(--font-interface);
+  border: 1px solid var(--background-modifier-border);
+  background-color: var(--background-primary);
+  color: var(--text-normal);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-decoration: none;
 }
 
-.groq-support-thanks__link:hover {
-  text-decoration: underline;
-  color: var(--link-color-hover, var(--interactive-accent-hover));
+.groq-support-thanks__button:hover {
+  background-color: var(--background-modifier-hover);
+  border-color: var(--interactive-accent);
+  color: var(--text-normal);
+}
+
+.groq-support-thanks__button--primary {
+  background-color: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-color: var(--interactive-accent);
+}
+
+.groq-support-thanks__button--primary:hover {
+  background-color: var(--interactive-accent-hover);
+  border-color: var(--interactive-accent-hover);
+}
+
+.groq-support-thanks__button svg {
+  flex-shrink: 0;
 }
