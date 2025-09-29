@@ -142,6 +142,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     symbolsTokens: 'символы/токены',
     modelIsThinking: 'Модель думает',
     generatingResponse: 'Формирую ответ',
+    supportButton: '💰 Поддержать',
   },
   en: {
     // Settings
@@ -263,6 +264,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     symbolsTokens: 'chars/tokens',
     modelIsThinking: 'Model is thinking',
     generatingResponse: 'Generating response',
+    supportButton: '💰 Support',
   },
 };
 

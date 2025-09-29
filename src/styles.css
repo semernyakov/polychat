@@ -1129,7 +1129,7 @@
 
 .groq-settings-subtitle {
   margin: 0 0 1.5em 0;
-  font-size: var(--font-ui-smaller, 0.9em);
+  font-size: var(--font-ui-medium, 1em);
   color: var(--text-muted);
   line-height: 1.5;
   font-family: var(--font-interface);
@@ -1204,7 +1204,7 @@
   margin: 0 0 1em 0;
   padding: 0;
   color: var(--text-muted);
-  font-size: var(--font-ui-smaller, 0.9em);
+  font-size: var(--font-ui-smaller, 0.95em);
   line-height: 1.5;
   font-family: var(--font-interface);
 }
@@ -1213,6 +1213,7 @@
   color: var(--link-color, var(--interactive-accent));
   text-decoration: none;
   font-weight: var(--font-medium, 500);
+  font-size: 1em;
 }
 
 .groq-settings-token-link a:hover {
@@ -1402,6 +1403,12 @@
 
 .groq-margin-top {
   margin-top: var(--spacing-small);
+}
+
+.groq-example-text {
+  margin-left: 1em;
+  margin-top: 0.5em;
+  color: var(--text-muted);
 }
 
 /* --- Адаптивность для настроек --- */

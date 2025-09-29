@@ -119,7 +119,11 @@ export default class GroqChatPlugin extends Plugin implements GroqPluginInterfac
 
   // Сброс настроек к значениям по умолчанию
   public async resetSettingsToDefault() {
+    // Сохраняем API key перед сбросом
+    const currentApiKey = this.settings.apiKey;
     this.settings = { ...this.defaultSettings };
+    // Восстанавливаем API key
+    this.settings.apiKey = currentApiKey;
     await this.saveSettings();
     // Обновить UI, если открыт settings tab
     if (this.settingsTab && typeof this.settingsTab.display === 'function') {

@@ -98,15 +98,11 @@ export class GroqChatSettingsTab extends PluginSettingTab {
     new Setting(this.containerEl).setName(t('settings.interface', locale)).setHeading();
     // this.addDisplayModeSetting(locale); // Метод отсутствует
     this.addTailSettings(locale);
-    // --- Температура и макс. токены в сетке ---
-    const flexGrid = this.containerEl.createEl('div', { cls: 'groq-settings-flex-grid' });
-    const tempDiv = this.containerEl.createEl('div', { cls: 'groq-settings-flex-item' });
-    tempDiv.appendChild(this.createTemperatureSetting(locale));
-    const tokensDiv = this.containerEl.createEl('div', { cls: 'groq-settings-flex-item' });
-    tokensDiv.appendChild(this.createMaxTokensSetting(locale));
-    flexGrid.appendChild(tempDiv);
-    flexGrid.appendChild(tokensDiv);
-    this.containerEl.appendChild(flexGrid);
+    // --- Температура ---
+    this.containerEl.appendChild(this.createTemperatureSetting(locale));
+
+    // --- Максимальное количество токенов ---
+    this.containerEl.appendChild(this.createMaxTokensSetting(locale));
     // Язык больше не настраивается в плагине; используется Obsidian app.getLanguage()
 
     // --- Кнопки "Сохранить все настройки" и "Сбросить настройки по умолчанию" ---
@@ -158,7 +154,7 @@ export class GroqChatSettingsTab extends PluginSettingTab {
     telegramLink.className = 'groq-settings-thanks-link';
 
     // Поддержка
-    const supportLink = createLink(linksDiv, '💰 Поддержать', 'https://yoomoney.ru/fundraise/194GT5A5R07.250321', {
+    const supportLink = createLink(linksDiv, t('supportButton', locale), 'https://yoomoney.ru/fundraise/194GT5A5R07.250321', {
       target: '_blank',
       rel: 'noopener noreferrer',
     });
@@ -185,12 +181,6 @@ export class GroqChatSettingsTab extends PluginSettingTab {
             this.showSavedIcon(slider.sliderEl);
           }),
       )
-      .settingEl.setAttribute(
-        'title',
-        locale === 'ru'
-          ? 'Чем выше, тем более креативные ответы'
-          : 'Higher = more creative responses',
-      );
     return wrapper;
   }
 
@@ -548,7 +538,6 @@ export class GroqChatSettingsTab extends PluginSettingTab {
         text.inputEl.type = 'number';
         text.inputEl.min = '0';
       })
-      .settingEl.setAttribute('title', locale === 'ru' ? 'Настройки истории' : 'History settings');
 
     if (this.plugin.settings.historyStorageMethod === 'file') {
       const historyFileSetting = new Setting(this.containerEl)
@@ -577,7 +566,7 @@ export class GroqChatSettingsTab extends PluginSettingTab {
         );
 
       const exampleP = document.createElement('p');
-      exampleP.className = 'groq-small-text groq-margin-top';
+      exampleP.className = 'groq-small-text groq-margin-top groq-example-text';
       exampleP.textContent =
         locale === 'ru' ? 'Пример: notes/history.md' : 'Example: notes/history.md';
       historyFileSetting.settingEl.appendChild(exampleP);
@@ -610,7 +599,6 @@ export class GroqChatSettingsTab extends PluginSettingTab {
             }, 1200);
           }),
       )
-      .settingEl.setAttribute('title', t('settings.default10', locale));
 
     // Шаг подгрузки истории
     new Setting(this.containerEl)
@@ -627,6 +615,5 @@ export class GroqChatSettingsTab extends PluginSettingTab {
           await this.plugin.saveSettings();
         });
       })
-      .settingEl.setAttribute('title', t('settings.default20', locale));
   }
 }
