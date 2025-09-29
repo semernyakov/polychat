@@ -144,25 +144,25 @@ export class GroqChatSettingsTab extends PluginSettingTab {
     const linksDiv = thanksBlock.createEl('div', { cls: 'groq-settings-thanks-links' });
 
     // GitHub
-    createLink(linksDiv, '⭐ GitHub', 'https://github.com/semernyakov/polychat', {
+    const githubLink = createLink(linksDiv, '⭐ GitHub', 'https://github.com/semernyakov/polychat', {
       target: '_blank',
       rel: 'noopener noreferrer',
-      cls: 'groq-settings-thanks-link',
     });
+    githubLink.className = 'groq-settings-thanks-link';
 
     // Telegram
-    createLink(linksDiv, '💬 Telegram', 'https://t.me/semernyakov', {
+    const telegramLink = createLink(linksDiv, '💬 Telegram', 'https://t.me/semernyakov', {
       target: '_blank',
       rel: 'noopener noreferrer',
-      cls: 'groq-settings-thanks-link',
     });
+    telegramLink.className = 'groq-settings-thanks-link';
 
     // Поддержка
-    createLink(linksDiv, '💰 Поддержать', 'https://yoomoney.ru/fundraise/194GT5A5R07.250321', {
+    const supportLink = createLink(linksDiv, '💰 Поддержать', 'https://yoomoney.ru/fundraise/194GT5A5R07.250321', {
       target: '_blank',
       rel: 'noopener noreferrer',
-      cls: 'groq-settings-thanks-link groq-settings-thanks-link--primary',
     });
+    supportLink.className = 'groq-settings-thanks-link groq-settings-thanks-link--primary';
   }
 
   private createTemperatureSetting(locale: Locale): HTMLElement {
