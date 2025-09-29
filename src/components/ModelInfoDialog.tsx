@@ -1,7 +1,7 @@
 import React from 'react';
 import { FiX } from 'react-icons/fi';
 import { ModelInfo } from '../types/types';
-import { t } from '../localization';
+import { t, Locale } from '../localization';
 import '../styles.css';
 
 interface ModelInfoDialogProps {
@@ -9,6 +9,7 @@ interface ModelInfoDialogProps {
   onClose: () => void;
   modelInfo: ModelInfo;
   isAvailable: boolean;
+  locale?: Locale;
 }
 
 export const ModelInfoDialog: React.FC<ModelInfoDialogProps> = ({
@@ -16,6 +17,7 @@ export const ModelInfoDialog: React.FC<ModelInfoDialogProps> = ({
   onClose,
   modelInfo,
   isAvailable,
+  locale = 'en',
 }) => {
   const prevModelIdRef = React.useRef<string>(modelInfo.id);
   const [currentModelInfo, setCurrentModelInfo] = React.useState(modelInfo);
@@ -46,11 +48,10 @@ export const ModelInfoDialog: React.FC<ModelInfoDialogProps> = ({
     <div className="groq-support-dialog-overlay">
       <div className="groq-support-dialog">
         <div className="groq-dialog-header">
-          <h3>{t('modelInfo')}</h3>
+          <h3>{t('modelInfo', locale)}</h3>
           <button
             onClick={onClose}
             className="groq-dialog-close groq-icon-button"
-            title={t('close')}
           >
             <FiX size={16} />
           </button>
@@ -65,19 +66,19 @@ export const ModelInfoDialog: React.FC<ModelInfoDialogProps> = ({
             <div className="groq-model-info__details">
               {currentModelInfo.description && currentModelInfo.description.trim() !== '' && (
                 <div className="groq-model-info__detail">
-                  <span className="groq-model-info__label">{t('description')}:</span>
+                  <span className="groq-model-info__label">{t('description', locale)}:</span>
                   <span className="groq-model-info__value">{currentModelInfo.description}</span>
                 </div>
               )}
               <div className="groq-model-info__detail">
-                <span className="groq-model-info__label">{t('developer')}:</span>
+                <span className="groq-model-info__label">{t('developer', locale)}:</span>
                 <span className="groq-model-info__value">
                   {currentModelInfo.developer?.name || '—'}
                 </span>
               </div>
               {typeof currentModelInfo.created === 'number' && (
                 <div className="groq-model-info__detail">
-                  <span className="groq-model-info__label">{t('releaseDate')}:</span>
+                  <span className="groq-model-info__label">{t('releaseDate', locale)}:</span>
                   <span className="groq-model-info__value">
                     {new Date(currentModelInfo.created * 1000).toISOString().slice(0, 10)}
                   </span>
@@ -85,14 +86,14 @@ export const ModelInfoDialog: React.FC<ModelInfoDialogProps> = ({
               )}
               {typeof currentModelInfo.updated === 'number' && (
                 <div className="groq-model-info__detail">
-                  <span className="groq-model-info__label">{t('actualDate')}:</span>
+                  <span className="groq-model-info__label">{t('actualDate', locale)}:</span>
                   <span className="groq-model-info__value">
                     {new Date(currentModelInfo.updated * 1000).toISOString().slice(0, 10)}
                   </span>
                 </div>
               )}
               <div className="groq-model-info__detail">
-                <span className="groq-model-info__label">{t('maxTokens')}:</span>
+                <span className="groq-model-info__label">{t('maxTokens', locale)}:</span>
                 <span className="groq-model-info__value">
                   {typeof currentModelInfo.maxTokens === 'number'
                     ? currentModelInfo.maxTokens
@@ -101,12 +102,16 @@ export const ModelInfoDialog: React.FC<ModelInfoDialogProps> = ({
               </div>
               {currentModelInfo.releaseStatus && (
                 <div className="groq-model-info__detail">
-                  <span className="groq-model-info__label">{t('releaseStatus')}:</span>
+                  <span className="groq-model-info__label">{t('releaseStatus', locale)}:</span>
                   <span className="groq-model-info__value">
                     {currentModelInfo.releaseStatus === 'main'
-                      ? 'Основная'
+                      ? locale === 'ru'
+                        ? 'Основная'
+                        : 'Main'
                       : currentModelInfo.releaseStatus === 'preview'
-                        ? 'Предварительная'
+                        ? locale === 'ru'
+                          ? 'Предварительная'
+                          : 'Preview'
                         : currentModelInfo.releaseStatus}
                   </span>
                 </div>
@@ -115,7 +120,7 @@ export const ModelInfoDialog: React.FC<ModelInfoDialogProps> = ({
 
             {!isAvailable && (
               <div className="groq-model-info__warning" role="alert" aria-live="polite">
-                ⚠️ {t('modelUnavailable')}
+                ⚠️ {t('modelUnavailable', locale)}
               </div>
             )}
           </div>
@@ -123,7 +128,7 @@ export const ModelInfoDialog: React.FC<ModelInfoDialogProps> = ({
 
         <div className="groq-dialog-actions">
           <button onClick={onClose} className="groq-button groq-dialog-secondary-button">
-            {t('close')}
+            {t('close', locale)}
           </button>
         </div>
       </div>

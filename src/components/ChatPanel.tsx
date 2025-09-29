@@ -59,7 +59,7 @@ interface ModelInfo {
 }
 
 // Хук для управления сообщениями
-const useMessages = (initialMessages: Message[], historyService: any) => {
+const useMessages = (initialMessages: Message[], historyService: any, locale: Locale) => {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [isHistoryLoading, setIsHistoryLoading] = useState(false);
   const [hasLoadedHistory, setHasLoadedHistory] = useState(false);
@@ -93,10 +93,10 @@ const useMessages = (initialMessages: Message[], historyService: any) => {
       await historyService.clearHistory();
       setMessages([]);
       setHasLoadedHistory(true);
-      toast.success(t('historyCleared'));
+      toast.success(t('historyCleared', locale));
     } catch (error) {
       console.error('Error clearing history:', error);
-      toast.error(t('historyClearError'));
+      toast.error(t('historyClearError', locale));
     }
   };
 
@@ -136,15 +136,45 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
     const [rateLimits, setRateLimits] = useState<any>(null);
     const messageListRef = useRef<MessageListHandles>(null);
     const containerRef = useRef<HTMLDivElement>(null);
-    // Определяем язык из настроек Obsidian (App API). Требуется minAppVersion: 1.8.0
-    const appLang = (plugin.app as any)?.getLanguage?.();
-    const locale: Locale = (
-      appLang && appLang.toLowerCase().startsWith('ru') ? 'ru' : 'en'
-    ) as Locale;
+
+    // Мониторинг изменения языка Obsidian
+    const getObsidianLocale = useCallback((): Locale => {
+      const appLang = (plugin.app as any)?.getLanguage?.();
+      if (typeof appLang === 'string') {
+        const val = appLang.toLowerCase();
+        return (val.startsWith('ru') ? 'ru' : 'en') as Locale;
+      }
+      const htmlLang = document?.documentElement?.getAttribute('lang');
+      if (typeof htmlLang === 'string') {
+        const val = htmlLang.toLowerCase();
+        return (val.startsWith('ru') ? 'ru' : 'en') as Locale;
+      }
+      return 'en';
+    }, [plugin.app]);
+
+    const [locale, setLocale] = useState<Locale>(getObsidianLocale);
+
+    // Монитор изменения языка
+    useEffect(() => {
+      const checkLanguageChange = () => {
+        const currentLocale = getObsidianLocale();
+        if (currentLocale !== locale) {
+          setLocale(currentLocale);
+        }
+      };
+
+      // Проверяем каждую секунду
+      const intervalId = window.setInterval(checkLanguageChange, 1000);
+
+      return () => {
+        window.clearInterval(intervalId);
+      };
+    }, [locale, getObsidianLocale]);
 
     const { messages, setMessages, isHistoryLoading, clearHistory } = useMessages(
       initialMessages,
       plugin.historyService,
+      locale,
     );
 
     // Динамическая тема
@@ -202,58 +232,58 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
     const handleSendMessage = useCallback(async () => {
       const trimmedValue = inputValue.trim();
       if (!trimmedValue || isLoading) return;
-    
+
       const userMessage = MessageUtils.create('user', trimmedValue);
       setInputValue('');
       setIsLoading(true);
-    
+
       try {
         await plugin.historyService.addMessage(userMessage);
-        
+
         // Создаем временное сообщение ассистента для стриминга
         const tempAssistantMessage: Message = {
           id: 'temp-' + Date.now().toString(),
           role: 'assistant',
           content: '',
           timestamp: Date.now(),
-          isStreaming: true
+          isStreaming: true,
         };
-        
+
         setMessages(prev => [...prev, userMessage, tempAssistantMessage]);
         setIsStreaming(true);
         requestAnimationFrame(() => messageListRef.current?.scrollToBottom());
-    
+
         // Обработчик для потоковых чанков
         let streamContent = '';
         const handleChunk = (chunk: string) => {
           streamContent += chunk;
-          setMessages(prev => prev.map(msg => 
-            msg.id === tempAssistantMessage.id 
-              ? { ...msg, content: streamContent }
-              : msg
-          ));
+          setMessages(prev =>
+            prev.map(msg =>
+              msg.id === tempAssistantMessage.id ? { ...msg, content: streamContent } : msg,
+            ),
+          );
           requestAnimationFrame(() => messageListRef.current?.scrollToBottom());
         };
-    
+
         const assistantMessage = await plugin.groqService.sendMessage(
-          trimmedValue, 
+          trimmedValue,
           selectedModel,
-          handleChunk
+          handleChunk,
         );
-    
+
         // Заменяем временное сообщение на финальное
-        setMessages(prev => prev.map(msg => 
-          msg.id === tempAssistantMessage.id ? assistantMessage : msg
-        ));
+        setMessages(prev =>
+          prev.map(msg => (msg.id === tempAssistantMessage.id ? assistantMessage : msg)),
+        );
         setIsStreaming(false);
         requestAnimationFrame(() => messageListRef.current?.scrollToBottom());
-    
+
         await plugin.historyService.addMessage(assistantMessage);
       } catch (error: any) {
         console.error('Error:', error);
         const errorMsg = error instanceof Error ? error.message : String(error);
-        toast.error(`${t('error')}: ${errorMsg}`);
-        const errorMessage = MessageUtils.create('assistant', `${t('error')}: ${errorMsg}`);
+        toast.error(`${t('error', locale)}: ${errorMsg}`);
+        const errorMessage = MessageUtils.create('assistant', `${t('error', locale)}: ${errorMsg}`);
         setMessages(prev => [...prev, errorMessage]);
       } finally {
         setIsLoading(false);
@@ -300,7 +330,9 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
 
     if (!plugin.settings.apiKey) {
       return (
-        <div className="groq-api-key-warning">{t('apiKeyMissing') || 'API key is missing'}</div>
+        <div className="groq-api-key-warning">
+          {t('apiKeyMissing', locale) || 'API key is missing'}
+        </div>
       );
     }
 
@@ -314,13 +346,14 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
               onSelectModel={handleModelChange}
               getAvailableModels={fetchAvailableModels}
               availableModels={availableModels}
+              locale={locale}
             />
           </div>
           <div className="groq-chat__header-right">
             <button
               onClick={() => setIsModelInfoOpen(true)}
               className="groq-icon-button groq-model-info-button"
-              aria-label={t('modelInfo')}
+              aria-label={t('modelInfo', locale)}
             >
               <FiInfo size={16} />
             </button>
@@ -328,21 +361,23 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
             <button
               onClick={toggleDisplayMode}
               className="groq-icon-button groq-display-mode-button"
-              aria-label={displayMode === 'tab' ? t('showInSidepanel') : t('showInTab')}
+              aria-label={
+                displayMode === 'tab' ? t('showInSidepanel', locale) : t('showInTab', locale)
+              }
             >
               {displayMode === 'tab' ? <FiSidebar size={16} /> : <FiSquare size={16} />}
             </button>
             <button
               onClick={() => setIsSupportOpen(true)}
               className="groq-icon-button groq-support-header-button"
-              aria-label={t('supportDevHeader')}
+              aria-label={t('supportDevHeader', locale)}
             >
               <FiHeart size={16} />
             </button>
             <button
               onClick={handleScrollToTop}
               className="groq-icon-button groq-scroll-button"
-              aria-label={t('scrollToTop')}
+              aria-label={t('scrollToTop', locale)}
               disabled={messages.length === 0}
             >
               <FiChevronUp size={16} />
@@ -350,7 +385,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
             <button
               onClick={handleScrollToBottom}
               className="groq-icon-button groq-scroll-button"
-              aria-label={t('scrollToBottom')}
+              aria-label={t('scrollToBottom', locale)}
               disabled={messages.length === 0}
             >
               <FiChevronDown size={16} />
@@ -358,7 +393,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
             <button
               onClick={clearHistory}
               className="groq-icon-button groq-clear-button"
-              aria-label={t('clearHistory')}
+              aria-label={t('clearHistory', locale)}
               disabled={messages.length === 0 || isLoading}
             >
               <FiTrash2 size={16} />
@@ -370,29 +405,29 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
           <div className="groq-chat__messages-container">
             {rateLimits && (rateLimits.requestsPerDay || rateLimits.tokensPerMinute) && (
               <section className="groq-rate-limits">
-                <b>{t('rateLimits')}:</b>
+                <b>{t('rateLimits', locale)}:</b>
                 {rateLimits.requestsPerDay !== undefined && (
                   <div>
-                    {t('requestsPerDay')}:{' '}
+                    {t('requestsPerDay', locale)}:{' '}
                     <b>
                       {rateLimits.remainingRequests ?? '—'} / {rateLimits.requestsPerDay}
                     </b>
                     {rateLimits.resetRequests && (
                       <span>
-                        ({t('reset')}: {rateLimits.resetRequests})
+                        ({t('reset', locale)}: {rateLimits.resetRequests})
                       </span>
                     )}
                   </div>
                 )}
                 {rateLimits.tokensPerMinute !== undefined && (
                   <div>
-                    {t('tokensPerMinute')}:{' '}
+                    {t('tokensPerMinute', locale)}:{' '}
                     <b>
                       {rateLimits.remainingTokens ?? '—'} / {rateLimits.tokensPerMinute}
                     </b>
                     {rateLimits.resetTokens && (
                       <span>
-                        ({t('reset')}: {rateLimits.resetTokens})
+                        ({t('reset', locale)}: {rateLimits.resetTokens})
                       </span>
                     )}
                   </div>
@@ -411,7 +446,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
             {isHistoryLoading && (
               <div className="groq-chat__loading-history">
                 <div className="groq-spinner"></div>
-                <span>{t('loadingHistory')}</span>
+                <span>{t('loadingHistory', locale)}</span>
               </div>
             )}
           </div>
@@ -423,17 +458,23 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
               onSend={handleSendMessage}
               disabled={isLoading || isHistoryLoading}
               maxTokens={selectedModelInfo.maxTokens}
+              locale={locale}
             />
           </div>
         </div>
 
-        <SupportDialog isOpen={isSupportOpen} onClose={() => setIsSupportOpen(false)} />
+        <SupportDialog
+          isOpen={isSupportOpen}
+          onClose={() => setIsSupportOpen(false)}
+          locale={locale}
+        />
         <ModelInfoDialog
           key={`${selectedModel}-${isModelInfoOpen}`}
           isOpen={isModelInfoOpen}
           onClose={() => setIsModelInfoOpen(false)}
           modelInfo={selectedModelInfo}
           isAvailable={availableModels.some(m => m.id === selectedModel)}
+          locale={locale}
         />
 
         <ToastContainer position="bottom-right" autoClose={3000} theme="dark" />

@@ -74,7 +74,7 @@ export const MessageList = React.memo(
         if (force || isAtBottomRef.current) {
           // Блокируем другие скролл-механизмы на время этой операции
           scrollLockRef.current = true;
-          
+
           if (!smooth) {
             el.scrollTop = el.scrollHeight;
           } else {
@@ -87,9 +87,12 @@ export const MessageList = React.memo(
           setShowNewMessageNotice(false);
 
           // Снимаем блокировку после завершения анимации
-          setTimeout(() => {
-            scrollLockRef.current = false;
-          }, smooth ? 300 : 0);
+          setTimeout(
+            () => {
+              scrollLockRef.current = false;
+            },
+            smooth ? 300 : 0,
+          );
         }
       }, []);
 
@@ -132,14 +135,14 @@ export const MessageList = React.memo(
         const handleScroll = () => {
           // Не обновляем состояние если скролл заблокирован
           if (scrollLockRef.current) return;
-          
+
           const wasAtBottom = isAtBottomRef.current;
           isAtBottomRef.current = checkIsNearBottom();
-          
+
           // Если пользователь прокрутил до самого низа, скрываем уведомление
           if (isAtBottomRef.current) {
             setShowNewMessageNotice(false);
-          } 
+          }
           // Если пользователь был внизу и прокрутил вверх - показываем уведомление
           else if (wasAtBottom && messages.length > visibleMessages.length) {
             setShowNewMessageNotice(true);
@@ -225,9 +228,9 @@ export const MessageList = React.memo(
       }, [scrollToBottom]);
 
       return (
-        <div 
-          className="groq-chat__messages" 
-          aria-live="polite" 
+        <div
+          className="groq-chat__messages"
+          aria-live="polite"
           ref={containerRef}
           style={{ overflowAnchor: 'none' }} // Предотвращаем браузерный auto-scroll
         >
@@ -245,9 +248,7 @@ export const MessageList = React.memo(
               )}
 
               {visibleMessages.map((message, idx) => (
-                <React.Fragment
-                  key={`${message.id ?? 'msg'}-${message.timestamp ?? '0'}-${idx}`}
-                >
+                <React.Fragment key={`${message.id ?? 'msg'}-${message.timestamp ?? '0'}-${idx}`}>
                   {separatorIndex !== null && idx === separatorIndex && (
                     <div className="groq-history-separator" aria-hidden="true" />
                   )}
@@ -259,6 +260,7 @@ export const MessageList = React.memo(
                       onRenderComplete={
                         idx === visibleMessages.length - 1 ? handleLastMessageRender : undefined
                       }
+                      locale={language}
                     />
                   </div>
                 </React.Fragment>

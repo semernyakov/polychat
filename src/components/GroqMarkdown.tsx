@@ -152,7 +152,13 @@ export const GroqMarkdown: React.FC<GroqMarkdownProps> = ({ content, app, onRend
         const sourcePath =
           effectiveApp.workspace.getActiveFile()?.path ?? effectiveApp.vault.getName() ?? '';
 
-        await MarkdownRenderer.render(effectiveApp, cleanedContent, container, sourcePath, mdComponent);
+        await MarkdownRenderer.render(
+          effectiveApp,
+          cleanedContent,
+          container,
+          sourcePath,
+          mdComponent,
+        );
 
         // Гарантируем безопасность внешних ссылок
         container.querySelectorAll('a:not(.internal-link)').forEach(link => {

@@ -119,6 +119,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     modelsUpdated: 'Список моделей обновлён',
     modelsUpdateError: 'Ошибка при обновлении списка моделей',
     noModelsFound: 'Нет доступных моделей',
+    loadingModels: 'Загрузка моделей...',
     imageNotice:
       '⚠️ Чат не поддерживает отображение изображений. Если модель возвращает абсолютную ссылку на изображение, будет показана только ссылка.',
     hasThinking: 'Есть размышления',
@@ -139,8 +140,8 @@ export const translations: Record<Locale, Record<string, string>> = {
     inputCounterTitle:
       'Текущее кол-во символов / Макс. кол-во токенов для модели (приблизительное сравнение)',
     symbolsTokens: 'символы/токены',
-    'modelIsThinking': 'Модель думает',
-    'generatingResponse': 'Формирую ответ',
+    modelIsThinking: 'Модель думает',
+    generatingResponse: 'Формирую ответ',
   },
   en: {
     // Settings
@@ -240,6 +241,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     modelsUpdated: 'Model list updated',
     modelsUpdateError: 'Error updating model list',
     noModelsFound: 'No available models',
+    loadingModels: 'Loading models...',
     imageNotice:
       '⚠️ Chat does not support image rendering. If the model returns an absolute image link, only the link will be shown.',
     hasThinking: 'Has thinking',
@@ -259,8 +261,8 @@ export const translations: Record<Locale, Record<string, string>> = {
       '<kbd>Ctrl</kbd>+<kbd>Enter</kbd> — send, <kbd>Shift</kbd>+<kbd>Enter</kbd> — new line',
     inputCounterTitle: 'Current character count / Max model tokens (approximate)',
     symbolsTokens: 'chars/tokens',
-    'modelIsThinking': 'Model is thinking',
-    'generatingResponse': 'Generating response',
+    modelIsThinking: 'Model is thinking',
+    generatingResponse: 'Generating response',
   },
 };
 

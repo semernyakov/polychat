@@ -7,13 +7,14 @@ interface SupportDialogProps {
   isOpen: boolean;
   onClose: () => void;
   supportLink?: string;
+  locale?: import('../localization').Locale;
 }
 
 // Красивый блок благодарности с темизацией
-const SupportThanksBlock: React.FC = () => {
+const SupportThanksBlock: React.FC<{ locale: import('../localization').Locale }> = ({ locale }) => {
   return (
     <div className="groq-support-thanks">
-      <span className="groq-support-thanks__text">{t('supportDialogThanks')}</span>
+      <span className="groq-support-thanks__text">{t('supportDialogThanks', locale)}</span>
     </div>
   );
 };
@@ -22,6 +23,7 @@ export const SupportDialog: React.FC<SupportDialogProps> = ({
   isOpen,
   onClose,
   supportLink = 'https://yoomoney.ru/fundraise/194GT5A5R07.250321', // Используйте вашу ссылку
+  locale = 'en',
 }) => {
   // Блокировка скролла фона при открытом диалоге
   useEffect(() => {
@@ -72,11 +74,11 @@ export const SupportDialog: React.FC<SupportDialogProps> = ({
       {/* Предотвращаем закрытие при клике на сам диалог */}
       <div className="groq-support-dialog" onClick={e => e.stopPropagation()}>
         <div className="groq-dialog-header">
-          <h3>{t('supportDialogTitle')}</h3>
+          <h3>{t('supportDialogTitle', locale)}</h3>
           <button
             onClick={onClose}
             className="groq-dialog-close groq-icon-button" // Общий стиль для иконок-кнопок
-            aria-label={t('supportDialogClose')}
+            aria-label={t('supportDialogClose', locale)}
           >
             × {/* Можно заменить иконкой FiX */}
           </button>
@@ -85,10 +87,10 @@ export const SupportDialog: React.FC<SupportDialogProps> = ({
         <div className="groq-dialog-content">
           <p
             className="groq-dialog-content__text"
-            dangerouslySetInnerHTML={tHtml('supportDialogContent')}
+            dangerouslySetInnerHTML={tHtml('supportDialogContent', locale)}
           />
           {/* Красивый блок благодарности, как в настройках */}
-          <SupportThanksBlock />
+          <SupportThanksBlock locale={locale} />
         </div>
 
         <div className="groq-dialog-actions">
@@ -99,10 +101,10 @@ export const SupportDialog: React.FC<SupportDialogProps> = ({
             rel="noopener noreferrer"
             className="groq-button groq-button--primary groq-support-button"
           >
-            <FiExternalLink /> {t('supportDialogGoToSupport')}
+            <FiExternalLink /> {t('supportDialogGoToSupport', locale)}
           </a>
           <button onClick={onClose} className="groq-button groq-dialog-secondary-button">
-            {t('supportDialogClose')}
+            {t('supportDialogClose', locale)}
           </button>
         </div>
       </div>

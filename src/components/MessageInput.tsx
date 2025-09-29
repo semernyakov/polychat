@@ -10,6 +10,7 @@ interface MessageInputProps {
   onKeyDown?: (event: React.KeyboardEvent) => void;
   disabled?: boolean;
   maxTokens?: number;
+  locale?: Locale;
 }
 
 export const MessageInput: React.FC<MessageInputProps> = ({
@@ -19,13 +20,10 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   onKeyDown,
   disabled = false,
   maxTokens,
+  locale = 'en',
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isComposing, setIsComposing] = useState(false);
-  const appLang = (window as any)?.app?.getLanguage?.();
-  const locale: Locale = (
-    appLang && appLang.toLowerCase().startsWith('ru') ? 'ru' : 'en'
-  ) as Locale;
 
   useEffect(() => {
     const textarea = textareaRef.current;
@@ -98,8 +96,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
         </button>
       </div>
       <div className="groq-chat-input__footer">
-        <span id="input-hint" className="groq-message-input__hint">
-          <kbd>Ctrl</kbd>+<kbd>Enter</kbd> — send, <kbd>Shift</kbd>+<kbd>Enter</kbd> — new line
+        <span id="input-hint" className="groq-message-input__hint" dangerouslySetInnerHTML={{ __html: t('inputHint', locale) }}>
         </span>
         {maxTokens !== undefined && (
           <span

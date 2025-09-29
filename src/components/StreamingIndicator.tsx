@@ -17,9 +17,7 @@ export const StreamingIndicator: React.FC<StreamingIndicatorProps> = React.memo(
           </div>
           <div className="groq-streaming-indicator__content">
             <div className="groq-streaming-indicator__header">
-              <span className="groq-streaming-indicator__role">
-                {t('assistant', language)}
-              </span>
+              <span className="groq-streaming-indicator__role">{t('assistant', language)}</span>
             </div>
             <div className="groq-streaming-indicator__body">
               <div className="groq-streaming-indicator__text">
@@ -37,7 +35,7 @@ export const StreamingIndicator: React.FC<StreamingIndicatorProps> = React.memo(
         </div>
       </div>
     );
-  }
+  },
 );
 
 StreamingIndicator.displayName = 'StreamingIndicator';

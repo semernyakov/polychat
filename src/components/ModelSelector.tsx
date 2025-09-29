@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import '../styles.css'; // Используем единый style.css
 import { GroqPluginInterface } from '../types/plugin';
 import { toast } from 'react-toastify'; // Импортируем toast
+import { t, Locale } from '../localization';
 
 // Используем DynamicModelInfo для моделей
 interface DynamicModelInfo {
@@ -16,6 +17,7 @@ export interface ModelSelectorProps {
   onSelectModel: (modelId: string) => void;
   getAvailableModels: () => Promise<{ id: string; name: string; description?: string }[]>;
   availableModels?: any[];
+  locale?: Locale;
 }
 
 export const ModelSelector: React.FC<ModelSelectorProps> = ({
@@ -24,6 +26,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
   onSelectModel,
   getAvailableModels,
   availableModels: availableModelsProp,
+  locale = 'en',
 }) => {
   // Если availableModels передан как проп, используем его, иначе локальный state
   const [availableModels, setAvailableModels] = useState<DynamicModelInfo[]>([]);
@@ -51,7 +54,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
       } catch (error) {
         console.error('Failed to fetch available models:', error);
         setAvailableModels([]);
-        toast.error('Не удалось загрузить список доступных моделей.'); // Добавляем toast
+        toast.error(t('modelsUpdateError', locale)); // Добавляем toast
       } finally {
         setIsLoading(false);
       }
@@ -61,7 +64,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
   }, [getAvailableModels, _plugin.settings.groqAvailableModels, availableModelsProp]); // Добавляем зависимость
 
   if (isLoading) {
-    return <div className="groq-model-selector">Загрузка моделей...</div>;
+    return <div className="groq-model-selector">{t('loadingModels', locale)}</div>;
   }
 
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -78,7 +81,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
         value={selectedModel}
         onChange={handleChange}
         className="groq-select"
-        aria-label="Выберите модель Groq"
+        aria-label={t('chooseModel', locale)}
       >
         {availableModels.map(modelInfo => {
           const displayName = `${modelInfo.name}`;

@@ -17,7 +17,11 @@ export type RateLimitsType = {
 interface GroqServiceMethods {
   updateApiKey: (apiKey: string) => void;
   validateApiKey: (apiKey: string) => Promise<boolean>;
-  sendMessage: (content: string, model: string, onChunk?: (chunk: string) => void) => Promise<Message>;
+  sendMessage: (
+    content: string,
+    model: string,
+    onChunk?: (chunk: string) => void,
+  ) => Promise<Message>;
   getAvailableModels: () => Promise<{ id: string; name: string; description?: string }[]>;
   getAvailableModelsWithLimits: (forceRefresh?: boolean) => Promise<{
     models: GroqModelInfo[];
@@ -71,7 +75,11 @@ export class GroqService implements GroqServiceMethods {
     }
   }
 
-  public async sendMessage(content: string, model: string, onChunk?: (chunk: string) => void): Promise<Message> {
+  public async sendMessage(
+    content: string,
+    model: string,
+    onChunk?: (chunk: string) => void,
+  ): Promise<Message> {
     if (!content.trim()) throw new Error('Сообщение не может быть пустым');
     if (!model || !this.plugin.settings.groqAvailableModels?.some(m => m.id === model)) {
       throw new Error(`Модель "${model}" не доступна`);
@@ -118,9 +126,8 @@ export class GroqService implements GroqServiceMethods {
         content: fullContent,
         timestamp: Date.now(),
         isStreaming: false,
-        hasThinkContent: false
+        hasThinkContent: false,
       };
-
     } catch (error) {
       throw this.handleApiError(error);
     }

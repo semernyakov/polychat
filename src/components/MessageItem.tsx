@@ -12,6 +12,7 @@ interface MessageItemProps {
   isCurrentUser?: boolean;
   isLastMessage?: boolean;
   onRenderComplete?: () => void;
+  locale?: Locale;
 }
 
 // Функция для извлечения think-контента
@@ -32,19 +33,17 @@ export const MessageItem: React.FC<MessageItemProps> = React.memo(
     isCurrentUser = false,
     isLastMessage = false,
     onRenderComplete,
+    locale = 'en',
   }) => {
     const [copyError, setCopyError] = useState(false);
     const [isCopied, setIsCopied] = useState(false);
     const [showRaw, setShowRaw] = useState(false);
     const [showThink, setShowThink] = useState(false); // Новое состояние для отображения think
-    
+
     const content = useMemo(() => message.content || '', [message.content]);
-    
+
     // Извлекаем think-контент
-    const { thinkContent, mainContent } = useMemo(() => 
-      extractThinkContent(content), 
-      [content]
-    );
+    const { thinkContent, mainContent } = useMemo(() => extractThinkContent(content), [content]);
 
     const hasThinkContent = thinkContent.length > 0;
 
@@ -58,7 +57,7 @@ export const MessageItem: React.FC<MessageItemProps> = React.memo(
       } catch (err) {
         console.error('Error copying:', err);
         setCopyError(true);
-        toast.error(t('copyError'));
+        toast.error(t('copyError', locale));
         setTimeout(() => setCopyError(false), 2000);
       }
     }, [mainContent]);
@@ -92,7 +91,7 @@ export const MessageItem: React.FC<MessageItemProps> = React.memo(
         <div className="groq-message__header">
           <div className="groq-message__meta">
             <span className="groq-message__role">
-              {message.role === 'user' ? t('you') : t('assistant')}
+              {message.role === 'user' ? t('you', locale) : t('assistant', locale)}
             </span>
             <span className="groq-message__timestamp">
               {new Date(message.timestamp || Date.now()).toLocaleTimeString([], {
@@ -101,9 +100,7 @@ export const MessageItem: React.FC<MessageItemProps> = React.memo(
               })}
             </span>
             {hasThinkContent && (
-              <span className="groq-message__think-badge">
-                {t('hasThinking')}
-              </span>
+              <span className="groq-message__think-badge">{t('hasThinking', locale)}</span>
             )}
           </div>
           {message.role === 'assistant' && (
@@ -113,8 +110,7 @@ export const MessageItem: React.FC<MessageItemProps> = React.memo(
                 <button
                   onClick={toggleThinkView}
                   className="groq-icon-button"
-                  aria-label={showThink ? t('hideThinking') : t('showThinking')}
-                  title={showThink ? t('hideThinking') : t('showThinking')}
+                  aria-label={showThink ? t('hideThinking', locale) : t('showThinking', locale)}
                 >
                   {showThink ? <FiEyeOff size={14} /> : <FiEye size={14} />}
                 </button>
@@ -123,8 +119,7 @@ export const MessageItem: React.FC<MessageItemProps> = React.memo(
               <button
                 onClick={toggleRawView}
                 className="groq-icon-button"
-                aria-label={showRaw ? t('showFormatted') : t('showRaw')}
-                title={showRaw ? t('showFormatted') : t('showRaw')}
+                aria-label={showRaw ? t('showFormatted', locale) : t('showRaw', locale)}
               >
                 <FiCode size={14} />
               </button>
@@ -132,8 +127,7 @@ export const MessageItem: React.FC<MessageItemProps> = React.memo(
               <button
                 onClick={handleCopy}
                 className="groq-icon-button"
-                aria-label={t('copyMessage')}
-                title={t('copyMessage')}
+                aria-label={t('copyMessage', locale)}
               >
                 {copyError ? (
                   <span className="groq-message__copy-error">!</span>
@@ -151,9 +145,7 @@ export const MessageItem: React.FC<MessageItemProps> = React.memo(
         {hasThinkContent && showThink && (
           <div className="groq-think-content">
             <div className="groq-think-content__header">
-              <span className="groq-think-content__title">
-                {t('thinkingProcess')}
-              </span>
+              <span className="groq-think-content__title">{t('thinkingProcess', locale)}</span>
             </div>
             <div className="groq-think-content__body">
               {showRaw ? (
@@ -174,7 +166,7 @@ export const MessageItem: React.FC<MessageItemProps> = React.memo(
         {/* Основной контент сообщения */}
         <div className={`groq-message__content ${showRaw ? 'groq-message__content--raw' : ''}`}>
           {showRaw ? (
-            <pre aria-label={t('rawContent')}>
+            <pre aria-label={t('rawContent', locale)}>
               <code>{mainContent}</code>
             </pre>
           ) : (
