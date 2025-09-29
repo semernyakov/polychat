@@ -48,8 +48,10 @@ export const translations: Record<Locale, Record<string, string>> = {
     supportDialogClose: 'Закрыть',
     supportDialogContent:
       'Этот плагин разрабатывается энтузиастом в свободное время. Ваша поддержка поможет ускорить разработку, добавить новые функции и поддерживать проект в актуальном состоянии. Спасибо за использование!',
-    supportDialogThanks:
-      'Спасибо за использование PolyChat Plugin! <br> Вы можете <a href="https://yoomoney.ru/fundraise/194GT5A5R07.250321" target="_blank" rel="noopener noreferrer">поддержать разработку на YooMoney</a> <br> <a href="https://github.com/semernyakov" target="_blank" rel="noopener noreferrer">Оставить отзыв на Github</a> или <a href="https://t.me/semernyakov" target="_blank" rel="noopener noreferrer"> или связаться со мной в Telegram</a> ❤️',
+    supportDialogThanksTitle: 'Спасибо за использование PolyChat Plugin!',
+    supportDialogThanksSupport: 'Вы можете поддержать разработку на YooMoney',
+    supportDialogThanksReview: 'Оставить отзыв на Github',
+    supportDialogThanksContact: 'или связаться со мной в Telegram',
     supportDialogGoToSupport: 'Перейти к поддержке',
     language: 'Язык',
     save: 'Сохранить',
@@ -89,6 +91,8 @@ export const translations: Record<Locale, Record<string, string>> = {
     releaseDate: 'Дата выпуска',
     actualDate: 'Дата актуальности',
     releaseStatus: 'Статус релиза',
+    releaseStatusMain: 'Основная',
+    releaseStatusPreview: 'Предварительная',
     you: 'Вы',
     assistant: 'Ассистент',
     copyError: 'Ошибка при копировании',
@@ -162,8 +166,10 @@ export const translations: Record<Locale, Record<string, string>> = {
     supportDialogClose: 'Close',
     supportDialogContent:
       'This plugin is developed by an enthusiast in their free time. Your support will help accelerate development, add new features, and maintain the project in an up-to-date state. Thank you for using it!',
-    supportDialogThanks:
-      'Thank you for using PolyChat Plugin! <br> You can <a href="https://yoomoney.ru/fundraise/194GT5A5R07.250321" target="_blank" rel="noopener noreferrer">support the author on YooMoney</a> <br> <a href="https://github.com/semernyakov" target="_blank" rel="noopener noreferrer">Leave a review on Github</a> or <a href="https://t.me/semernyakov" target="_blank" rel="noopener noreferrer">contact with author in Telegram</a> ❤️',
+    supportDialogThanksTitle: 'Thank you for using PolyChat Plugin!',
+    supportDialogThanksSupport: 'You can support the author on YooMoney',
+    supportDialogThanksReview: 'Leave a review on Github',
+    supportDialogThanksContact: 'or contact with author in Telegram',
     supportDialogGoToSupport: 'Go to support',
     language: 'Language',
     save: 'Save',
@@ -203,6 +209,8 @@ export const translations: Record<Locale, Record<string, string>> = {
     releaseDate: 'Release Date',
     actualDate: 'As of Date',
     releaseStatus: 'Release Status',
+    releaseStatusMain: 'Main',
+    releaseStatusPreview: 'Preview',
     you: 'You',
     assistant: 'Assistant',
     copyError: 'Error copying to clipboard',

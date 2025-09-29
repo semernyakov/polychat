@@ -10,7 +10,7 @@ import {
   FiTrash2,
   FiChevronUp,
   FiChevronDown,
-  FiHeart,
+  FiDollarSign,
   FiSidebar,
   FiSquare,
   FiInfo,
@@ -372,7 +372,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
               className="groq-icon-button groq-support-header-button"
               aria-label={t('supportDevHeader', locale)}
             >
-              <FiHeart size={16} />
+              <FiDollarSign size={16} />
             </button>
             <button
               onClick={handleScrollToTop}

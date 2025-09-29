@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FiX } from 'react-icons/fi';
 import { ModelInfo } from '../types/types';
 import { t, Locale } from '../localization';
@@ -23,6 +23,38 @@ export const ModelInfoDialog: React.FC<ModelInfoDialogProps> = ({
   const [currentModelInfo, setCurrentModelInfo] = React.useState(modelInfo);
   const [isDialogOpen, setIsDialogOpen] = React.useState(isOpen);
 
+  // Блокировка скролла фона при открытом диалоге
+  useEffect(() => {
+    const body = document.body;
+
+    if (isDialogOpen) {
+      body.classList.add('groq-dialog-open');
+    } else {
+      body.classList.remove('groq-dialog-open');
+    }
+
+    return () => {
+      body.classList.remove('groq-dialog-open');
+    };
+  }, [isDialogOpen]);
+
+  // Закрытие по ESC
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    if (isDialogOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isDialogOpen, onClose]);
+
   // Update current model info when modelInfo prop changes and dialog is open
   React.useEffect(() => {
     if (isOpen && modelInfo.id !== prevModelIdRef.current) {
@@ -44,14 +76,22 @@ export const ModelInfoDialog: React.FC<ModelInfoDialogProps> = ({
 
   if (!isDialogOpen) return null;
 
+  // Закрытие по клику на оверлей
+  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   return (
-    <div className="groq-support-dialog-overlay">
-      <div className="groq-support-dialog">
+    <div className="groq-support-dialog-overlay" onClick={handleOverlayClick}>
+      <div className="groq-support-dialog" onClick={e => e.stopPropagation()}>
         <div className="groq-dialog-header">
           <h3>{t('modelInfo', locale)}</h3>
           <button
             onClick={onClose}
             className="groq-dialog-close groq-icon-button"
+            aria-label={t('close', locale)}
           >
             <FiX size={16} />
           </button>
@@ -105,13 +145,9 @@ export const ModelInfoDialog: React.FC<ModelInfoDialogProps> = ({
                   <span className="groq-model-info__label">{t('releaseStatus', locale)}:</span>
                   <span className="groq-model-info__value">
                     {currentModelInfo.releaseStatus === 'main'
-                      ? locale === 'ru'
-                        ? 'Основная'
-                        : 'Main'
+                      ? t('releaseStatusMain', locale)
                       : currentModelInfo.releaseStatus === 'preview'
-                        ? locale === 'ru'
-                          ? 'Предварительная'
-                          : 'Preview'
+                        ? t('releaseStatusPreview', locale)
                         : currentModelInfo.releaseStatus}
                   </span>
                 </div>

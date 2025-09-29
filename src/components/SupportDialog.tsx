@@ -14,7 +14,38 @@ interface SupportDialogProps {
 const SupportThanksBlock: React.FC<{ locale: import('../localization').Locale }> = ({ locale }) => {
   return (
     <div className="groq-support-thanks">
-      <span className="groq-support-thanks__text">{t('supportDialogThanks', locale)}</span>
+      <div className="groq-support-thanks__text">
+        {t('supportDialogThanksTitle', locale)}
+      </div>
+      <div className="groq-support-thanks__links">
+        <a
+          href="https://yoomoney.ru/fundraise/194GT5A5R07.250321"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="groq-support-thanks__link"
+        >
+          {t('supportDialogThanksSupport', locale)}
+        </a>
+        <br />
+        <a
+          href="https://github.com/semernyakov"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="groq-support-thanks__link"
+        >
+          {t('supportDialogThanksReview', locale)}
+        </a>{' '}
+        {t('supportDialogThanksContact', locale)}{' '}
+        <a
+          href="https://t.me/semernyakov"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="groq-support-thanks__link"
+        >
+          Telegram
+        </a>{' '}
+        ❤️
+      </div>
     </div>
   );
 };

@@ -1483,3 +1483,37 @@
     padding: 0.75em;
   }
 }
+
+/* ===== БЛОК БЛАГОДАРНОСТИ В ДИАЛОГАХ ===== */
+
+.groq-support-thanks {
+  margin: 1em 0;
+  padding: 1em;
+  background: var(--background-modifier-border);
+  border-radius: 8px;
+  border: 1px solid var(--background-modifier-border);
+}
+
+.groq-support-thanks__text {
+  color: var(--text-normal);
+  line-height: 1.5;
+  text-align: center;
+  margin-bottom: 0.5em;
+  font-weight: 500;
+}
+
+.groq-support-thanks__links {
+  text-align: center;
+  line-height: 1.6;
+}
+
+.groq-support-thanks__link {
+  color: var(--link-color, var(--interactive-accent));
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.groq-support-thanks__link:hover {
+  text-decoration: underline;
+  color: var(--link-color-hover, var(--interactive-accent-hover));
+}
