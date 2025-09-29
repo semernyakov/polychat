@@ -134,56 +134,35 @@ export class GroqChatSettingsTab extends PluginSettingTab {
     this.containerEl.appendChild(actionsBlock);
 
     // --- Блок благодарности автору ---
-    // Add a spacer div to create space between buttons and thanks block
-    const spacer = this.containerEl.createEl('div', { cls: 'groq-thanks-spacer' });
+    const thanksBlock = this.containerEl.createEl('div', { cls: 'groq-settings-thanks' });
 
-    const thanksBlock = this.containerEl.createEl('div', { cls: 'groq-thanks-block' });
+    // Заголовок с сердечком
+    const titleDiv = thanksBlock.createEl('div', { cls: 'groq-settings-thanks-title' });
+    titleDiv.innerHTML = `💙 <strong>${t('thanks.title', locale)}</strong>`;
 
-    // Add heart emoji
-    createTextNode(thanksBlock, '💙 ');
+    // Ссылки в компактном формате
+    const linksDiv = thanksBlock.createEl('div', { cls: 'groq-settings-thanks-links' });
 
-    // Add strong text
-    const strong = thanksBlock.createEl('strong');
-    strong.textContent = t('thanks.title', locale);
-
-    // Add space after strong
-    createTextNode(thanksBlock, ' ');
-
-    // Add link text before and after the link
-    const linkText = t('thanks.reviewLink', locale);
-    const textBeforeLink = t('thanks.reviewBefore', locale);
-    const textAfterLink = t('thanks.reviewAfter', locale);
-
-    createTextNode(thanksBlock, textBeforeLink);
-    createLink(thanksBlock, linkText, 'https://github.com/semernyakov/polychat', {
+    // GitHub
+    createLink(linksDiv, '⭐ GitHub', 'https://github.com/semernyakov/polychat', {
       target: '_blank',
       rel: 'noopener noreferrer',
+      cls: 'groq-settings-thanks-link',
     });
-    createTextNode(thanksBlock, textAfterLink);
 
-    // Add link to Telegram
-    const telegramLinkText = t('thanks.telegramLink', locale);
-    const telegramTextBeforeLink = t('thanks.telegramBefore', locale);
-    const telegramTextAfterLink = t('thanks.telegramAfter', locale);
-
-    createTextNode(thanksBlock, telegramTextBeforeLink);
-    createLink(thanksBlock, telegramLinkText, 'https://t.me/semernyakov', {
+    // Telegram
+    createLink(linksDiv, '💬 Telegram', 'https://t.me/semernyakov', {
       target: '_blank',
       rel: 'noopener noreferrer',
+      cls: 'groq-settings-thanks-link',
     });
-    createTextNode(thanksBlock, telegramTextAfterLink);
 
-    // Add link to YooMoney
-    const yoomoneyLinkText = t('thanks.yoomoneyLink', locale);
-    const yoomoneyTextBeforeLink = t('thanks.yoomoneyBefore', locale);
-    const yoomoneyTextAfterLink = t('thanks.yoomoneyAfter', locale);
-
-    createTextNode(thanksBlock, yoomoneyTextBeforeLink);
-    createLink(thanksBlock, yoomoneyLinkText, 'https://yoomoney.ru/fundraise/194GT5A5R07.250321', {
+    // Поддержка
+    createLink(linksDiv, '💰 Поддержать', 'https://yoomoney.ru/fundraise/194GT5A5R07.250321', {
       target: '_blank',
       rel: 'noopener noreferrer',
+      cls: 'groq-settings-thanks-link groq-settings-thanks-link--primary',
     });
-    createTextNode(thanksBlock, yoomoneyTextAfterLink);
   }
 
   private createTemperatureSetting(locale: Locale): HTMLElement {

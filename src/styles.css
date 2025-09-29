@@ -1119,23 +1119,25 @@
 
 /* --- Заголовки настроек --- */
 .groq-settings-title {
-  margin: 0 0 var(--spacing-medium) 0;
-  font-size: 1.8em;
-  font-weight: 600;
-  color: var(--text-normal);
-  line-height: 1.3;
+  margin: 0 0 1em 0;
+  font-size: var(--h2-size, 1.6em);
+  font-weight: var(--h2-weight, 600);
+  color: var(--h2-color, var(--text-normal));
+  line-height: var(--h2-line-height, 1.3);
+  font-family: var(--font-interface);
 }
 
 .groq-settings-subtitle {
-  margin: 0 0 var(--spacing-large) 0;
-  font-size: 1em;
+  margin: 0 0 1.5em 0;
+  font-size: var(--font-ui-smaller, 0.9em);
   color: var(--text-muted);
   line-height: 1.5;
+  font-family: var(--font-interface);
 }
 
 /* --- Секции настроек --- */
 .groq-settings-section {
-  margin: var(--spacing-large) 0;
+  margin: 1.5em 0;
   padding: 0;
 }
 
@@ -1146,9 +1148,9 @@
 /* --- Сетка настроек --- */
 .groq-settings-flex-grid {
   display: flex;
-  gap: var(--spacing-large);
+  gap: 1.5em;
   align-items: flex-start;
-  margin: var(--spacing-medium) 0;
+  margin: 1em 0;
 }
 
 .groq-settings-flex-item {
@@ -1158,59 +1160,72 @@
 
 /* --- Действия настроек --- */
 .groq-settings-actions {
-  margin: var(--spacing-large) 0 0 0;
-  padding: var(--spacing-medium) 0 0 0;
-  border-top: var(--border-width) solid var(--background-modifier-border);
+  margin: 1.5em 0 0 0;
+  padding: 1em 0 0 0;
+  border-top: 1px solid var(--background-modifier-border);
   display: flex;
-  gap: var(--spacing-medium);
+  gap: 0.75em;
   justify-content: flex-end;
   align-items: center;
 }
 
 .groq-settings-actions button {
-  min-width: 140px;
-  height: 32px;
-  padding: 0 var(--spacing-medium);
-  border-radius: var(--border-radius);
-  font-size: 0.9em;
-  font-weight: 500;
-  transition: all 0.2s ease;
+  min-width: 120px;
+  height: 30px;
+  padding: 0 0.75em;
+  border-radius: var(--radius-s, 4px);
+  font-size: var(--font-ui-smaller, 0.9em);
+  font-weight: var(--font-medium, 500);
+  font-family: var(--font-interface);
+  transition: all 0.15s ease;
+  border: 1px solid var(--background-modifier-border);
+  background-color: var(--background-primary);
+  color: var(--text-normal);
+  cursor: pointer;
+}
+
+.groq-settings-actions button:hover {
+  background-color: var(--background-modifier-hover);
 }
 
 .groq-settings-actions button.mod-cta {
   background-color: var(--interactive-accent);
   color: var(--text-on-accent);
-  border: none;
+  border-color: var(--interactive-accent);
 }
 
 .groq-settings-actions button.mod-cta:hover {
   background-color: var(--interactive-accent-hover);
+  border-color: var(--interactive-accent-hover);
 }
 
 /* --- Ссылки настроек --- */
 .groq-settings-token-link {
-  margin: 0 0 var(--spacing-medium) 0;
+  margin: 0 0 1em 0;
   padding: 0;
   color: var(--text-muted);
-  font-size: 0.9em;
+  font-size: var(--font-ui-smaller, 0.9em);
   line-height: 1.5;
+  font-family: var(--font-interface);
 }
 
 .groq-settings-token-link a {
-  color: var(--interactive-accent);
+  color: var(--link-color, var(--interactive-accent));
   text-decoration: none;
+  font-weight: var(--font-medium, 500);
 }
 
 .groq-settings-token-link a:hover {
   text-decoration: underline;
+  color: var(--link-color-hover, var(--interactive-accent-hover));
 }
 
 /* --- Иконка сохранения --- */
 .groq-saved-icon {
-  color: var(--interactive-success);
-  margin-left: var(--spacing-small);
-  font-weight: 600;
-  font-size: 0.9em;
+  color: var(--interactive-success, var(--text-success, #16a34a));
+  margin-left: 0.5em;
+  font-weight: var(--font-semibold, 600);
+  font-size: var(--font-ui-smaller, 0.9em);
   transition: opacity 0.3s ease;
 }
 
@@ -1220,23 +1235,24 @@
 
 /* --- Управление моделями --- */
 .groq-models-select-all {
-  margin: 0 0 var(--spacing-medium) 0;
+  margin: 0 0 1em 0;
   display: flex;
-  gap: var(--spacing-medium);
+  gap: 0.75em;
   align-items: center;
 }
 
 .groq-models-select-all button {
-  min-width: 120px;
+  min-width: 100px;
   height: 28px;
-  padding: 0 var(--spacing-medium);
-  border-radius: var(--border-radius);
-  font-size: 0.85em;
-  font-weight: 500;
-  border: var(--border-width) solid var(--background-modifier-border);
+  padding: 0 0.75em;
+  border-radius: var(--radius-s, 4px);
+  font-size: var(--font-ui-smaller, 0.85em);
+  font-weight: var(--font-medium, 500);
+  font-family: var(--font-interface);
+  border: 1px solid var(--background-modifier-border);
   background-color: var(--background-primary);
   color: var(--text-normal);
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
   cursor: pointer;
 }
 
@@ -1259,12 +1275,14 @@
 .groq-models-table {
   width: 100%;
   border-collapse: collapse;
-  margin: var(--spacing-medium) 0;
-  font-size: 0.9em;
+  margin: 1em 0;
+  font-size: var(--font-ui-smaller, 0.9em);
+  font-family: var(--font-interface);
   background: var(--background-primary);
-  border: var(--border-width) solid var(--background-modifier-border);
-  border-radius: var(--border-radius);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s, 4px);
   overflow: hidden;
+  box-shadow: var(--shadow-s, 0 1px 3px rgba(0, 0, 0, 0.1));
 }
 
 .groq-models-table thead {
@@ -1273,17 +1291,19 @@
 
 .groq-models-table th {
   text-align: left;
-  padding: var(--spacing-medium);
-  font-weight: 600;
+  padding: 0.75em 1em;
+  font-weight: var(--font-semibold, 600);
   color: var(--text-normal);
-  border-bottom: var(--border-width) solid var(--background-modifier-border);
+  border-bottom: 1px solid var(--background-modifier-border);
+  font-size: inherit;
 }
 
 .groq-models-table td {
-  padding: var(--spacing-medium);
-  border-bottom: var(--border-width) solid var(--background-modifier-border);
+  padding: 0.75em 1em;
+  border-bottom: 1px solid var(--background-modifier-border);
   color: var(--text-normal);
   line-height: 1.4;
+  vertical-align: middle;
 }
 
 .groq-models-table tr:last-child td {
@@ -1301,84 +1321,74 @@
   margin: 0;
   cursor: pointer;
   accent-color: var(--interactive-accent);
+  border-radius: var(--radius-s, 2px);
 }
 
-/* --- Блок благодарности --- */
-.groq-thanks-spacer {
-  height: var(--spacing-large);
-}
-
-.groq-thanks-block {
-  margin: var(--spacing-large) 0 0 0;
-  padding: var(--spacing-medium);
-  border-radius: var(--border-radius);
-  background-color: var(--background-secondary);
-  font-size: 0.9em;
-  line-height: 1.5;
-  color: var(--text-muted);
-  border: var(--border-width) solid var(--background-modifier-border);
-}
-
-.groq-thanks-block strong {
-  color: var(--text-normal);
-  font-weight: 600;
-}
-
-.groq-thanks-block a {
-  color: var(--interactive-accent);
-  text-decoration: none;
-}
-
-.groq-thanks-block a:hover {
-  text-decoration: underline;
-}
 
 /* --- Блок благодарности в настройках --- */
 .groq-settings-thanks {
-  margin: var(--spacing-large) 0 var(--spacing-medium) 0;
-  padding: var(--spacing-medium);
-  border-radius: var(--border-radius);
+  margin: 1.5em 0 1em 0;
+  padding: 1em;
+  border-radius: var(--radius-m, 6px);
   text-align: center;
-  transition: all 0.3s ease;
-  background: linear-gradient(
-    135deg,
-    var(--background-modifier-hover) 0%,
-    var(--background-secondary) 100%
-  );
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  box-shadow: var(--shadow-s, 0 1px 3px rgba(0, 0, 0, 0.1));
+}
+
+.groq-settings-thanks-title {
+  margin-bottom: 0.75em;
+  font-size: var(--font-ui-smaller, 0.9em);
+  color: var(--text-muted);
+}
+
+.groq-settings-thanks-title strong {
   color: var(--text-normal);
-  border: var(--border-width) solid var(--background-modifier-border);
+  font-weight: var(--font-semibold, 600);
 }
 
-.theme-dark .groq-settings-thanks {
-  background: linear-gradient(
-    135deg,
-    var(--background-modifier-hover) 0%,
-    var(--background-secondary) 100%
-  );
+.groq-settings-thanks-links {
+  display: flex;
+  gap: 0.5em;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
-/* --- Блок благодарности в диалоге поддержки --- */
-.groq-support-thanks {
-  margin: var(--spacing-medium) 0;
-  padding: var(--spacing-medium);
-  border-radius: var(--border-radius);
-  text-align: center;
-  background: linear-gradient(
-    135deg,
-    var(--background-modifier-hover) 0%,
-    var(--background-secondary) 100%
-  );
+.groq-settings-thanks-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25em;
+  padding: 0.375em 0.75em;
+  border-radius: var(--radius-s, 4px);
+  font-size: var(--font-ui-smaller, 0.85em);
+  font-weight: var(--font-medium, 500);
+  font-family: var(--font-interface);
+  text-decoration: none;
+  color: var(--text-muted);
+  background-color: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  transition: all 0.15s ease;
+}
+
+.groq-settings-thanks-link:hover {
+  background-color: var(--background-modifier-hover);
   color: var(--text-normal);
-  border: var(--border-width) solid var(--background-modifier-border);
+  border-color: var(--interactive-accent);
+  text-decoration: none;
 }
 
-.theme-dark .groq-support-thanks {
-  background: linear-gradient(
-    135deg,
-    var(--background-secondary) 0%,
-    var(--background-modifier-border) 100%
-  );
+.groq-settings-thanks-link--primary {
+  background-color: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-color: var(--interactive-accent);
 }
+
+.groq-settings-thanks-link--primary:hover {
+  background-color: var(--interactive-accent-hover);
+  border-color: var(--interactive-accent-hover);
+}
+
 
 /* --- Утилитарные текстовые стили --- */
 .groq-small-text {
@@ -1398,7 +1408,7 @@
 @media (max-width: 768px) {
   .groq-settings-flex-grid {
     flex-direction: column;
-    gap: var(--spacing-medium);
+    gap: 1em;
   }
 
   .groq-settings-flex-item {
@@ -1408,6 +1418,7 @@
   .groq-settings-actions {
     flex-direction: column;
     align-items: stretch;
+    gap: 0.5em;
   }
 
   .groq-settings-actions button {
@@ -1418,7 +1429,7 @@
   .groq-models-select-all {
     flex-direction: column;
     align-items: stretch;
-    gap: var(--spacing-small);
+    gap: 0.5em;
   }
 
   .groq-models-select-all button {
@@ -1427,21 +1438,41 @@
   }
 
   .groq-models-table {
-    font-size: 0.8em;
+    font-size: var(--font-ui-smaller, 0.85em);
   }
 
   .groq-models-table th,
   .groq-models-table td {
-    padding: var(--spacing-small);
+    padding: 0.5em 0.75em;
+  }
+
+  .groq-settings-thanks-links {
+    flex-direction: column;
+    gap: 0.375em;
+  }
+
+  .groq-settings-thanks-link {
+    width: 100%;
+    justify-content: center;
   }
 }
 
 @media (max-width: 480px) {
   .groq-settings-title {
-    font-size: 1.5em;
+    font-size: var(--h3-size, 1.4em);
   }
 
   .groq-settings-subtitle {
-    font-size: 0.9em;
+    font-size: var(--font-ui-smaller, 0.85em);
+  }
+
+  .groq-settings-actions {
+    margin-top: 1em;
+    padding-top: 0.75em;
+  }
+
+  .groq-settings-thanks {
+    margin: 1em 0 0.5em 0;
+    padding: 0.75em;
   }
 }
