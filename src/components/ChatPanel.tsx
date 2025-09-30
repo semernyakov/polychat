@@ -125,6 +125,11 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
     };
     const [selectedModel, setSelectedModel] = useState<string>(getInitialModel());
 
+    // При смене модели — сразу скроллим в самый низ (новые требования)
+    useEffect(() => {
+      messageListRef.current?.scrollToBottom({ smooth: false });
+    }, [selectedModel]);
+
     // Если выбранная модель исчезла из списка, сбрасываем на первую доступную
     useEffect(() => {
       if (availableModels.length > 0 && !availableModels.find(m => m.id === selectedModel)) {
