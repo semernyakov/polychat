@@ -112,10 +112,7 @@ export const SupportDialog: React.FC<SupportDialogProps> = ({
         </div>
 
         <div className="groq-dialog-content">
-          <p
-            className="groq-dialog-content__text"
-            dangerouslySetInnerHTML={tHtml('supportDialogContent', locale)}
-          />
+          <p className="groq-dialog-content__text">{t('supportDialogContent', locale)}</p>
           {/* Красивый блок благодарности, как в настройках */}
           <SupportThanksBlock locale={locale} />
         </div>

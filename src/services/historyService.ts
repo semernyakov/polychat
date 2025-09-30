@@ -93,18 +93,18 @@ export class HistoryService {
 
   private getFromLocalStorage(): Message[] {
     try {
-      const data = localStorage.getItem(LOCAL_STORAGE_KEY);
+      const data = this.plugin.app.loadLocalStorage(LOCAL_STORAGE_KEY);
       return data ? JSON.parse(data) : [];
     } catch (error) {
       console.error('Error reading from localStorage', error);
-      localStorage.removeItem(LOCAL_STORAGE_KEY);
+      this.plugin.app.saveLocalStorage(LOCAL_STORAGE_KEY, null);
       return [];
     }
   }
 
   private saveToLocalStorage(history: Message[]): void {
     try {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(history));
+      this.plugin.app.saveLocalStorage(LOCAL_STORAGE_KEY, JSON.stringify(history));
     } catch (error) {
       console.error('Error saving to localStorage', error);
       if (error instanceof Error && error.name === 'QuotaExceededError') {
@@ -268,7 +268,7 @@ export class HistoryService {
         this.memoryHistory = [];
         break;
       case 'localStorage':
-        localStorage.removeItem(LOCAL_STORAGE_KEY);
+        this.plugin.app.saveLocalStorage(LOCAL_STORAGE_KEY, null);
         break;
       case 'indexedDB':
         await this.clearIndexedDB();

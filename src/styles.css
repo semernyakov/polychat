@@ -1402,6 +1402,10 @@
   vertical-align: middle;
 }
 
+.groq-models-table-group-header {
+	font-weight: 600;
+}
+
 .groq-models-table tr:last-child td {
   border-bottom: none;
 }

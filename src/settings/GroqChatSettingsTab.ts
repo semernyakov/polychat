@@ -135,7 +135,8 @@ export class GroqChatSettingsTab extends PluginSettingTab {
 
     // Заголовок с сердечком
     const titleDiv = thanksBlock.createEl('div', { cls: 'groq-settings-thanks-title' });
-    titleDiv.innerHTML = `💙 <strong>${t('thanks.title', locale)}</strong>`;
+    titleDiv.createSpan({ text: '💙 ' });
+    titleDiv.createEl('strong', { text: t('thanks.title', locale) });
 
     // Ссылки в компактном формате
     const linksDiv = thanksBlock.createEl('div', { cls: 'groq-settings-thanks-links' });
