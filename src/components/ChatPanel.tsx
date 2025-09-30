@@ -59,7 +59,7 @@ interface ModelInfo {
 }
 
 // Хук для управления сообщениями
-const useMessages = (initialMessages: Message[], historyService: any, locale: Locale) => {
+const useMessages = (initialMessages: Message[], historyService: any) => {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [isHistoryLoading, setIsHistoryLoading] = useState(false);
   const [hasLoadedHistory, setHasLoadedHistory] = useState(false);
@@ -258,31 +258,28 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
         let streamContent = '';
         const handleChunk = (chunk: string) => {
           streamContent += chunk;
-          setMessages(prev =>
-            prev.map(msg =>
-              msg.id === tempAssistantMessage.id ? { ...msg, content: streamContent } : msg,
-            ),
-          );
-          // Скролл будет выполнен автоматически через onRenderComplete
+          setMessages(prev => prev.map(msg =>
+            msg.id === tempAssistantMessage.id
+              ? { ...msg, content: streamContent }
+              : msg
+          ));
+          requestAnimationFrame(() => messageListRef.current?.scrollToBottom());
         };
 
         const assistantMessage = await plugin.groqService.sendMessage(
           trimmedValue,
           selectedModel,
-          handleChunk,
+          handleChunk
         );
 
-        // Обновляем временное сообщение финальным контентом вместо замены
-        const finalMessage = { ...tempAssistantMessage, content: assistantMessage.content, isStreaming: false };
-        setMessages(prev =>
-          prev.map(msg =>
-            msg.id === tempAssistantMessage.id ? finalMessage : msg,
-          ),
-        );
+        // Заменяем временное сообщение на финальное
+        setMessages(prev => prev.map(msg =>
+          msg.id === tempAssistantMessage.id ? assistantMessage : msg
+        ));
         setIsStreaming(false);
-        // Скролл будет выполнен автоматически через onRenderComplete
+        requestAnimationFrame(() => messageListRef.current?.scrollToBottom());
 
-        await plugin.historyService.addMessage(finalMessage);
+        await plugin.historyService.addMessage(assistantMessage);
       } catch (error: any) {
         console.error('Error:', error);
         const errorMsg = error instanceof Error ? error.message : String(error);

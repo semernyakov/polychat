@@ -95,13 +95,19 @@
   overflow-x: hidden;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
-  overflow-anchor: none;
-  contain: layout style;
+  /* Убрали overflow-anchor: none - может конфликтовать с программным скроллом */
 
   /* Переменные для скролла */
-  --near-bottom-threshold: 100px;
+  --near-bottom-threshold: 50px;
   --near-top-threshold: 40px;
   --load-reveal-offset: 80px;
+
+  /* Улучшения для стабильного скроллинга */
+  scroll-padding: 10px; /* Минимальный отступ при программном скролле */
+  /* Убрали scroll-margin - может вызывать проблемы */
+
+  /* Предотвращаем возможные конфликты */
+  transform: translateZ(0); /* Аппаратное ускорение для плавного скролла */
 }
 
 /* --- Поле ввода --- */
