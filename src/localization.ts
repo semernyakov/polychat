@@ -113,6 +113,11 @@ export const translations: Record<Locale, Record<string, string>> = {
     refreshModels: 'Обновить модели',
     modelsUpdated: 'Список моделей обновлён',
     modelsUpdateError: 'Ошибка при обновлении списка моделей',
+    showRawCode: 'Показать исходный код',
+    hideRawCode: 'Скрыть исходный код',
+    createNote: 'Создать заметку',
+    noteCreated: 'Заметка создана',
+    noteCreateError: 'Не удалось создать заметку',
     noModelsFound: 'Нет доступных моделей',
     loadingModels: 'Загрузка моделей...',
     imageNotice:
@@ -231,6 +236,11 @@ export const translations: Record<Locale, Record<string, string>> = {
     refreshModels: 'Refresh models',
     modelsUpdated: 'Model list updated',
     modelsUpdateError: 'Error updating model list',
+    showRawCode: 'Show raw code',
+    hideRawCode: 'Hide raw code',
+    createNote: 'Create note',
+    noteCreated: 'Note created',
+    noteCreateError: 'Failed to create note',
     noModelsFound: 'No available models',
     loadingModels: 'Loading models...',
     imageNotice:

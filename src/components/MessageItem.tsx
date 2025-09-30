@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { GroqMarkdown } from './GroqMarkdown';
-import { FiCopy, FiCheck, FiCode, FiEye, FiEyeOff } from 'react-icons/fi';
+import { FiCopy, FiCheck, FiCode, FiEye, FiEyeOff, FiFilePlus } from 'react-icons/fi';
 import '../styles.css';
 import { toast } from 'react-toastify';
 import { t, Locale } from '../localization';
@@ -38,7 +38,7 @@ export const MessageItem: React.FC<MessageItemProps> = React.memo(
     const [copyError, setCopyError] = useState(false);
     const [isCopied, setIsCopied] = useState(false);
     const [showRaw, setShowRaw] = useState(false);
-    const [showThink, setShowThink] = useState(false); // Новое состояние для отображения think
+    const [showThink, setShowThink] = useState(false);
 
     const content = useMemo(() => message.content || '', [message.content]);
 
@@ -80,6 +80,29 @@ export const MessageItem: React.FC<MessageItemProps> = React.memo(
     const toggleThinkView = useCallback(() => {
       setShowThink(prev => !prev);
     }, []);
+
+    const handleCreateNote = useCallback(async () => {
+      try {
+        const app = (window as any)?.app;
+        if (!app?.vault) {
+          throw new Error('App API is not available');
+        }
+        const noteContent = message.content ?? '';
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const fileName = `Groq Chat ${timestamp}.md`;
+        const file = await app.vault.create(fileName, noteContent);
+        if (app.workspace?.getLeaf) {
+          const leaf = app.workspace.getLeaf(false);
+          if (leaf?.openFile) {
+            await leaf.openFile(file);
+          }
+        }
+        toast.success(t('noteCreated', locale));
+      } catch (error) {
+        console.error('Error creating note:', error);
+        toast.error(t('noteCreateError', locale));
+      }
+    }, [locale, message.content]);
 
     const handleMarkdownRender = useCallback(() => {
       // Уведомляем только для последнего сообщения
@@ -130,6 +153,14 @@ export const MessageItem: React.FC<MessageItemProps> = React.memo(
           </div>
           {message.role === 'assistant' && (
             <div className="groq-message__actions">
+              <button
+                onClick={handleCreateNote}
+                className="groq-icon-button"
+                aria-label={t('createNote', locale)}
+                title={t('createNote', locale)}
+              >
+                <FiFilePlus size={14} />
+              </button>
               {/* Кнопка показа think-контента */}
               {hasThinkContent && (
                 <button
