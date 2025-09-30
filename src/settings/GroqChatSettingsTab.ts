@@ -6,7 +6,7 @@ import { createLink, createTextNode, clearElement } from '../utils/domUtils';
 import { t, Locale } from '../localization';
 import type { RateLimitsType } from '../services/groqService';
 import type { GroqChatSettings as GroqChatSettingsType } from '../settings/GroqChatSettings';
-import { fixModelNameCasing } from '../utils/modelUtils';
+import { fixModelNameCasing, groupModelsByOwner, isPreviewModel } from '../utils/modelUtils';
 
 // NOTE: Use canonical settings type imported from '../settings/GroqChatSettings'
 
@@ -141,10 +141,15 @@ export class GroqChatSettingsTab extends PluginSettingTab {
     const linksDiv = thanksBlock.createEl('div', { cls: 'groq-settings-thanks-links' });
 
     // GitHub
-    const githubLink = createLink(linksDiv, '⭐ GitHub', 'https://github.com/semernyakov/polychat', {
-      target: '_blank',
-      rel: 'noopener noreferrer',
-    });
+    const githubLink = createLink(
+      linksDiv,
+      '⭐ GitHub',
+      'https://github.com/semernyakov/polychat',
+      {
+        target: '_blank',
+        rel: 'noopener noreferrer',
+      },
+    );
     githubLink.className = 'groq-settings-thanks-link';
 
     // Telegram
@@ -155,10 +160,15 @@ export class GroqChatSettingsTab extends PluginSettingTab {
     telegramLink.className = 'groq-settings-thanks-link';
 
     // Поддержка
-    const supportLink = createLink(linksDiv, t('supportButton', locale), 'https://yoomoney.ru/fundraise/194GT5A5R07.250321', {
-      target: '_blank',
-      rel: 'noopener noreferrer',
-    });
+    const supportLink = createLink(
+      linksDiv,
+      t('supportButton', locale),
+      'https://yoomoney.ru/fundraise/194GT5A5R07.250321',
+      {
+        target: '_blank',
+        rel: 'noopener noreferrer',
+      },
+    );
     supportLink.className = 'groq-settings-thanks-link groq-settings-thanks-link--primary';
   }
 
@@ -181,7 +191,7 @@ export class GroqChatSettingsTab extends PluginSettingTab {
             await this.plugin.saveSettings();
             this.showSavedIcon(slider.sliderEl);
           }),
-      )
+      );
     return wrapper;
   }
 
@@ -279,15 +289,34 @@ export class GroqChatSettingsTab extends PluginSettingTab {
     let selectEl: HTMLSelectElement;
     const dropdown = modelSetting.addDropdown(dd => {
       selectEl = dd.selectEl;
-      dd.addOption('', locale === 'ru' ? 'Выберите модель' : 'Select a model');
 
-      // Add available models
+      // Add available models with grouping
       if (this.plugin.settings.groqAvailableModels) {
-        for (const model of this.plugin.settings.groqAvailableModels) {
-          if (model.isActive) {
-            dd.addOption(model.id, fixModelNameCasing(model.name));
-          }
-        }
+        // Группируем модели по владельцам
+        const groupedModels = groupModelsByOwner(
+          this.plugin.settings.groqAvailableModels.filter(model => model.isActive),
+        );
+
+        // Добавляем опцию по умолчанию
+        dd.addOption('', locale === 'ru' ? 'Выберите модель' : 'Select a model');
+
+        // Добавляем сгруппированные модели
+        Object.entries(groupedModels).forEach(([owner, models]) => {
+          // Создаем группу для каждого владельца
+          models.forEach(model => {
+            // Формируем отображаемое имя с учетом preview статуса
+            const displayName =
+              fixModelNameCasing(model.name) +
+              (isPreviewModel(model) ? ` (${t('preview', locale)})` : '');
+
+            dd.addOption(model.id, displayName);
+            // Устанавливаем атрибут data-owner для группировки
+            const optionEl = dd.selectEl.querySelector(`option[value="${model.id}"]`);
+            if (optionEl) {
+              optionEl.setAttribute('data-owner', owner);
+            }
+          });
+        });
       }
 
       // Set the selected model
@@ -322,6 +351,8 @@ export class GroqChatSettingsTab extends PluginSettingTab {
                 id: m.id,
                 name: fixModelNameCasing(m.name || m.id),
                 description: m.description || '',
+                owned_by: m.owned_by || undefined,
+                isPreview: isPreviewModel(m),
                 isActive: true,
               }));
 
@@ -337,14 +368,28 @@ export class GroqChatSettingsTab extends PluginSettingTab {
                 });
 
                 if (this.plugin.settings.groqAvailableModels) {
-                  for (const model of this.plugin.settings.groqAvailableModels) {
-                    if (model.isActive) {
-                      selectEl.createEl('option', {
-                        text: fixModelNameCasing(model.name),
+                  // Группируем модели по владельцам
+                  const groupedModels = groupModelsByOwner(
+                    this.plugin.settings.groqAvailableModels.filter(model => model.isActive),
+                  );
+
+                  // Добавляем сгруппированные модели
+                  Object.entries(groupedModels).forEach(([owner, models]) => {
+                    models.forEach(model => {
+                      // Формируем отображаемое имя с учетом preview статуса
+                      const displayName =
+                        fixModelNameCasing(model.name) +
+                        (isPreviewModel(model) ? ` (${t('preview', locale)})` : '');
+
+                      const optionEl = selectEl.createEl('option', {
+                        text: displayName,
                         value: model.id,
                       });
-                    }
-                  }
+
+                      // Устанавливаем атрибут data-owner для группировки
+                      optionEl.setAttribute('data-owner', owner);
+                    });
+                  });
                 }
 
                 // Restore selected value if any
@@ -379,27 +424,14 @@ export class GroqChatSettingsTab extends PluginSettingTab {
       modelsBlock.removeChild(modelsBlock.firstChild);
     }
 
-    // Extended model type for the table
-    interface DisplayModel {
-      id: string;
-      name: string;
-      description?: string;
-      created?: number;
-      owned_by?: string;
-      object?: string;
-      isActive: boolean;
-      category?: string;
-      developer?: { name: string; url?: string };
-      maxTokens?: number;
-      tokensPerMinute?: number;
-      releaseStatus?: string;
-    }
-
     const settings = this.plugin.settings as GroqChatSettingsType;
-    const models: DisplayModel[] = (settings.groqAvailableModels || []).map(model => ({
+    const models = (settings.groqAvailableModels || []).map(model => ({
       ...model,
       isActive: model.isActive !== false, // Default to true if undefined
     }));
+
+    // Группируем модели по владельцам
+    const groupedModels = groupModelsByOwner(models);
 
     // --- Select All / Deselect All buttons ---
     const selectAllBlock = document.createElement('div');
@@ -433,45 +465,82 @@ export class GroqChatSettingsTab extends PluginSettingTab {
     const tbody = modelsTable.createTBody();
     const checkboxes: HTMLInputElement[] = [];
 
-    // Create table rows
-    models.forEach((model, idx) => {
-      const tr = tbody.insertRow();
-      tr.className = 'groq-models-table-row';
+    // Create table rows with grouping
+    let rowIndex = 0;
+    Object.entries(groupedModels).forEach(([owner, ownerModels]) => {
+      // Добавляем заголовок группы
+      const groupHeaderRow = tbody.insertRow();
+      groupHeaderRow.className = 'groq-models-table-group-header';
 
-      // Model name cell
-      const nameCell = tr.insertCell();
-      nameCell.className = 'groq-models-table-cell';
-      nameCell.textContent = fixModelNameCasing(model.name.replace(' (недоступна)', ''));
+      const groupHeaderCell = groupHeaderRow.insertCell();
+      groupHeaderCell.colSpan = 2;
+      groupHeaderCell.textContent = owner;
+      groupHeaderCell.className = 'groq-models-table-group-header-cell';
 
-      // Toggle cell
-      const toggleCell = tr.insertCell();
-      toggleCell.className = 'groq-models-table-cell';
+      // Добавляем модели в группе
+      ownerModels.forEach(model => {
+        const tr = tbody.insertRow();
+        tr.className = 'groq-models-table-row';
 
-      const toggle = document.createElement('input');
-      toggle.type = 'checkbox';
-      toggle.checked = model.isActive;
-      toggle.classList.add('groq-model-toggle');
-      toggle.title =
-        locale === 'ru' ? 'Включить/выключить модель для чата' : 'Enable/disable model for chat';
+        // Model name cell
+        const nameCell = tr.insertCell();
+        nameCell.className = 'groq-models-table-cell';
 
-      toggle.addEventListener('change', async () => {
-        models[idx].isActive = toggle.checked;
-        if (settings.groqAvailableModels) {
-          settings.groqAvailableModels = [...models];
-          await this.plugin.saveSettings();
-          this.showSavedIcon(toggle);
-        }
+        // Формируем отображаемое имя с учетом preview статуса
+        const displayName =
+          fixModelNameCasing(model.name) +
+          (isPreviewModel(model) ? ` (${t('preview', locale)})` : '');
+        nameCell.textContent = displayName;
+
+        // Toggle cell
+        const toggleCell = tr.insertCell();
+        toggleCell.className = 'groq-models-table-cell';
+
+        const toggle = document.createElement('input');
+        toggle.type = 'checkbox';
+        toggle.checked = model.isActive;
+        toggle.classList.add('groq-model-toggle');
+        toggle.title =
+          locale === 'ru' ? 'Включить/выключить модель для чата' : 'Enable/disable model for chat';
+
+        toggle.addEventListener('change', async () => {
+          // Находим модель в массиве и обновляем ее статус
+          const modelIndex = models.findIndex(m => m.id === model.id);
+          if (modelIndex !== -1) {
+            models[modelIndex].isActive = toggle.checked;
+            if (settings.groqAvailableModels) {
+              settings.groqAvailableModels = [...models];
+              await this.plugin.saveSettings();
+              this.showSavedIcon(toggle);
+            }
+          }
+        });
+
+        toggleCell.appendChild(toggle);
+        checkboxes.push(toggle);
+        rowIndex++;
       });
-
-      toggleCell.appendChild(toggle);
-      checkboxes.push(toggle);
     });
 
     // Select all functionality
     btnSelectAll.onclick = async () => {
       checkboxes.forEach((cb, idx) => {
         cb.checked = true;
-        models[idx].isActive = true;
+        // Находим модель по индексу и обновляем ее статус
+        const modelKeys = Object.keys(groupedModels);
+        let currentIdx = 0;
+        for (const owner of modelKeys) {
+          for (const model of groupedModels[owner]) {
+            if (currentIdx === idx) {
+              const modelIndex = models.findIndex(m => m.id === model.id);
+              if (modelIndex !== -1) {
+                models[modelIndex].isActive = true;
+              }
+              break;
+            }
+            currentIdx++;
+          }
+        }
       });
       if (settings.groqAvailableModels) {
         settings.groqAvailableModels = [...models];
@@ -483,7 +552,21 @@ export class GroqChatSettingsTab extends PluginSettingTab {
     btnDeselectAll.onclick = async () => {
       checkboxes.forEach((cb, idx) => {
         cb.checked = false;
-        models[idx].isActive = false;
+        // Находим модель по индексу и обновляем ее статус
+        const modelKeys = Object.keys(groupedModels);
+        let currentIdx = 0;
+        for (const owner of modelKeys) {
+          for (const model of groupedModels[owner]) {
+            if (currentIdx === idx) {
+              const modelIndex = models.findIndex(m => m.id === model.id);
+              if (modelIndex !== -1) {
+                models[modelIndex].isActive = false;
+              }
+              break;
+            }
+            currentIdx++;
+          }
+        }
       });
       if (settings.groqAvailableModels) {
         settings.groqAvailableModels = [...models];
@@ -538,7 +621,7 @@ export class GroqChatSettingsTab extends PluginSettingTab {
         text.inputEl.after(hintSpan);
         text.inputEl.type = 'number';
         text.inputEl.min = '0';
-      })
+      });
 
     if (this.plugin.settings.historyStorageMethod === 'file') {
       const historyFileSetting = new Setting(this.containerEl)
@@ -599,7 +682,7 @@ export class GroqChatSettingsTab extends PluginSettingTab {
               setTimeout(() => icon.remove(), 500);
             }, 1200);
           }),
-      )
+      );
 
     // Шаг подгрузки истории
     new Setting(this.containerEl)
@@ -615,6 +698,6 @@ export class GroqChatSettingsTab extends PluginSettingTab {
           plugin.settings.messageLoadStep = num;
           await this.plugin.saveSettings();
         });
-      })
+      });
   }
 }

@@ -264,24 +264,24 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
         let streamContent = '';
         const handleChunk = (chunk: string) => {
           streamContent += chunk;
-          setMessages(prev => prev.map(msg =>
-            msg.id === tempAssistantMessage.id
-              ? { ...msg, content: streamContent }
-              : msg
-          ));
+          setMessages(prev =>
+            prev.map(msg =>
+              msg.id === tempAssistantMessage.id ? { ...msg, content: streamContent } : msg,
+            ),
+          );
           requestAnimationFrame(() => messageListRef.current?.scrollToBottom());
         };
 
         const assistantMessage = await plugin.groqService.sendMessage(
           trimmedValue,
           selectedModel,
-          handleChunk
+          handleChunk,
         );
 
         // Заменяем временное сообщение на финальное
-        setMessages(prev => prev.map(msg =>
-          msg.id === tempAssistantMessage.id ? assistantMessage : msg
-        ));
+        setMessages(prev =>
+          prev.map(msg => (msg.id === tempAssistantMessage.id ? assistantMessage : msg)),
+        );
         setIsStreaming(false);
         requestAnimationFrame(() => messageListRef.current?.scrollToBottom());
 

@@ -59,24 +59,21 @@ export const MessageList = React.memo(
         setHasPendingNewMessages(value);
       }, []);
 
-      const ensureStrictBottom = useCallback(
-        (el: HTMLDivElement, onSettled?: () => void) => {
-          const clampToBottom = () => {
-            const target = Math.max(0, el.scrollHeight - el.clientHeight);
-            el.scrollTop = target;
-          };
+      const ensureStrictBottom = useCallback((el: HTMLDivElement, onSettled?: () => void) => {
+        const clampToBottom = () => {
+          const target = Math.max(0, el.scrollHeight - el.clientHeight);
+          el.scrollTop = target;
+        };
 
+        clampToBottom();
+        requestAnimationFrame(() => {
           clampToBottom();
           requestAnimationFrame(() => {
             clampToBottom();
-            requestAnimationFrame(() => {
-              clampToBottom();
-              onSettled?.();
-            });
+            onSettled?.();
           });
-        },
-        [],
-      );
+        });
+      }, []);
 
       // Вычисляем видимую "хвостовую" часть
       const visibleMessages = React.useMemo(() => {
@@ -169,7 +166,13 @@ export const MessageList = React.memo(
         }
 
         prevMessagesLengthRef.current = currentLength;
-      }, [isLastMessageVisible, messages.length, scrollToBottom, updatePendingNewMessages, visibleMessages.length]);
+      }, [
+        isLastMessageVisible,
+        messages.length,
+        scrollToBottom,
+        updatePendingNewMessages,
+        visibleMessages.length,
+      ]);
 
       useEffect(() => {
         return () => {
@@ -271,13 +274,13 @@ export const MessageList = React.memo(
       const handleLoadMore = useCallback(() => {
         const el = containerRef.current;
         if (!el) return;
-        
+
         // Сохраняем текущую позицию прокрутки
         const prevScrollTop = el.scrollTop;
-        
+
         // Блокируем автоматическую прокрутку
         scrollLockRef.current = true;
-        
+
         setLimit(prev => {
           const newLimit = Math.min(prev + STEP, messages.length);
           if (newLimit > prev) {
@@ -292,7 +295,7 @@ export const MessageList = React.memo(
             if (el) {
               // Фиксируем позицию прокрутки
               el.scrollTop = prevScrollTop;
-              
+
               // Разблокируем автоматическую прокрутку через более длинную задержку
               setTimeout(() => {
                 scrollLockRef.current = false;
@@ -322,11 +325,7 @@ export const MessageList = React.memo(
       }, [scrollToBottom]);
 
       return (
-        <div
-          className="groq-chat__messages"
-          aria-live="polite"
-          ref={containerRef}
-        >
+        <div className="groq-chat__messages" aria-live="polite" ref={containerRef}>
           {messages.length > 0 ? (
             <>
               {messages.length > visibleMessages.length && (
@@ -341,9 +340,7 @@ export const MessageList = React.memo(
               )}
 
               {visibleMessages.map((message, idx) => (
-                <React.Fragment
-                  key={`${message.id ?? 'msg'}-${message.timestamp ?? '0'}-${idx}`}
-                >
+                <React.Fragment key={`${message.id ?? 'msg'}-${message.timestamp ?? '0'}-${idx}`}>
                   {separatorIndex !== null && idx === separatorIndex && (
                     <div className="groq-history-separator" aria-hidden="true" />
                   )}
@@ -367,7 +364,11 @@ export const MessageList = React.memo(
                   <StreamingIndicator language={language} />
                 </div>
               )}
-              <div ref={bottomSentinelRef} className="groq-chat__bottom-sentinel" aria-hidden="true" />
+              <div
+                ref={bottomSentinelRef}
+                className="groq-chat__bottom-sentinel"
+                aria-hidden="true"
+              />
             </>
           ) : (
             !isLoading && <div className="groq-chat__empty">{t('noMessages', language)}</div>

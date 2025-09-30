@@ -96,8 +96,11 @@ export const MessageInput: React.FC<MessageInputProps> = ({
         </button>
       </div>
       <div className="groq-chat-input__footer">
-        <span id="input-hint" className="groq-message-input__hint" dangerouslySetInnerHTML={{ __html: t('inputHint', locale) }}>
-        </span>
+        <span
+          id="input-hint"
+          className="groq-message-input__hint"
+          dangerouslySetInnerHTML={{ __html: t('inputHint', locale) }}
+        ></span>
         {maxTokens !== undefined && (
           <span
             id="input-counter"

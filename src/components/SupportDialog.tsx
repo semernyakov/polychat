@@ -18,9 +18,7 @@ const SupportThanksBlock: React.FC<{ locale: import('../localization').Locale }>
 
   return (
     <div className="groq-support-thanks">
-      <div className="groq-support-thanks__text">
-        {t('supportDialogThanksTitle', locale)}
-      </div>
+      <div className="groq-support-thanks__text">{t('supportDialogThanksTitle', locale)}</div>
       <div className="groq-support-thanks__buttons">
         <button
           onClick={() => openLink('https://yoomoney.ru/fundraise/194GT5A5R07.250321')}

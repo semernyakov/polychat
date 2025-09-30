@@ -19,7 +19,11 @@ export type RateLimitsType = {
 interface GroqServiceMethods {
   updateApiKey: (apiKey: string) => void;
   validateApiKey: (apiKey: string) => Promise<boolean>;
-  sendMessage: (content: string, model: string, onChunk?: (chunk: string) => void) => Promise<Message>;
+  sendMessage: (
+    content: string,
+    model: string,
+    onChunk?: (chunk: string) => void,
+  ) => Promise<Message>;
   getAvailableModels: () => Promise<{ id: string; name: string; description?: string }[]>;
   getAvailableModelsWithLimits: (forceRefresh?: boolean) => Promise<{
     models: GroqModelInfo[];
@@ -73,7 +77,11 @@ export class GroqService implements GroqServiceMethods {
     }
   }
 
-  public async sendMessage(content: string, model: string, onChunk?: (chunk: string) => void): Promise<Message> {
+  public async sendMessage(
+    content: string,
+    model: string,
+    onChunk?: (chunk: string) => void,
+  ): Promise<Message> {
     if (!content.trim()) throw new Error(t('emptyMessage'));
     if (!model || !this.plugin.settings.groqAvailableModels?.some(m => m.id === model)) {
       throw new Error(t('modelNotAvailable').replace('{{model}}', model));
@@ -120,9 +128,8 @@ export class GroqService implements GroqServiceMethods {
         content: fullContent,
         timestamp: Date.now(),
         isStreaming: false,
-        hasThinkContent: false
+        hasThinkContent: false,
       };
-
     } catch (error) {
       throw this.handleApiError(error);
     }
@@ -201,6 +208,11 @@ export class GroqService implements GroqServiceMethods {
           typeof m.max_completion_tokens === 'number' ? m.max_completion_tokens : undefined,
         active: typeof m.active === 'boolean' ? m.active : undefined,
         releaseStatus: m.release_status || m.releaseStatus || undefined,
+        owned_by: m.owned_by || undefined, // Добавляем информацию о владельце
+        isPreview:
+          (m.release_status || m.releaseStatus) === 'preview' ||
+          (m.name && m.name.toLowerCase().includes('preview')) ||
+          (m.id && m.id.toLowerCase().includes('preview')), // Определяем, является ли модель preview
       }));
 
       // ВРЕМЕННО: логируем все поля моделей для отладки

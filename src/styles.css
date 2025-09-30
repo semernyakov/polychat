@@ -218,16 +218,14 @@
 }
 
 .groq-message--error.groq-message--user {
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--text-error, #ef5350) 35%, transparent),
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--text-error, #ef5350) 35%, transparent),
     0 4px 10px rgba(239, 83, 80, 0.25);
 }
 
 .groq-message--error-maxtokens {
-  background: linear-gradient(
-      135deg,
-      rgba(239, 83, 80, 0.12),
-      rgba(239, 83, 80, 0.04)
-    ),
+  background:
+    linear-gradient(135deg, rgba(239, 83, 80, 0.12), rgba(239, 83, 80, 0.04)),
     var(--background-primary);
 }
 
@@ -1112,7 +1110,7 @@
 }
 
 .groq-model-info__header {
-	padding-bottom: 1em;
+  padding-bottom: 1em;
 }
 
 /* --- Спинер --- */
@@ -1422,7 +1420,6 @@
   border-radius: var(--radius-s, 2px);
 }
 
-
 /* --- Блок благодарности в настройках --- */
 .groq-settings-thanks {
   margin: 1.5em 0 1em 0;
@@ -1486,7 +1483,6 @@
   background-color: var(--interactive-accent-hover);
   border-color: var(--interactive-accent-hover);
 }
-
 
 /* --- Утилитарные текстовые стили --- */
 .groq-small-text {

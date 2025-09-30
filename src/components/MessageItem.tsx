@@ -135,7 +135,10 @@ export const MessageItem: React.FC<MessageItemProps> = React.memo(
     }, [isMaxTokensError, showRaw]);
 
     return (
-      <div className={messageClassName} data-error-label={isMaxTokensError ? t('errorLabel', locale) : undefined}>
+      <div
+        className={messageClassName}
+        data-error-label={isMaxTokensError ? t('errorLabel', locale) : undefined}
+      >
         <div className="groq-message__header">
           <div className="groq-message__meta">
             <span className="groq-message__role">

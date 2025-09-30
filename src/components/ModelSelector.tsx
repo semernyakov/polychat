@@ -3,13 +3,15 @@ import '../styles.css'; // Используем единый style.css
 import { GroqPluginInterface } from '../types/plugin';
 import { toast } from 'react-toastify'; // Импортируем toast
 import { t, Locale } from '../localization';
-import { fixModelNameCasing } from '../utils/modelUtils';
+import { fixModelNameCasing, groupModelsByOwner, isPreviewModel } from '../utils/modelUtils';
 
 // Используем DynamicModelInfo для моделей
 interface DynamicModelInfo {
   id: string;
   name: string;
   description?: string;
+  owned_by?: string;
+  isPreview?: boolean;
 }
 
 export interface ModelSelectorProps {
@@ -84,15 +86,45 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
         className="groq-select"
         aria-label={t('chooseModel', locale)}
       >
-        {availableModels.map(modelInfo => {
-          const displayName = fixModelNameCasing(modelInfo.name);
+        {(() => {
+          // Группируем модели по владельцам
+          const groupedModels = groupModelsByOwner(availableModels);
 
-          return (
-            <option key={modelInfo.id} value={modelInfo.id}>
-              {displayName}
-            </option>
+          // Создаем массив опций для select
+          const options = [];
+
+          // Добавляем опцию по умолчанию
+          options.push(
+            <option key="" value="">
+              {locale === 'ru' ? 'Выберите модель' : 'Select a model'}
+            </option>,
           );
-        })}
+
+          // Добавляем сгруппированные модели
+          Object.entries(groupedModels).forEach(([owner, models]) => {
+            // Создаем optgroup для каждого владельца
+            const optgroup = (
+              <optgroup key={owner} label={owner}>
+                {models.map(modelInfo => {
+                  // Формируем отображаемое имя с учетом preview статуса
+                  const displayName =
+                    fixModelNameCasing(modelInfo.name) +
+                    (isPreviewModel(modelInfo) ? ` (${t('preview', locale)})` : '');
+
+                  return (
+                    <option key={modelInfo.id} value={modelInfo.id}>
+                      {displayName}
+                    </option>
+                  );
+                })}
+              </optgroup>
+            );
+
+            options.push(optgroup);
+          });
+
+          return options;
+        })()}
       </select>
     </div>
   );
