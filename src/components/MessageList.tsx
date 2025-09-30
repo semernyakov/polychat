@@ -206,7 +206,8 @@ export const MessageList = React.memo(
         if (!el) return;
 
         resizeObserverRef.current = new ResizeObserver(() => {
-          if (hasPendingNewMessagesRef.current) {
+          // Не скроллим вниз, если есть непрочитанные сообщения или пользователь не внизу
+          if (hasPendingNewMessagesRef.current || !isAtBottomRef.current) {
             return;
           }
           scrollToBottom({ smooth: false, force: true });
@@ -269,8 +270,14 @@ export const MessageList = React.memo(
 
       const handleLoadMore = useCallback(() => {
         const el = containerRef.current;
-        const prevScrollHeight = el?.scrollHeight || 0;
-
+        if (!el) return;
+        
+        // Сохраняем текущую позицию прокрутки
+        const prevScrollTop = el.scrollTop;
+        
+        // Блокируем автоматическую прокрутку
+        scrollLockRef.current = true;
+        
         setLimit(prev => {
           const newLimit = Math.min(prev + STEP, messages.length);
           if (newLimit > prev) {
@@ -279,12 +286,19 @@ export const MessageList = React.memo(
           return newLimit;
         });
 
-        // Сохраняем позицию прокрутки после загрузки
+        // Ждем два кадра анимации для полного обновления DOM
         requestAnimationFrame(() => {
-          if (el && prevScrollHeight > 0) {
-            const newScrollHeight = el.scrollHeight;
-            el.scrollTop = el.scrollTop + (newScrollHeight - prevScrollHeight);
-          }
+          requestAnimationFrame(() => {
+            if (el) {
+              // Фиксируем позицию прокрутки
+              el.scrollTop = prevScrollTop;
+              
+              // Разблокируем автоматическую прокрутку через более длинную задержку
+              setTimeout(() => {
+                scrollLockRef.current = false;
+              }, 300); // Увеличиваем задержку до 300ms
+            }
+          });
         });
       }, [STEP, messages.length]);
 
@@ -301,7 +315,8 @@ export const MessageList = React.memo(
 
       const handleLastMessageRender = useCallback(() => {
         // После рендеринга markdown всегда докручиваем до низа (без задержек)
-        if (!isInitialRenderRef.current && !scrollLockRef.current) {
+        // Но только если пользователь находится у нижней границы
+        if (!isInitialRenderRef.current && !scrollLockRef.current && isAtBottomRef.current) {
           scrollToBottom({ smooth: false, force: true });
         }
       }, [scrollToBottom]);
