@@ -448,7 +448,7 @@
   width: 100%;
   border-collapse: collapse;
   margin: 0.5em 0;
-  font-size: 0.9em;
+  font-size: inherit;
 }
 
 .groq-markdown-content th,
@@ -456,6 +456,7 @@
   padding: 0.5em;
   border: 1px solid var(--background-modifier-border);
   text-align: left;
+  font-size: inherit;
 }
 
 .groq-markdown-content th {
@@ -1104,7 +1105,7 @@
     font-size: 0.95em;
   }
   .groq-markdown-content table {
-    font-size: 0.85em;
+    font-size: inherit;
   }
 }
 
