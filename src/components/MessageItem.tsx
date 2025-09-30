@@ -42,6 +42,17 @@ export const MessageItem: React.FC<MessageItemProps> = React.memo(
 
     const content = useMemo(() => message.content || '', [message.content]);
 
+    const isMaxTokensError = useMemo(() => {
+      if (message.role !== 'assistant') return false;
+      const normalized = content.toLowerCase();
+      return (
+        /error:\s*400/.test(normalized) &&
+        normalized.includes(
+          '"max_tokens must be less than or equal to 512, the maximum value for max_tokens is less than the context_window for this model"',
+        )
+      );
+    }, [content, message.role]);
+
     // Извлекаем think-контент
     const { thinkContent, mainContent } = useMemo(() => extractThinkContent(content), [content]);
 
@@ -83,8 +94,22 @@ export const MessageItem: React.FC<MessageItemProps> = React.memo(
       if (message.isStreaming) {
         classes.push('groq-message--streaming');
       }
+      if (isMaxTokensError) {
+        classes.push('groq-message--error', 'groq-message--error-maxtokens');
+      }
       return classes.join(' ');
-    }, [message.role, message.isStreaming]);
+    }, [isMaxTokensError, message.role, message.isStreaming]);
+
+    const contentClassName = React.useMemo(() => {
+      const classes = ['groq-message__content'];
+      if (showRaw) {
+        classes.push('groq-message__content--raw');
+      }
+      if (isMaxTokensError) {
+        classes.push('groq-message__content--error');
+      }
+      return classes.join(' ');
+    }, [isMaxTokensError, showRaw]);
 
     return (
       <div className={messageClassName}>
@@ -164,7 +189,7 @@ export const MessageItem: React.FC<MessageItemProps> = React.memo(
         )}
 
         {/* Основной контент сообщения */}
-        <div className={`groq-message__content ${showRaw ? 'groq-message__content--raw' : ''}`}>
+        <div className={contentClassName}>
           {showRaw ? (
             <pre aria-label={t('rawContent', locale)}>
               <code>{mainContent}</code>

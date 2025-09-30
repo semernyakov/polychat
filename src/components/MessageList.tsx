@@ -28,6 +28,8 @@ export interface MessageListHandles {
   forceUpdate: () => void;
 }
 
+const SCROLL_LOCK_CLASS = 'groq-chat__messages--scroll-locked';
+
 export const MessageList = React.memo(
   forwardRef<MessageListHandles, MessageListProps>(
     ({ messages, isLoading, isStreaming = false, language = 'en', tailLimit, tailStep }, ref) => {
@@ -38,8 +40,8 @@ export const MessageList = React.memo(
       const resizeObserverRef = useRef<ResizeObserver | null>(null);
       const initialScrollDoneRef = useRef<boolean>(false);
       const scrollLockRef = useRef<boolean>(false);
+      const scrollTimeoutRef = useRef<number | null>(null);
 
-      const NEAR_BOTTOM_THRESHOLD = 100; // px
       const DEFAULT_TAIL_LIMIT = Math.max(1, tailLimit ?? 10);
       const [limit, setLimit] = useState<number>(DEFAULT_TAIL_LIMIT);
       const STEP = Math.max(1, tailStep ?? 20);
@@ -47,6 +49,25 @@ export const MessageList = React.memo(
       const [separatorIndex, setSeparatorIndex] = useState<number | null>(null);
       const [showNewMessageNotice, setShowNewMessageNotice] = useState<boolean>(false);
       const [isNoticeExiting, setIsNoticeExiting] = useState<boolean>(false);
+
+      const ensureStrictBottom = useCallback(
+        (el: HTMLDivElement, onSettled?: () => void) => {
+          const clampToBottom = () => {
+            const target = Math.max(0, el.scrollHeight - el.clientHeight);
+            el.scrollTop = target;
+          };
+
+          clampToBottom();
+          requestAnimationFrame(() => {
+            clampToBottom();
+            requestAnimationFrame(() => {
+              clampToBottom();
+              onSettled?.();
+            });
+          });
+        },
+        [],
+      );
 
       // Вычисляем видимую "хвостовую" часть
       const visibleMessages = React.useMemo(() => {
@@ -64,36 +85,49 @@ export const MessageList = React.memo(
       }, []);
 
       // Прокрутка вниз с гарантированным позиционированием (без «скачков»)
-      const scrollToBottom = useCallback((opts?: { smooth?: boolean; force?: boolean }) => {
-        const el = containerRef.current;
-        if (!el) return;
+      const scrollToBottom = useCallback(
+        (opts?: { smooth?: boolean; force?: boolean }) => {
+          const el = containerRef.current;
+          if (!el) return;
 
-        const smooth = opts?.smooth ?? true;
-        const force = opts?.force ?? false;
+          const smooth = opts?.smooth ?? true;
+          const force = opts?.force ?? false;
 
-        if (force || isAtBottomRef.current) {
+          if (!(force || isAtBottomRef.current)) {
+            return;
+          }
+
           scrollLockRef.current = true;
 
-          const target = Math.max(0, el.scrollHeight - el.clientHeight);
+          if (scrollTimeoutRef.current !== null) {
+            window.clearTimeout(scrollTimeoutRef.current);
+            scrollTimeoutRef.current = null;
+          }
 
           if (!smooth) {
-            // Двойная установка для гарантии (DOM может дорисоваться асинхронно)
-            el.scrollTop = target;
-            requestAnimationFrame(() => {
-              el.scrollTop = target;
+            el.classList.add(SCROLL_LOCK_CLASS);
+
+            ensureStrictBottom(el, () => {
+              el.classList.remove(SCROLL_LOCK_CLASS);
               scrollLockRef.current = false;
             });
           } else {
+            const target = Math.max(0, el.scrollHeight - el.clientHeight);
             el.scrollTo({ top: target, behavior: 'smooth' });
-            setTimeout(() => {
-              scrollLockRef.current = false;
-            }, 300);
+
+            scrollTimeoutRef.current = window.setTimeout(() => {
+              ensureStrictBottom(el, () => {
+                scrollLockRef.current = false;
+              });
+              scrollTimeoutRef.current = null;
+            }, 320);
           }
 
           isAtBottomRef.current = true;
           setShowNewMessageNotice(false);
-        }
-      }, []);
+        },
+        [ensureStrictBottom],
+      );
 
       // Initial scroll - только при первом рендере с сообщениями
       useLayoutEffect(() => {
@@ -126,6 +160,15 @@ export const MessageList = React.memo(
 
         prevMessagesLengthRef.current = currentLength;
       }, [messages.length, scrollToBottom, visibleMessages.length]);
+
+      useEffect(() => {
+        return () => {
+          if (scrollTimeoutRef.current !== null) {
+            window.clearTimeout(scrollTimeoutRef.current);
+            scrollTimeoutRef.current = null;
+          }
+        };
+      }, []);
 
       // Отслеживание положения скролла
       useEffect(() => {
