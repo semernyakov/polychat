@@ -3,6 +3,7 @@ import '../styles.css'; // Используем единый style.css
 import { GroqPluginInterface } from '../types/plugin';
 import { toast } from 'react-toastify'; // Импортируем toast
 import { t, Locale } from '../localization';
+import { fixModelNameCasing } from '../utils/modelUtils';
 
 // Используем DynamicModelInfo для моделей
 interface DynamicModelInfo {
@@ -84,7 +85,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
         aria-label={t('chooseModel', locale)}
       >
         {availableModels.map(modelInfo => {
-          const displayName = `${modelInfo.name}`;
+          const displayName = fixModelNameCasing(modelInfo.name);
 
           return (
             <option key={modelInfo.id} value={modelInfo.id}>

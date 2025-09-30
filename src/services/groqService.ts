@@ -3,6 +3,7 @@ import { GroqPluginInterface } from '../types/plugin';
 import { Message } from '../types/types';
 import type { GroqModelInfo } from '../settings/GroqChatSettings';
 import { Notice, requestUrl } from 'obsidian';
+import { fixModelNameCasing } from '../utils/modelUtils';
 
 // Тип для лимитов
 export type RateLimitsType = {
@@ -192,7 +193,7 @@ export class GroqService implements GroqServiceMethods {
       });
       const models = sorted.map((m: any) => ({
         id: m.id,
-        name: m.name || m.id,
+        name: fixModelNameCasing(m.name || m.id),
         description: m.description || '',
         developer: { name: m.owned_by || '—' },
         maxTokens:

@@ -1111,6 +1111,10 @@
   overflow: hidden !important;
 }
 
+.groq-model-info__header {
+	padding-bottom: 1em;
+}
+
 /* --- Спинер --- */
 .groq-spinner--visible {
   display: inline-block;

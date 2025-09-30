@@ -23,6 +23,7 @@ import { PluginSettingsProvider } from '../context/PluginSettingsContext';
 import { t, Locale } from '../localization';
 // import { DEFAULT_MODEL } from '../types/models'; // Удалено, если не используется
 import { GroqModel, ModelCategory, ModelReleaseStatus } from '../types/types';
+import { fixModelNameCasing } from '../utils/modelUtils';
 
 interface ChatPanelProps {
   plugin: GroqPluginInterface;
@@ -312,7 +313,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
       id: (Object.values(GroqModel).includes(model.id as GroqModel)
         ? model.id
         : GroqModel.LLAMA3_70B) as GroqModel,
-      name: model.name,
+      name: fixModelNameCasing(model.name),
       description: model.description || '',
       category: (model.category as ModelCategory) || 'text',
       developer: model.developer || { name: '' },

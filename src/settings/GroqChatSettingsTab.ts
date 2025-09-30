@@ -6,6 +6,7 @@ import { createLink, createTextNode, clearElement } from '../utils/domUtils';
 import { t, Locale } from '../localization';
 import type { RateLimitsType } from '../services/groqService';
 import type { GroqChatSettings as GroqChatSettingsType } from '../settings/GroqChatSettings';
+import { fixModelNameCasing } from '../utils/modelUtils';
 
 // NOTE: Use canonical settings type imported from '../settings/GroqChatSettings'
 
@@ -284,7 +285,7 @@ export class GroqChatSettingsTab extends PluginSettingTab {
       if (this.plugin.settings.groqAvailableModels) {
         for (const model of this.plugin.settings.groqAvailableModels) {
           if (model.isActive) {
-            dd.addOption(model.id, model.name);
+            dd.addOption(model.id, fixModelNameCasing(model.name));
           }
         }
       }
@@ -319,7 +320,7 @@ export class GroqChatSettingsTab extends PluginSettingTab {
               const settings = this.plugin.settings as any;
               settings.groqAvailableModels = apiModels.map((m: any) => ({
                 id: m.id,
-                name: m.name || m.id,
+                name: fixModelNameCasing(m.name || m.id),
                 description: m.description || '',
                 isActive: true,
               }));
@@ -339,7 +340,7 @@ export class GroqChatSettingsTab extends PluginSettingTab {
                   for (const model of this.plugin.settings.groqAvailableModels) {
                     if (model.isActive) {
                       selectEl.createEl('option', {
-                        text: model.name,
+                        text: fixModelNameCasing(model.name),
                         value: model.id,
                       });
                     }
@@ -440,7 +441,7 @@ export class GroqChatSettingsTab extends PluginSettingTab {
       // Model name cell
       const nameCell = tr.insertCell();
       nameCell.className = 'groq-models-table-cell';
-      nameCell.textContent = model.name.replace(' (недоступна)', '');
+      nameCell.textContent = fixModelNameCasing(model.name.replace(' (недоступна)', ''));
 
       // Toggle cell
       const toggleCell = tr.insertCell();

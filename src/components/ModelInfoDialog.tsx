@@ -3,6 +3,7 @@ import { FiX } from 'react-icons/fi';
 import { ModelInfo } from '../types/types';
 import { t, Locale } from '../localization';
 import '../styles.css';
+import { fixModelNameCasing } from '../utils/modelUtils';
 
 interface ModelInfoDialogProps {
   isOpen: boolean;
@@ -100,7 +101,7 @@ export const ModelInfoDialog: React.FC<ModelInfoDialogProps> = ({
         <div className="groq-dialog-content">
           <div className="groq-model-info">
             <div className="groq-model-info__header">
-              <h3>{currentModelInfo.name || currentModelInfo.id}</h3>
+              <h3>{fixModelNameCasing(currentModelInfo.name || currentModelInfo.id)}</h3>
             </div>
 
             <div className="groq-model-info__details">
