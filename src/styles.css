@@ -589,6 +589,36 @@
   color: var(--text-normal);
 }
 
+/* Кнопка показа исходного кода */
+.groq-code-show-original {
+  /* Стили аналогичны groq-code-copy */
+}
+
+.groq-code-show-original.is-active {
+  background-color: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+/* Кнопка показа исходного кода */
+.groq-code-show-original {
+  /* Стили аналогичны groq-code-copy */
+}
+
+.groq-code-show-original.is-active {
+  background-color: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+/* Кнопка показа исходного кода */
+.groq-code-show-original {
+  /* Стили аналогичны groq-code-copy */
+}
+
+.groq-code-show-original.is-active {
+  background-color: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
 /* ===== КНОПКИ И ИКОНКИ ===== */
 
 /* --- Базовые стили кнопок --- */
