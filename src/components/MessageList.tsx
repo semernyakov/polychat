@@ -34,6 +34,7 @@ export const MessageList = React.memo(
   forwardRef<MessageListHandles, MessageListProps>(
     ({ messages, isLoading, isStreaming = false, language = 'en', tailLimit, tailStep }, ref) => {
       const containerRef = useRef<HTMLDivElement>(null);
+      const bottomSentinelRef = useRef<HTMLDivElement>(null);
       const isAtBottomRef = useRef<boolean>(true);
       const prevMessagesLengthRef = useRef<number>(messages.length);
       const isInitialRenderRef = useRef<boolean>(true);
@@ -41,6 +42,7 @@ export const MessageList = React.memo(
       const initialScrollDoneRef = useRef<boolean>(false);
       const scrollLockRef = useRef<boolean>(false);
       const scrollTimeoutRef = useRef<number | null>(null);
+      const hasPendingNewMessagesRef = useRef<boolean>(false);
 
       const DEFAULT_TAIL_LIMIT = Math.max(1, tailLimit ?? 10);
       const [limit, setLimit] = useState<number>(DEFAULT_TAIL_LIMIT);
@@ -49,6 +51,13 @@ export const MessageList = React.memo(
       const [separatorIndex, setSeparatorIndex] = useState<number | null>(null);
       const [showNewMessageNotice, setShowNewMessageNotice] = useState<boolean>(false);
       const [isNoticeExiting, setIsNoticeExiting] = useState<boolean>(false);
+      const [isLastMessageVisible, setIsLastMessageVisible] = useState<boolean>(true);
+      const [hasPendingNewMessages, setHasPendingNewMessages] = useState<boolean>(false);
+
+      const updatePendingNewMessages = useCallback((value: boolean) => {
+        hasPendingNewMessagesRef.current = value;
+        setHasPendingNewMessages(value);
+      }, []);
 
       const ensureStrictBottom = useCallback(
         (el: HTMLDivElement, onSettled?: () => void) => {
@@ -124,9 +133,11 @@ export const MessageList = React.memo(
           }
 
           isAtBottomRef.current = true;
+          updatePendingNewMessages(false);
           setShowNewMessageNotice(false);
+          setIsNoticeExiting(false);
         },
-        [ensureStrictBottom],
+        [ensureStrictBottom, updatePendingNewMessages],
       );
 
       // Initial scroll - только при первом рендере с сообщениями
@@ -151,15 +162,14 @@ export const MessageList = React.memo(
           if (isAtBottomRef.current) {
             // Пользователь находился у нижней границы — жестко прокручиваем вниз синхронно
             scrollToBottom({ smooth: false, force: true });
-            setShowNewMessageNotice(false);
-          } else if (messages.length > visibleMessages.length) {
-            // Пользователь пролистал выше — показываем уведомление о новых сообщениях
-            setShowNewMessageNotice(true);
+            updatePendingNewMessages(false);
+          } else if (!isLastMessageVisible) {
+            updatePendingNewMessages(true);
           }
         }
 
         prevMessagesLengthRef.current = currentLength;
-      }, [messages.length, scrollToBottom, visibleMessages.length]);
+      }, [isLastMessageVisible, messages.length, scrollToBottom, updatePendingNewMessages, visibleMessages.length]);
 
       useEffect(() => {
         return () => {
@@ -179,23 +189,16 @@ export const MessageList = React.memo(
           // Не обновляем состояние если скролл заблокирован
           if (scrollLockRef.current) return;
 
-          const wasAtBottom = isAtBottomRef.current;
           isAtBottomRef.current = checkIsNearBottom();
-
-          // Если пользователь прокрутил до самого низа, скрываем уведомление
           if (isAtBottomRef.current) {
-            setShowNewMessageNotice(false);
-          }
-          // Если пользователь был внизу и прокрутил вверх - показываем уведомление
-          else if (wasAtBottom && messages.length > visibleMessages.length) {
-            setShowNewMessageNotice(true);
+            updatePendingNewMessages(false);
           }
         };
 
         handleScroll(); // Initial check
         el.addEventListener('scroll', handleScroll, { passive: true });
         return () => el.removeEventListener('scroll', handleScroll);
-      }, [checkIsNearBottom, messages.length, visibleMessages.length]);
+      }, [checkIsNearBottom, messages.length, updatePendingNewMessages, visibleMessages.length]);
 
       // Resize observer для пересчета макета
       useEffect(() => {
@@ -203,7 +206,9 @@ export const MessageList = React.memo(
         if (!el) return;
 
         resizeObserverRef.current = new ResizeObserver(() => {
-          // По требованию: при изменении размеров окна всегда скроллим в самый низ
+          if (hasPendingNewMessagesRef.current) {
+            return;
+          }
           scrollToBottom({ smooth: false, force: true });
         });
 
@@ -212,6 +217,39 @@ export const MessageList = React.memo(
           resizeObserverRef.current?.disconnect();
         };
       }, [scrollToBottom]);
+
+      useEffect(() => {
+        const container = containerRef.current;
+        const sentinel = bottomSentinelRef.current;
+        if (!container || !sentinel) return;
+
+        const observer = new IntersectionObserver(
+          entries => {
+            const entry = entries[0];
+            const visible = Boolean(entry?.isIntersecting || entry?.intersectionRatio);
+            setIsLastMessageVisible(visible);
+
+            if (visible) {
+              isAtBottomRef.current = true;
+              updatePendingNewMessages(false);
+            }
+          },
+          {
+            root: container,
+            threshold: 0.01,
+          },
+        );
+
+        observer.observe(sentinel);
+
+        return () => {
+          observer.disconnect();
+        };
+      }, [visibleMessages.length, updatePendingNewMessages]);
+
+      useEffect(() => {
+        setShowNewMessageNotice(hasPendingNewMessages && !isLastMessageVisible);
+      }, [hasPendingNewMessages, isLastMessageVisible]);
 
       useImperativeHandle(ref, () => ({
         scrollToTop: () => {
@@ -255,10 +293,11 @@ export const MessageList = React.memo(
         setIsNoticeExiting(true);
         setTimeout(() => {
           scrollToBottom({ smooth: true, force: true });
+          updatePendingNewMessages(false);
           setShowNewMessageNotice(false);
           setIsNoticeExiting(false);
         }, 150); // Длительность анимации
-      }, [scrollToBottom]);
+      }, [scrollToBottom, updatePendingNewMessages]);
 
       const handleLastMessageRender = useCallback(() => {
         // После рендеринга markdown всегда докручиваем до низа (без задержек)
@@ -313,6 +352,7 @@ export const MessageList = React.memo(
                   <StreamingIndicator language={language} />
                 </div>
               )}
+              <div ref={bottomSentinelRef} className="groq-chat__bottom-sentinel" aria-hidden="true" />
             </>
           ) : (
             !isLoading && <div className="groq-chat__empty">{t('noMessages', language)}</div>
