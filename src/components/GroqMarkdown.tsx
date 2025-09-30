@@ -248,12 +248,7 @@ export const GroqMarkdown: React.FC<GroqMarkdownProps> = ({ content, app, onRend
     <div className="groq-message__content-wrapper">
       <div
         ref={containerRef}
-        className="groq-markdown-content markdown-rendered"
-        style={{
-          wordWrap: 'break-word',
-          overflowWrap: 'break-word',
-          maxWidth: '100%',
-        }}
+        className="groq-markdown-content markdown-rendered groq-markdown-content-wrapper"
       />
     </div>
   );
@@ -268,13 +263,7 @@ export const GroqMarkdownLegacy: React.FC<GroqMarkdownLegacyProps> = ({ content 
   return (
     <div className="groq-message__content-wrapper">
       <div
-        className="groq-markdown-content markdown-preview"
-        style={{
-          whiteSpace: 'pre-wrap',
-          wordWrap: 'break-word',
-          overflowWrap: 'break-word',
-          maxWidth: '100%',
-        }}
+        className="groq-markdown-content markdown-preview groq-markdown-content-legacy"
         dangerouslySetInnerHTML={{ __html: simpleMarkdownRender(content) }}
       />
     </div>

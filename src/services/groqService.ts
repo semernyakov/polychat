@@ -4,6 +4,7 @@ import { Message } from '../types/types';
 import type { GroqModelInfo } from '../settings/GroqChatSettings';
 import { Notice, requestUrl } from 'obsidian';
 import { fixModelNameCasing } from '../utils/modelUtils';
+import { t } from '../localization';
 
 // Тип для лимитов
 export type RateLimitsType = {
@@ -73,14 +74,14 @@ export class GroqService implements GroqServiceMethods {
   }
 
   public async sendMessage(content: string, model: string, onChunk?: (chunk: string) => void): Promise<Message> {
-    if (!content.trim()) throw new Error('Сообщение не может быть пустым');
+    if (!content.trim()) throw new Error(t('emptyMessage'));
     if (!model || !this.plugin.settings.groqAvailableModels?.some(m => m.id === model)) {
-      throw new Error(`Модель "${model}" не доступна`);
+      throw new Error(t('modelNotAvailable').replace('{{model}}', model));
     }
     try {
       if (this.rateLimits.remainingRequests === 0 || this.rateLimits.remainingTokens === 0) {
-        new Notice('Превышен лимит запросов или токенов. Попробуйте позже.');
-        throw new Error('Лимиты запросов исчерпаны');
+        new Notice(t('rateLimitExceeded'));
+        throw new Error(t('rateLimitsExhausted'));
       }
 
       const streamResponse = await this.retryRequest(() =>
@@ -222,17 +223,17 @@ export class GroqService implements GroqServiceMethods {
   public handleApiError(error: unknown): Error {
     if (error instanceof Error) {
       if (error.message.includes('401')) {
-        return new Error('Неверный API ключ. Проверьте настройки.');
+        return new Error(t('invalidApiKey'));
       } else if (error.message.includes('429')) {
-        return new Error('Превышен лимит запросов. Попробуйте позже.');
+        return new Error(t('rateLimitExceeded'));
       } else if (error.message.includes('500')) {
-        return new Error('Ошибка сервера. Пожалуйста, попробуйте позже.');
+        return new Error(t('serverError'));
       } else if (error.message.includes('network')) {
-        return new Error('Ошибка сети. Проверьте подключение к интернету.');
+        return new Error(t('networkError'));
       }
       return error;
     }
-    return new Error('Произошла неизвестная ошибка');
+    return new Error(t('unknownError'));
   }
 
   public async retryRequest<T>(fn: () => Promise<T>, retries = 3, delay = 1000): Promise<T> {

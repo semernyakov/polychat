@@ -1,4 +1,5 @@
 import { GroqApiError } from '../types/api';
+import { t } from '../localization';
 
 export const apiUtils = {
   isApiError(error: unknown): error is GroqApiError {
@@ -12,9 +13,9 @@ export const apiUtils = {
 
   formatApiError(error: unknown): string {
     if (this.isApiError(error)) {
-      return `API ошибка: ${error.error.message}`;
+      return `${t('apiError')}: ${error.error.message}`;
     }
-    return `API ошибка: ${error instanceof Error ? error.message : 'Неизвестная ошибка'}`;
+    return `${t('apiError')}: ${error instanceof Error ? error.message : t('unknownError')}`;
   },
 
   createApiHeaders(apiKey: string): Headers {

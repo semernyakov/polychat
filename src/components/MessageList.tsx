@@ -315,7 +315,7 @@ export const MessageList = React.memo(
           {messages.length > 0 ? (
             <>
               {messages.length > visibleMessages.length && (
-                <div style={{ marginBottom: '12px', textAlign: 'center' }}>
+                <div className="groq-load-more-container">
                   <button
                     className="groq-button groq-dialog-secondary-button"
                     onClick={handleLoadMore}

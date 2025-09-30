@@ -198,7 +198,7 @@
 }
 
 .groq-message--error::before {
-  content: 'Ошибка';
+  content: attr(data-error-label);
   position: absolute;
   top: -10px;
   left: 12px;
@@ -1655,4 +1655,27 @@
 
 .groq-support-thanks__button svg {
   flex-shrink: 0;
+}
+
+/* ===== INLINE STYLES REPLACEMENT ===== */
+
+/* --- MessageList load more button container --- */
+.groq-load-more-container {
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+/* --- Markdown content wrapper --- */
+.groq-markdown-content-wrapper {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
+}
+
+/* --- Markdown content legacy wrapper --- */
+.groq-markdown-content-legacy {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
 }
