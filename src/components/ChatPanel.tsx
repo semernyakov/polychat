@@ -251,7 +251,8 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
 
         setMessages(prev => [...prev, userMessage, tempAssistantMessage]);
         setIsStreaming(true);
-        requestAnimationFrame(() => messageListRef.current?.scrollToBottom());
+        // Устанавливаем флаг блокировки скролла во время стриминга
+        // Скролл будет выполнен автоматически через onRenderComplete после рендеринга markdown
 
         // Обработчик для потоковых чанков
         let streamContent = '';
@@ -262,7 +263,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
               msg.id === tempAssistantMessage.id ? { ...msg, content: streamContent } : msg,
             ),
           );
-          requestAnimationFrame(() => messageListRef.current?.scrollToBottom());
+          // Скролл будет выполнен автоматически через onRenderComplete
         };
 
         const assistantMessage = await plugin.groqService.sendMessage(
@@ -271,14 +272,17 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
           handleChunk,
         );
 
-        // Заменяем временное сообщение на финальное
+        // Обновляем временное сообщение финальным контентом вместо замены
+        const finalMessage = { ...tempAssistantMessage, content: assistantMessage.content, isStreaming: false };
         setMessages(prev =>
-          prev.map(msg => (msg.id === tempAssistantMessage.id ? assistantMessage : msg)),
+          prev.map(msg =>
+            msg.id === tempAssistantMessage.id ? finalMessage : msg,
+          ),
         );
         setIsStreaming(false);
-        requestAnimationFrame(() => messageListRef.current?.scrollToBottom());
+        // Скролл будет выполнен автоматически через onRenderComplete
 
-        await plugin.historyService.addMessage(assistantMessage);
+        await plugin.historyService.addMessage(finalMessage);
       } catch (error: any) {
         console.error('Error:', error);
         const errorMsg = error instanceof Error ? error.message : String(error);

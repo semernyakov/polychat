@@ -22,7 +22,7 @@ function getCurrentLocale(): Locale {
 export const translations: Record<Locale, Record<string, string>> = {
   ru: {
     // Settings
-    'settings.interface': '👀 Интерфейс',
+    'settings.interface': '👀 Интерфейс и язык',
     'settings.subtitle': 'Настройте PolyChat, чтобы общение с ИИ было максимально удобным! 😊',
     'settings.apiHeading': '🔑 Доступ к API',
     'settings.tailLimitName': 'Последние сообщения при открытии',
@@ -141,7 +141,7 @@ export const translations: Record<Locale, Record<string, string>> = {
   },
   en: {
     // Settings
-    'settings.interface': '👀 Interface',
+    'settings.interface': '👀 Interface & Language',
     'settings.subtitle': 'Make your AI chat experience as friendly and delightful as possible! 😊',
     'settings.apiHeading': '🔑 API Access',
     'settings.tailLimitName': 'Last messages at startup',
@@ -216,8 +216,8 @@ export const translations: Record<Locale, Record<string, string>> = {
     copyError: 'Error copying to clipboard',
     close: 'Close',
     modelUnavailable: 'This model is temporarily unavailable',
-    showInSidepanel: 'Show in side panel',
-    showInTab: 'Show in tab',
+    showInSidepanel: 'Show in Sidepanel',
+    showInTab: 'Show in Tab',
     scrollToTop: 'Scroll to top',
     scrollToBottom: 'Scroll to bottom',
     clearHistory: 'Clear history',

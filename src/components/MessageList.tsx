@@ -16,7 +16,7 @@ import { Locale, t } from '../localization';
 interface MessageListProps {
   messages: Message[];
   isLoading: boolean;
-  isStreaming?: boolean; // Добавляем новый проп
+  isStreaming?: boolean;
   language?: Locale;
   tailLimit?: number;
   tailStep?: number;
@@ -35,11 +35,8 @@ export const MessageList = React.memo(
       const isAtBottomRef = useRef<boolean>(true);
       const prevMessagesLengthRef = useRef<number>(messages.length);
       const isInitialRenderRef = useRef<boolean>(true);
-      const resizeObserverRef = useRef<ResizeObserver | null>(null);
       const initialScrollDoneRef = useRef<boolean>(false);
-      const scrollLockRef = useRef<boolean>(false);
 
-      const NEAR_BOTTOM_THRESHOLD = 100; // px
       const DEFAULT_TAIL_LIMIT = Math.max(1, tailLimit ?? 10);
       const [limit, setLimit] = useState<number>(DEFAULT_TAIL_LIMIT);
       const STEP = Math.max(1, tailStep ?? 20);
@@ -55,77 +52,47 @@ export const MessageList = React.memo(
         return messages.slice(messages.length - currentLimit);
       }, [messages, limit]);
 
-      // Проверка находится ли пользователь near bottom
+      // Проверка находится ли пользователь near bottom с адаптивным порогом
       const checkIsNearBottom = useCallback((): boolean => {
         const el = containerRef.current;
         if (!el) return true;
-        return el.scrollHeight - el.scrollTop - el.clientHeight <= NEAR_BOTTOM_THRESHOLD;
+        const threshold = Math.max(50, Math.min(150, el.clientHeight * 0.1)); // 10% от высоты контейнера
+        return el.scrollHeight - el.scrollTop - el.clientHeight <= threshold;
       }, []);
 
-      // Прокрутка вниз с опциями - ОСНОВНОЙ МЕХАНИЗМ СКРОЛЛА
-      const scrollToBottom = useCallback((opts?: { smooth?: boolean; force?: boolean }) => {
+      // Прокрутка вниз
+      const scrollToBottom = useCallback((smooth: boolean = true) => {
         const el = containerRef.current;
         if (!el) return;
 
-        const smooth = opts?.smooth ?? true;
-        const force = opts?.force ?? false;
-
-        // Если принудительно или пользователь near bottom
-        if (force || isAtBottomRef.current) {
-          // Блокируем другие скролл-механизмы на время этой операции
-          scrollLockRef.current = true;
-
-          if (!smooth) {
-            el.scrollTop = el.scrollHeight;
-          } else {
-            el.scrollTo({
-              top: el.scrollHeight,
-              behavior: 'smooth',
-            });
-          }
-          isAtBottomRef.current = true;
-          setShowNewMessageNotice(false);
-
-          // Снимаем блокировку после завершения анимации
-          setTimeout(
-            () => {
-              scrollLockRef.current = false;
-            },
-            smooth ? 300 : 0,
-          );
-        }
-      }, []);
-
-      // Initial scroll - только при первом рендере с сообщениями
-      useLayoutEffect(() => {
-        if (isInitialRenderRef.current && messages.length > 0 && !initialScrollDoneRef.current) {
-          initialScrollDoneRef.current = true;
-          // Небольшая задержка для гарантии что DOM готов
-          requestAnimationFrame(() => {
-            scrollToBottom({ smooth: false, force: true });
-            isInitialRenderRef.current = false;
+        if (!smooth) {
+          el.scrollTop = el.scrollHeight;
+        } else {
+          el.scrollTo({
+            top: el.scrollHeight,
+            behavior: 'smooth',
           });
         }
-      }, [messages.length, scrollToBottom]);
+        isAtBottomRef.current = true;
+        setShowNewMessageNotice(false);
+      }, []);
 
-      // Обработка новых сообщений - КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ
+      // Обработка новых сообщений
       useEffect(() => {
         const prevLength = prevMessagesLengthRef.current;
         const currentLength = messages.length;
         const hasNewMessages = currentLength > prevLength;
 
-        if (hasNewMessages && !isInitialRenderRef.current && !scrollLockRef.current) {
-          // ТОЛЬКО если пользователь near bottom, скроллим вниз
-          if (isAtBottomRef.current) {
-            scrollToBottom({ smooth: true });
-          } else {
-            // Показываем уведомление о новых сообщениях
+        if (hasNewMessages && !isInitialRenderRef.current) {
+          // Если пользователь не внизу - показываем уведомление
+          if (!isAtBottomRef.current) {
             setShowNewMessageNotice(true);
           }
+          // Скролл будет выполнен через onRenderComplete после рендеринга markdown
         }
 
         prevMessagesLengthRef.current = currentLength;
-      }, [messages.length, scrollToBottom]);
+      }, [messages.length]);
 
       // Отслеживание положения скролла
       useEffect(() => {
@@ -133,9 +100,6 @@ export const MessageList = React.memo(
         if (!el) return;
 
         const handleScroll = () => {
-          // Не обновляем состояние если скролл заблокирован
-          if (scrollLockRef.current) return;
-
           const wasAtBottom = isAtBottomRef.current;
           isAtBottomRef.current = checkIsNearBottom();
 
@@ -154,24 +118,6 @@ export const MessageList = React.memo(
         return () => el.removeEventListener('scroll', handleScroll);
       }, [checkIsNearBottom, messages.length, visibleMessages.length]);
 
-      // Resize observer для пересчета макета
-      useEffect(() => {
-        const el = containerRef.current;
-        if (!el) return;
-
-        resizeObserverRef.current = new ResizeObserver(() => {
-          // При изменении размера контейнера, если были near bottom - остаемся там
-          if (isAtBottomRef.current && !scrollLockRef.current) {
-            scrollToBottom({ smooth: false });
-          }
-        });
-
-        resizeObserverRef.current.observe(el);
-        return () => {
-          resizeObserverRef.current?.disconnect();
-        };
-      }, [scrollToBottom]);
-
       useImperativeHandle(ref, () => ({
         scrollToTop: () => {
           const el = containerRef.current;
@@ -181,7 +127,7 @@ export const MessageList = React.memo(
           isAtBottomRef.current = false;
         },
         scrollToBottom: (opts?: { smooth?: boolean }) => {
-          scrollToBottom({ ...opts, force: true });
+          scrollToBottom(opts?.smooth ?? true);
         },
         forceUpdate: () => {
           // trigger re-render if needed
@@ -213,17 +159,24 @@ export const MessageList = React.memo(
         // Запускаем анимацию исчезновения
         setIsNoticeExiting(true);
         setTimeout(() => {
-          scrollToBottom({ smooth: true, force: true });
+          scrollToBottom(true); // Smooth scroll
           setShowNewMessageNotice(false);
           setIsNoticeExiting(false);
         }, 150); // Длительность анимации
       }, [scrollToBottom]);
 
       const handleLastMessageRender = useCallback(() => {
-        // Только для streaming сообщений - плавно скроллим вниз
-        // НЕ вызываем при initial render или если скролл заблокирован
-        if (!isInitialRenderRef.current && isAtBottomRef.current && !scrollLockRef.current) {
-          scrollToBottom({ smooth: true });
+        // Для initial render всегда скроллим вниз
+        if (isInitialRenderRef.current && !initialScrollDoneRef.current) {
+          initialScrollDoneRef.current = true;
+          scrollToBottom(false); // Мгновенный скролл для initial
+          isInitialRenderRef.current = false;
+          return;
+        }
+
+        // Для последующих рендеров скроллим только если пользователь был внизу
+        if (isAtBottomRef.current) {
+          scrollToBottom(false); // Мгновенный скролл после рендеринга markdown
         }
       }, [scrollToBottom]);
 
