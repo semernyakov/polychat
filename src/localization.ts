@@ -49,7 +49,7 @@ const translations: Record<Locale, Record<string, string>> = {
     supportDialogContent:
       'Этот плагин разрабатывается энтузиастом в свободное время. Ваша поддержка поможет ускорить разработку, добавить новые функции и поддерживать проект в актуальном состоянии.',
     supportDialogYooMoneyInfo:
-      'Вы можете поддержать проект через YooMoney. Сервис принимает переводы как из России, так и из других стран (через банковские карты). Средства автоматически конвертируются в рубли, возможна комиссия (обычно 1%).',
+      'Вы можете поддержать проект через YooMoney. Сервис принимает переводы как из России, так и из других стран (через банковские карты).',
     supportDialogThanksTitle: 'Спасибо за использование PolyChat!',
     supportDialogThanksSupport: 'Поддержать проект',
     supportDialogThanksReview: 'Оставить отзыв',
@@ -188,7 +188,7 @@ const translations: Record<Locale, Record<string, string>> = {
     supportDialogContent:
       'This plugin is developed by an enthusiast in their free time. Your support will help accelerate development, add new features, and maintain the project in an up-to-date state.',
     supportDialogYooMoneyInfo:
-      'You can support the project via YooMoney. The service accepts transfers from both Russia and other countries (via bank cards). Funds are automatically converted to rubles, a commission may apply (usually 1%).',
+      'You can support the project via YooMoney. The service accepts transfers from both Russia and other Countries (via bank cards).',
     supportDialogThanksTitle: 'Thank you for using PolyChat!',
     supportDialogThanksSupport: 'Support project',
     supportDialogThanksReview: 'Leave review',
