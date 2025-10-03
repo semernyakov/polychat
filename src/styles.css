@@ -939,7 +939,7 @@
   display: flex;
   justify-content: flex-end;
   gap: var(--spacing-medium, 8px);
-	font-size: 0.9em;
+  font-size: 0.9em;
 }
 
 .groq-dialog-close {
