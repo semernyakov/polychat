@@ -146,7 +146,8 @@ const translations: Record<Locale, Record<string, string>> = {
     modelIsThinking: 'Модель думает',
     generatingResponse: 'Формирую ответ',
     supportButton: '💰 Поддержать',
-    supportNote: 'Вы можете поддержать проект через YooMoney. Сервис принимает переводы как из России, так и из других стран (через банковские карты).',
+    supportNote:
+      'Вы можете поддержать проект через YooMoney. Сервис принимает переводы как из России, так и из других стран (через банковские карты).',
     // Error messages
     apiError: 'API ошибка',
     unknownError: 'Неизвестная ошибка',
@@ -283,7 +284,8 @@ const translations: Record<Locale, Record<string, string>> = {
     modelIsThinking: 'Model is thinking',
     generatingResponse: 'Generating response',
     supportButton: '💰 Support',
-    supportNote: 'You can support the project via YooMoney. The service accepts transfers from both Russia and other Countries (via bank cards).',
+    supportNote:
+      'You can support the project via YooMoney. The service accepts transfers from both Russia and other Countries (via bank cards).',
     // Error messages
     apiError: 'API error',
     unknownError: 'Unknown error',

@@ -27,16 +27,16 @@ PolyChat is a powerful chat extension with support for AI models via the Groq AP
 
 ## Features
 
-| Category | Features |
-|----------|----------|
-| **🤖 AI Integration** | Direct integration with Groq AI models<br>Dynamic model list: models are updated in real-time<br>Model Info Dialog: detailed info for each model<br>Support for text, vision (image), coder, and audio models |
-| **🌐 Localization** | Localized interface (English/Russian)<br>Automatically detects Obsidian language |
-| **📝 Content** | Markdown formatting and code highlighting<br>Raw/Markdown source view toggle<br>Context-aware responses<br>Create new notes from AI messages |
-| **📱 Platform** | Mobile support<br>Configurable default display mode (tab or side panel) |
-| **⚙️ Model Management** | Custom model selection with grouping by model owner<br>Batch model activation/deactivation<br>Temperature and max tokens configuration |
-| **💾 Storage** | Chat history with multiple storage options:<br>• In-memory storage<br>• localStorage<br>• IndexedDB<br>• File-based storage<br>Configurable history length and loading behavior |
-| **🔐 Security** | Secure API key storage<br>Hotkeys and advanced settings |
-| **💝 Community** | Support dialog with donation links<br>Open source and community-driven |
+| Category                | Features                                                                                                                                                                                                      |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **🤖 AI Integration**   | Direct integration with Groq AI models<br>Dynamic model list: models are updated in real-time<br>Model Info Dialog: detailed info for each model<br>Support for text, vision (image), coder, and audio models |
+| **🌐 Localization**     | Localized interface (English/Russian)<br>Automatically detects Obsidian language                                                                                                                              |
+| **📝 Content**          | Markdown formatting and code highlighting<br>Raw/Markdown source view toggle<br>Context-aware responses<br>Create new notes from AI messages                                                                  |
+| **📱 Platform**         | Mobile support<br>Configurable default display mode (tab or side panel)                                                                                                                                       |
+| **⚙️ Model Management** | Custom model selection with grouping by model owner<br>Batch model activation/deactivation<br>Temperature and max tokens configuration                                                                        |
+| **💾 Storage**          | Chat history with multiple storage options:<br>• In-memory storage<br>• localStorage<br>• IndexedDB<br>• File-based storage<br>Configurable history length and loading behavior                               |
+| **🔐 Security**         | Secure API key storage<br>Hotkeys and advanced settings                                                                                                                                                       |
+| **💝 Community**        | Support dialog with donation links<br>Open source and community-driven                                                                                                                                        |
 
 ## Project Status
 
@@ -44,17 +44,17 @@ This project is actively maintained and developed. New features are added regula
 
 ### Supported Models (Grouped by Developer)
 
-| Developer | Models |
-|-----------|--------|
-| **SDAIA** | Allam 2 7B |
-| **DeepSeek / Meta** | DeepSeek-R1-Distill-Llama-70B |
-| **Google** | Gemma 2 9B Instruct |
-| **Groq** | Groq Compound<br>Groq Compound Mini |
-| **Meta** | Llama 3.1 8B Instant<br>Llama 3.3 70B Versatile<br>Llama 4 Maverick 17B 128E Instruct<br>Llama 4 Scout 17B 16E Instruct<br>Llama Guard 4 12B<br>Llama Prompt Guard 2 22M<br>Llama Prompt Guard 2 86M |
-| **Moonshot AI** | Kimi K2 Instruct<br>Kimi K2 Instruct (0905) |
-| **PlayAI** | PlayAI TTS<br>PlayAI TTS (Arabic) |
-| **Alibaba Cloud** | Qwen3 32B |
-| **OpenAI** | Supports Whisper models (by OpenAI):<br>• Whisper Large v3<br>• Whisper Large v3 Turbo |
+| Developer           | Models                                                                                                                                                                                               |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **SDAIA**           | Allam 2 7B                                                                                                                                                                                           |
+| **DeepSeek / Meta** | DeepSeek-R1-Distill-Llama-70B                                                                                                                                                                        |
+| **Google**          | Gemma 2 9B Instruct                                                                                                                                                                                  |
+| **Groq**            | Groq Compound<br>Groq Compound Mini                                                                                                                                                                  |
+| **Meta**            | Llama 3.1 8B Instant<br>Llama 3.3 70B Versatile<br>Llama 4 Maverick 17B 128E Instruct<br>Llama 4 Scout 17B 16E Instruct<br>Llama Guard 4 12B<br>Llama Prompt Guard 2 22M<br>Llama Prompt Guard 2 86M |
+| **Moonshot AI**     | Kimi K2 Instruct<br>Kimi K2 Instruct (0905)                                                                                                                                                          |
+| **PlayAI**          | PlayAI TTS<br>PlayAI TTS (Arabic)                                                                                                                                                                    |
+| **Alibaba Cloud**   | Qwen3 32B                                                                                                                                                                                            |
+| **OpenAI**          | Supports Whisper models (by OpenAI):<br>• Whisper Large v3<br>• Whisper Large v3 Turbo                                                                                                               |
 
 > See plugin settings for the full up-to-date list. Descriptions will be updated as soon as they become available.
 
@@ -171,8 +171,8 @@ Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md)
 For security issues, please read our [Security Policy](SECURITY.md) and report any vulnerabilities responsibly.
 
 > **🔐 Security Note:** Your Groq API key is stored only on your local device and is never transmitted to any server.
-   >
-   > **🛡️ Data Privacy:** This plugin does not collect, store, or transmit your API keys or chat data. All data remains on your local device.
+>
+> **🛡️ Data Privacy:** This plugin does not collect, store, or transmit your API keys or chat data. All data remains on your local device.
 
 ## License
 
@@ -194,4 +194,3 @@ See [CHANGELOG.md](CHANGELOG.md) for all changes.
 ---
 
 Copyright (c) 2025 Ivan Semernyakov.
-
