@@ -193,8 +193,5 @@ See [CHANGELOG.md](CHANGELOG.md) for all changes.
 
 ---
 
-Made with ❤️ for Obsidian Community
+Copyright (c) 2025 Ivan Semernyakov.
 
-🇷🇺 For Russian users: [Support via YooMoney](https://yoomoney.ru/fundraise/194GT5A5R07.250321)
-
-Copyright (c) 2025 Ivan Semernyakov

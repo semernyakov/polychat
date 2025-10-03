@@ -198,8 +198,4 @@ npm run check-models -- --lang=en
 
 ---
 
-Создано с ❤️ для сообщества Obsidian
-
-🇷🇺 Для пользователей из России: [Поддержать через YooMoney](https://yoomoney.ru/fundraise/194GT5A5R07.250321)
-
 Copyright (c) 2025 Ivan Semernyakov
