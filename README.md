@@ -11,10 +11,9 @@
 
 [Русская версия](docs/README.ru.md)
 
-A plugin for [Obsidian](https://obsidian.md) that integrates Groq's AI chat capabilities directly into your notes.
+A plugin for Obsidian that integrates Groq AI capabilities directly into your notes.
 
 PolyChat is a powerful chat extension with support for AI models via the Groq API. Designed for flexibility and ease of use, it enables seamless communication with multiple models directly from your vault.
-
 ## Screenshots
 
 **Main Interface**
@@ -176,7 +175,7 @@ For security issues, please read our [Security Policy](SECURITY.md) and report a
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE.md) file for details.
 
 ## Support
 
