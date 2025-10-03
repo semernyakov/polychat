@@ -1,4 +1,4 @@
-# PolyChat™ – Obsidian Plugin
+# PolyChat – Obsidian Plugin
 
 [![Release](https://img.shields.io/github/v/release/semernyakov/polychat?style=flat-square&label=Release)](https://github.com/semernyakov/polychat/releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/semernyakov/polychat/total?style=flat-square&label=Downloads)](https://github.com/semernyakov/polychat/releases)
@@ -9,7 +9,7 @@
 
 <!-- [![Coverage](https://img.shields.io/codecov/c/github/semernyakov/groq-chat-plugin?style=flat-square)](https://codecov.io/gh/semernyakov/groq-chat-plugin) -->
 
-[Русская версия](docs/README.ru.md) | [English version](README.md)
+[Русская версия](docs/README.ru.md)
 
 A plugin for [Obsidian](https://obsidian.md) that integrates Groq's AI chat capabilities directly into your notes.
 
@@ -27,53 +27,34 @@ PolyChat is a powerful chat extension with support for AI models via the Groq AP
 
 ## Features
 
-- Direct integration with Groq AI models
-- Dynamic model list: models are updated in real-time, always fresh
-- Model Info Dialog: detailed info for each model (name, description, developer, max tokens, release status, etc.)
-- Support for text, vision (image), coder, and audio models
-- Localized interface (English/Russian) - automatically detects Obsidian language
-- Markdown formatting and code highlighting
-- Mobile support
-- Custom model selection with grouping by model owner
-- Chat history with multiple storage options:
-  - In-memory storage
-  - localStorage
-  - IndexedDB
-  - File-based storage
-- Configurable history length and loading behavior
-- Context-aware responses
-- Raw/Markdown source view toggle for assistant messages
-- Configurable default display mode (tab or side panel)
-- Support dialog with donation links
-- Hotkeys and advanced settings
-- Secure API key storage
-- Temperature and max tokens configuration
-- Batch model activation/deactivation
-- Open source and community-driven
+| Category | Features |
+|----------|----------|
+| **🤖 AI Integration** | Direct integration with Groq AI models<br>Dynamic model list: models are updated in real-time<br>Model Info Dialog: detailed info for each model<br>Support for text, vision (image), coder, and audio models |
+| **🌐 Localization** | Localized interface (English/Russian)<br>Automatically detects Obsidian language |
+| **📝 Content** | Markdown formatting and code highlighting<br>Raw/Markdown source view toggle<br>Context-aware responses<br>Create new notes from AI messages |
+| **📱 Platform** | Mobile support<br>Configurable default display mode (tab or side panel) |
+| **⚙️ Model Management** | Custom model selection with grouping by model owner<br>Batch model activation/deactivation<br>Temperature and max tokens configuration |
+| **💾 Storage** | Chat history with multiple storage options:<br>• In-memory storage<br>• localStorage<br>• IndexedDB<br>• File-based storage<br>Configurable history length and loading behavior |
+| **🔐 Security** | Secure API key storage<br>Hotkeys and advanced settings |
+| **💝 Community** | Support dialog with donation links<br>Open source and community-driven |
 
 ## Project Status
 
 This project is actively maintained and developed. New features are added regularly, including dynamic model updates, vision/coder/audio support, and improved UI/UX. Automated tests and advanced model integrations (audio/image) are planned. Feedback and contributions are welcome!
 
-### Supported Models (Current List)
+### Supported Models (Grouped by Developer)
 
-- Allam 2 7B
-- DeepSeek R1 Distill Llama 70B
-- DeepSeek R1 Distill Qwen 32B
-- Gemma 2 9B IT
-- Llama 3.1 8B Instant
-- Llama 3.2 1B Preview
-- Llama 3.2 3B Preview
-- Llama 3.3 70B SpecDec
-- Llama 3.3 70B Versatile
-- Llama Guard 3 8B
-- Llama 3 70B
-- Llama 3 8B
-- Meta Llama 4 Maverick 17B 128E Instruct
-- Mistral Saba 24B
-- Qwen 2.5 32B
-- Qwen 2.5 Coder 32B
-- Qwen QwQ 32B
+| Developer | Models |
+|-----------|--------|
+| **SDAIA** | Allam 2 7B |
+| **DeepSeek / Meta** | DeepSeek-R1-Distill-Llama-70B |
+| **Google** | Gemma 2 9B Instruct |
+| **Groq** | Groq Compound<br>Groq Compound Mini |
+| **Meta** | Llama 3.1 8B Instant<br>Llama 3.3 70B Versatile<br>Llama 4 Maverick 17B 128E Instruct<br>Llama 4 Scout 17B 16E Instruct<br>Llama Guard 4 12B<br>Llama Prompt Guard 2 22M<br>Llama Prompt Guard 2 86M |
+| **Moonshot AI** | Kimi K2 Instruct<br>Kimi K2 Instruct (0905) |
+| **PlayAI** | PlayAI TTS<br>PlayAI TTS (Arabic) |
+| **Alibaba Cloud** | Qwen3 32B |
+| **OpenAI** | Supports Whisper models (by OpenAI):<br>• Whisper Large v3<br>• Whisper Large v3 Turbo |
 
 > See plugin settings for the full up-to-date list. Descriptions will be updated as soon as they become available.
 
@@ -114,12 +95,9 @@ npm run build
 
 # Lint the code
 npm run lint
-
-# Check for obsolete models
-npm run check-models -- --help
 ```
 
-## Model Checking
+<!-- ## Model Checking
 
 The `check_obsolete_models.ts` script verifies if the plugin is using any obsolete Groq models and helps maintain compatibility with the latest available models.
 
@@ -147,7 +125,11 @@ npm run check-models -- --lang=en
 1. **Specify Obsidian config directory** (if you know the path to `.obsidian`):
 
    ```bash
-   npm run check-models -- --config-dir=~/.config/obsidian
+   # Relative path (recommended)
+   npm run check-models -- --config-dir=~/.obsidian
+
+   # Absolute path
+   npm run check-models -- --config-dir=/full/path/to/vault/.obsidian
    ```
 
 2. **Use environment variables** (useful for scripts):
@@ -178,6 +160,7 @@ Plugin settings are usually found in one of these locations:
 4. Identifies deprecated models that should be replaced
 5. Detects unknown models that aren't in the official list
 6. Provides recommendations for model replacements when available
+-->
 
 ## Contributing
 
@@ -187,17 +170,22 @@ Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md)
 
 For security issues, please read our [Security Policy](SECURITY.md) and report any vulnerabilities responsibly.
 
+> **🔐 Security Note:** Your Groq API key is stored only on your local device and is never transmitted to any server.
+   >
+   > **🛡️ Data Privacy:** This plugin does not collect, store, or transmit your API keys or chat data. All data remains on your local device.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Support
 
-If you find this plugin helpful, consider:
+If you find PolyChat helpful, you can support development via:
 
-- [Starring the repository](https://github.com/semernyakov/polychat)
-- [Sponsoring the development](https://yoomoney.ru/fundraise/194GT5A5R07.250321)
-- [Reporting issues](https://github.com/semernyakov/polychat/issues)
+- 💰 **YooMoney**: [Support via YooMoney](https://yoomoney.ru/fundraise/194GT5A5R07.250321)
+  - Accepts transfers from both Russia and other Countries (via bank cards)
+- ⭐ **Star the repository**: [Add a star on GitHub](https://github.com/semernyakov/polychat)
+- 🐛 **Report issues**: [Create an issue](https://github.com/semernyakov/polychat/issues)
 
 ## Changelog
 
@@ -205,6 +193,8 @@ See [CHANGELOG.md](CHANGELOG.md) for all changes.
 
 ---
 
-Made with ❤️ for Obsidian Community,
+Made with ❤️ for Obsidian Community
 
-[Support developer with YooMoney](https://yoomoney.ru/fundraise/194GT5A5R07.250321)
+🇷🇺 For Russian users: [Support via YooMoney](https://yoomoney.ru/fundraise/194GT5A5R07.250321)
+
+Copyright (c) 2025 Ivan Semernyakov

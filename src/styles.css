@@ -437,7 +437,7 @@
 .groq-markdown-content pre code {
   background: none;
   padding: 0;
-  font-size: 12px;
+  font-size: 1em;
   font-family: var(--font-monospace);
 }
 
@@ -1447,6 +1447,28 @@
   font-weight: var(--font-semibold, 600);
 }
 
+.groq-settings-support-note {
+  margin: 0.75em 0;
+  padding: 0.5em 0.75em;
+  background-color: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s, 4px);
+  font-size: var(--font-ui-smaller, 0.85em);
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.groq-settings-support-note a {
+  color: var(--interactive-accent);
+  text-decoration: none;
+  font-weight: var(--font-medium, 500);
+}
+
+.groq-settings-support-note a:hover {
+  text-decoration: underline;
+  color: var(--interactive-accent-hover);
+}
+
 .groq-settings-thanks-links {
   display: flex;
   gap: 0.5em;
@@ -1656,6 +1678,18 @@
 
 .groq-support-thanks__button svg {
   flex-shrink: 0;
+}
+
+/* --- YooMoney info in dialog --- */
+.groq-dialog-yoomoney-info {
+  margin: 0.75em 0;
+  padding: 0.75em;
+  background-color: var(--background-modifier-border);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s, 4px);
+  font-size: var(--font-ui-smaller, 0.9em);
+  line-height: 1.6;
+  color: var(--text-normal);
 }
 
 /* ===== INLINE STYLES REPLACEMENT ===== */

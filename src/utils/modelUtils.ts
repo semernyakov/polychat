@@ -11,7 +11,8 @@ const MODEL_NAME_PREFIX_MAP: Record<string, string> = {
   deepseek: 'DeepSeek',
   mixtral: 'Mixtral',
   'llama-guard': 'Llama Guard',
-  'llama-3': 'Llama-3',
+  'llama-3': 'Llama 3',
+  'llama-4': 'Llama 4',
   saba: 'Saba',
   coder: 'Coder',
   versatile: 'Versatile',
@@ -19,9 +20,11 @@ const MODEL_NAME_PREFIX_MAP: Record<string, string> = {
   preview: 'Preview',
   specdec: 'SpecDec',
   distill: 'Distill',
-  allam: 'Llama', // Fixing typo
-  guard: 'Guard', // For Llama Guard
+  allam: 'Allam',
+  guard: 'Guard',
+  'prompt-guard': 'Prompt Guard',
   maverick: 'Maverick',
+  scout: 'Scout',
   qwq: 'QwQ',
   'deepseek-r1': 'DeepSeek-R1',
   'saba-24b': 'Saba-24B',
@@ -34,8 +37,22 @@ const MODEL_NAME_PREFIX_MAP: Record<string, string> = {
   '70b': '70B',
   '90b': '90B',
   '128e': '128E',
+  '16e': '16E',
   kimi: 'Kimi',
   openai: 'OpenAI',
+  groq: 'Groq',
+  meta: 'Meta',
+  compound: 'Compound',
+  'compound-mini': 'Compound Mini',
+  playai: 'PlayAI',
+  tts: 'TTS',
+  arabic: 'Arabic',
+  whisper: 'Whisper',
+  large: 'Large',
+  'large-v3': 'Large v3',
+  'large-v3-turbo': 'Large v3 Turbo',
+  instruct: 'Instruct',
+  '0905': '0905',
 };
 
 /**
@@ -47,9 +64,33 @@ export function fixModelNameCasing(modelName: string): string {
   if (!modelName) return modelName;
 
   // Handle special cases first
-  // Fix the "allam" typo
-  if (modelName.toLowerCase().includes('allam')) {
-    modelName = modelName.replace(/allam/gi, 'llama');
+  // Specific model name transformations
+  const specificMappings: Record<string, string> = {
+    'gemma2-9b-it': 'Gemma 2 9B Instruct',
+    'llama-3.1-8b-instant': 'Llama 3.1 8B Instant',
+    'llama-3.3-70b-versatile': 'Llama 3.3 70B Versatile',
+    'meta-llama/llama-4-maverick-17b-128e-instruct': 'Llama 4 Maverick 17B 128E Instruct',
+    'meta-llama/llama-4-scout-17b-16e-instruct': 'Llama 4 Scout 17B 16E Instruct',
+    'llama-guard-4-12b': 'Llama Guard 4 12B',
+    'llama-prompt-guard-2-22m': 'Llama Prompt Guard 2 22M',
+    'llama-prompt-guard-2-86m': 'Llama Prompt Guard 2 86M',
+    'allam-2-7b': 'Allam 2 7B',
+    'deepseek-r1-distill-llama-70b': 'DeepSeek-R1-Distill-Llama-70B',
+    'moonshotai/kimi-k2-instruct': 'Kimi K2 Instruct',
+    'moonshotai/kimi-k2-instruct-0905': 'Kimi K2 Instruct (0905)',
+    'groq/compound': 'Groq Compound',
+    'groq/compound-mini': 'Groq Compound Mini',
+    'playai-tts': 'PlayAI TTS',
+    'playai-tts-arabic': 'PlayAI TTS (Arabic)',
+    'whisper-large-v3': 'Whisper Large v3',
+    'whisper-large-v3-turbo': 'Whisper Large v3 Turbo',
+    'qwen/qwen3-32b': 'Qwen3 32B',
+    'openai/gpt-oss-120b': 'Community OSS Model (120B)',
+    'openai/gpt-oss-20b': 'Community OSS Model (20B)',
+  };
+
+  if (specificMappings[modelName]) {
+    return specificMappings[modelName];
   }
 
   // Apply prefix mapping
@@ -59,12 +100,9 @@ export function fixModelNameCasing(modelName: string): string {
     modelName = modelName.replace(regex, properCasing);
   }
 
-  // Special handling for specific models
+  // Special handling for specific patterns
   // Fix "llama3" to "Llama3"
   modelName = modelName.replace(/\bllama3\b/gi, 'Llama3');
-
-  // Fix "llama-3" to "Llama-3"
-  modelName = modelName.replace(/\bllama-3\b/gi, 'Llama-3');
 
   // Fix "gemma2" to "Gemma2"
   modelName = modelName.replace(/\bgemma2\b/gi, 'Gemma2');
@@ -80,6 +118,18 @@ export function fixModelNameCasing(modelName: string): string {
 
   // Fix "mixtral8x7b" to "Mixtral8x7B"
   modelName = modelName.replace(/\bmixtral8x7b\b/gi, 'Mixtral8x7B');
+
+  // Handle dashes between numbers and letters (e.g., 8b -> 8B)
+  modelName = modelName.replace(/(\d)([a-z])/g, (match, num, letter) => num + letter.toUpperCase());
+
+  // Handle version numbers with dots (preserve dots in versions)
+  modelName = modelName.replace(/(\d)\.(\d)/g, '$1.$2');
+
+  // Replace dashes with spaces for better readability, except in specific cases
+  modelName = modelName.replace(/-/g, ' ');
+
+  // Clean up extra spaces
+  modelName = modelName.replace(/\s+/g, ' ').trim();
 
   return modelName;
 }

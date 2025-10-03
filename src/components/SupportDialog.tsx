@@ -112,10 +112,14 @@ export const SupportDialog: React.FC<SupportDialogProps> = ({
         </div>
 
         <div className="groq-dialog-content">
-          <p className="groq-dialog-content__text">{t('supportDialogContent', locale)}</p>
-          {/* Красивый блок благодарности, как в настройках */}
-          <SupportThanksBlock locale={locale} />
-        </div>
+           <p className="groq-dialog-content__text">{t('supportDialogContent', locale)}</p>
+           {/* YooMoney information */}
+           {t('supportDialogYooMoneyInfo', locale) && (
+             <p className="groq-dialog-yoomoney-info">{t('supportDialogYooMoneyInfo', locale)}</p>
+           )}
+           {/* Красивый блок благодарности, как в настройках */}
+           <SupportThanksBlock locale={locale} />
+         </div>
 
         <div className="groq-dialog-actions">
           {/* Используем общий стиль .groq-button */}

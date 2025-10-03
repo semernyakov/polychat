@@ -47,7 +47,9 @@ const translations: Record<Locale, Record<string, string>> = {
     supportDialogTitle: 'Поддержать разработку',
     supportDialogClose: 'Закрыть',
     supportDialogContent:
-      'Этот плагин разрабатывается энтузиастом в свободное время. Ваша поддержка поможет ускорить разработку, добавить новые функции и поддерживать проект в актуальном состоянии. Спасибо за использование!',
+      'Этот плагин разрабатывается энтузиастом в свободное время. Ваша поддержка поможет ускорить разработку, добавить новые функции и поддерживать проект в актуальном состоянии.',
+    supportDialogYooMoneyInfo:
+      'Вы можете поддержать проект через YooMoney. Сервис принимает переводы как из России, так и из других стран (через банковские карты). Средства автоматически конвертируются в рубли, возможна комиссия (обычно 1%).',
     supportDialogThanksTitle: 'Спасибо за использование PolyChat!',
     supportDialogThanksSupport: 'Поддержать проект',
     supportDialogThanksReview: 'Оставить отзыв',
@@ -144,6 +146,7 @@ const translations: Record<Locale, Record<string, string>> = {
     modelIsThinking: 'Модель думает',
     generatingResponse: 'Формирую ответ',
     supportButton: '💰 Поддержать',
+    supportNote: 'Вы можете поддержать проект через YooMoney. Сервис принимает переводы как из России, так и из других стран (через банковские карты).',
     // Error messages
     apiError: 'API ошибка',
     unknownError: 'Неизвестная ошибка',
@@ -182,7 +185,9 @@ const translations: Record<Locale, Record<string, string>> = {
     supportDialogTitle: 'Support development',
     supportDialogClose: 'Close',
     supportDialogContent:
-      'This plugin is developed by an enthusiast in their free time. Your support will help accelerate development, add new features, and maintain the project in an up-to-date state. Thank you for using it!',
+      'This plugin is developed by an enthusiast in their free time. Your support will help accelerate development, add new features, and maintain the project in an up-to-date state.',
+    supportDialogYooMoneyInfo:
+      'You can support the project via YooMoney. The service accepts transfers from both Russia and other countries (via bank cards). Funds are automatically converted to rubles, a commission may apply (usually 1%).',
     supportDialogThanksTitle: 'Thank you for using PolyChat!',
     supportDialogThanksSupport: 'Support project',
     supportDialogThanksReview: 'Leave review',
@@ -198,7 +203,7 @@ const translations: Record<Locale, Record<string, string>> = {
     apiKey: 'API Key',
     apiKeyPlaceholder: 'Enter API key',
     checkApiKey: 'Check',
-    validApiKey: '✅ Key is valid',
+    validApiKey: '✔️ Key is valid',
     invalidApiKey: '❌ Invalid key. Please check your settings!',
     model: 'Model',
     active: 'Active',
@@ -278,6 +283,7 @@ const translations: Record<Locale, Record<string, string>> = {
     modelIsThinking: 'Model is thinking',
     generatingResponse: 'Generating response',
     supportButton: '💰 Support',
+    supportNote: 'You can support the project via YooMoney. The service accepts transfers from both Russia and other Countries (via bank cards).',
     // Error messages
     apiError: 'API error',
     unknownError: 'Unknown error',

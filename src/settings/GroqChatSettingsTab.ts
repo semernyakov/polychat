@@ -138,6 +138,12 @@ export class GroqChatSettingsTab extends PluginSettingTab {
     titleDiv.createSpan({ text: '💙 ' });
     titleDiv.createEl('strong', { text: t('thanks.title', locale) });
 
+    // Support note for Russian users
+    if (t('supportNote', locale)) {
+      const supportNoteDiv = thanksBlock.createEl('div', { cls: 'groq-settings-support-note' });
+      supportNoteDiv.innerHTML = t('supportNote', locale);
+    }
+
     // Ссылки в компактном формате
     const linksDiv = thanksBlock.createEl('div', { cls: 'groq-settings-thanks-links' });
 

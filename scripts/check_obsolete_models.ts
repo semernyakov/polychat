@@ -455,10 +455,20 @@ if (isMain) {
     console.log(`Используется переданный путь к данным плагина: ${settingsPath}`);
   } else if (configDirArg) {
     // Если передан configDir, используем стандартную структуру
-    const vaultRoot = process.env.OBSIDIAN_VAULT_PATH || path.join(process.cwd(), '..', '..');
-    const configPath = configDirArg.startsWith('.')
-      ? configDirArg // Если путь относительный, оставляем как есть
-      : path.join('.', configDirArg); // Иначе делаем относительным
+    let vaultRoot: string;
+    let configPath: string;
+
+    if (path.isAbsolute(configDirArg)) {
+      // Если передан абсолютный путь, используем его как полный путь к .obsidian
+      vaultRoot = path.dirname(configDirArg); // Получаем родительскую директорию .obsidian
+      configPath = path.basename(configDirArg); // Получаем имя директории .obsidian
+    } else {
+      // Относительный путь - используем стандартную логику
+      vaultRoot = process.env.OBSIDIAN_VAULT_PATH || path.join(process.cwd(), '..', '..');
+      configPath = configDirArg.startsWith('.')
+        ? configDirArg // Если путь относительный, оставляем как есть
+        : path.join('.', configDirArg); // Иначе делаем относительным
+    }
 
     settingsPath = path.join(vaultRoot, configPath, 'plugins/polychat/data/settings.json');
     console.log(`Используется configDir: ${path.join(vaultRoot, configPath)}`);
