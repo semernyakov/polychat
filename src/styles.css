@@ -939,6 +939,7 @@
   display: flex;
   justify-content: flex-end;
   gap: var(--spacing-medium, 8px);
+	font-size: 0.9em;
 }
 
 .groq-dialog-close {
@@ -1403,7 +1404,7 @@
 }
 
 .groq-models-table-group-header {
-	font-weight: 600;
+  font-weight: 600;
 }
 
 .groq-models-table tr:last-child td {
@@ -1608,7 +1609,7 @@
   color: var(--text-normal);
   line-height: 1.5;
   text-align: center;
-  margin-bottom: 0.5em;
+  margin-bottom: 0.9em;
   font-weight: 500;
 }
 
@@ -1625,7 +1626,7 @@
   gap: 0.375em;
   padding: 0.5em 0.75em;
   border-radius: var(--border-radius, 3px);
-  font-size: 0.85em;
+  font-size: 0.9em;
   font-weight: 500;
   font-family: var(--font-interface);
   border: 1px solid var(--background-modifier-border);
@@ -1643,7 +1644,7 @@
 }
 
 .groq-support-thanks__button--primary {
-  background-color: var(--interactive-accent);
+  background-color: var(--interactive-accent) !important;
   color: var(--text-on-accent);
   border-color: var(--interactive-accent);
 }

@@ -89,7 +89,7 @@ export const MessageItem: React.FC<MessageItemProps> = React.memo(
         }
         const noteContent = message.content ?? '';
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-        const fileName = `Groq Chat ${timestamp}.md`;
+        const fileName = `PolyChat ${timestamp}.md`;
         const file = await app.vault.create(fileName, noteContent);
         if (app.workspace?.getLeaf) {
           const leaf = app.workspace.getLeaf(false);

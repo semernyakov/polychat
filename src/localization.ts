@@ -23,8 +23,7 @@ const translations: Record<Locale, Record<string, string>> = {
   ru: {
     // Settings
     'settings.interface': '👀 Интерфейс и язык',
-    'settings.subtitle':
-      'Настройте PolyChat, чтобы общение с ИИ было максимально удобным! 😊',
+    'settings.subtitle': 'Настройте PolyChat, чтобы общение с ИИ было максимально удобным! 😊',
     'settings.apiHeading': '🔑 Доступ к API',
     'settings.tailLimitName': 'Последние сообщения при открытии',
     'settings.tailLimitDesc': 'Сколько последних сообщений показывать без прокрутки',
@@ -52,7 +51,7 @@ const translations: Record<Locale, Record<string, string>> = {
     supportDialogThanksTitle: 'Спасибо за использование PolyChat!',
     supportDialogThanksSupport: 'Поддержать проект',
     supportDialogThanksReview: 'Оставить отзыв',
-    supportDialogThanksContact: 'Написать разработчику',
+    supportDialogThanksContact: 'Написать разработчику в Telegram',
     supportDialogGoToSupport: 'Перейти к поддержке',
     language: 'Язык',
     save: 'Сохранить',
@@ -160,14 +159,12 @@ const translations: Record<Locale, Record<string, string>> = {
   en: {
     // Settings
     'settings.interface': '👀 Interface & Language',
-    'settings.subtitle':
-      'Make your AI chat experience as friendly and delightful as possible! 😊',
+    'settings.subtitle': 'Make your AI chat experience as friendly and delightful as possible! 😊',
     'settings.apiHeading': '🔑 API Access',
     'settings.tailLimitName': 'Last messages at startup',
     'settings.tailLimitDesc': 'How many last messages to show without initial scrolling',
     'settings.loadStepName': 'History load step',
-    'settings.loadStepDesc':
-      'How many messages to load when clicking the button or scrolling up',
+    'settings.loadStepDesc': 'How many messages to load when clicking the button or scrolling up',
     'settings.historyHeading': '🕓 Chat History',
     'settings.default10': 'Default: 10',
     'settings.default20': 'Default: 20',
@@ -189,7 +186,7 @@ const translations: Record<Locale, Record<string, string>> = {
     supportDialogThanksTitle: 'Thank you for using PolyChat!',
     supportDialogThanksSupport: 'Support project',
     supportDialogThanksReview: 'Leave review',
-    supportDialogThanksContact: 'Contact developer',
+    supportDialogThanksContact: 'Contact with developer by Telegram',
     supportDialogGoToSupport: 'Go to support',
     language: 'Language',
     save: 'Save',
@@ -276,8 +273,7 @@ const translations: Record<Locale, Record<string, string>> = {
     sendTitle: 'Send (Ctrl+Enter)',
     inputHint:
       '<kbd>Ctrl</kbd>+<kbd>Enter</kbd> — send, <kbd>Shift</kbd>+<kbd>Enter</kbd> — new line',
-    inputCounterTitle:
-      'Current character count / Max model tokens (approximate)',
+    inputCounterTitle: 'Current character count / Max model tokens (approximate)',
     symbolsTokens: 'chars/tokens',
     modelIsThinking: 'Model is thinking',
     generatingResponse: 'Generating response',
