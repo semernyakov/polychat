@@ -2,12 +2,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import { MarkdownRenderer, Component } from 'obsidian';
 import type { App } from 'obsidian';
 import { FiClipboard, FiCode, FiAlignLeft } from 'react-icons/fi';
+import { t, Locale } from '../localization';
 import '../styles.css';
 
 interface GroqMarkdownProps {
   content: string;
   app?: App;
   onRenderComplete?: () => void;
+  locale?: Locale;
 }
 
 interface CodeBlockProps {
@@ -50,7 +52,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ language, value, className = '' }
   );
 };
 
-export const GroqMarkdown: React.FC<GroqMarkdownProps> = ({ content, app, onRenderComplete }) => {
+export const GroqMarkdown: React.FC<GroqMarkdownProps> = ({ content, app, onRenderComplete, locale = 'en' }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const mdComponentRef = useRef<Component | null>(null);
   const lastRenderedRef = useRef<string>('');
@@ -167,7 +169,7 @@ export const GroqMarkdown: React.FC<GroqMarkdownProps> = ({ content, app, onRend
         });
 
         // Обогащаем блоки кода
-        enhanceCodeBlocks(container);
+        enhanceCodeBlocks(container, locale);
 
         lastRenderedRef.current = cleanedContent;
 
@@ -184,8 +186,8 @@ export const GroqMarkdown: React.FC<GroqMarkdownProps> = ({ content, app, onRend
     }, 50);
   }, [cleanedContent, effectiveApp, onRenderComplete]);
 
-  // Функция enhanceCodeBlocks остается без изменений
-  const enhanceCodeBlocks = (root: HTMLElement) => {
+  // Функция enhanceCodeBlocks с локализацией
+  const enhanceCodeBlocks = (root: HTMLElement, currentLocale: Locale) => {
     const codeBlocks = Array.from(root.querySelectorAll('pre > code')) as HTMLElement[];
     codeBlocks.forEach(codeEl => {
       const preEl = codeEl.parentElement as HTMLPreElement | null;
@@ -216,7 +218,7 @@ export const GroqMarkdown: React.FC<GroqMarkdownProps> = ({ content, app, onRend
       const copyBtn = document.createElement('button');
       copyBtn.className = 'groq-icon-button groq-code-copy';
       copyBtn.type = 'button';
-      copyBtn.setAttribute('aria-label', 'Скопировать');
+      copyBtn.setAttribute('aria-label', t('copyCode', currentLocale));
       copyBtn.innerHTML =
         '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v12h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>';
 
@@ -230,7 +232,6 @@ export const GroqMarkdown: React.FC<GroqMarkdownProps> = ({ content, app, onRend
         }
       });
 
-      // ... остальной код enhanceCodeBlocks без изменений
       actions.appendChild(copyBtn);
 
       header.appendChild(langLabel);

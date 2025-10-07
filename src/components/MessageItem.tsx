@@ -216,6 +216,7 @@ export const MessageItem: React.FC<MessageItemProps> = React.memo(
                   content={thinkContent}
                   onRenderComplete={isLastMessage ? handleMarkdownRender : undefined}
                   app={window.app || undefined}
+                  locale={locale}
                 />
               )}
             </div>
@@ -233,6 +234,7 @@ export const MessageItem: React.FC<MessageItemProps> = React.memo(
               content={mainContent}
               onRenderComplete={isLastMessage ? handleMarkdownRender : undefined}
               app={window.app || undefined}
+              locale={locale}
             />
           )}
         </div>
