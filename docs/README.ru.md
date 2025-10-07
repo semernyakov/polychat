@@ -89,7 +89,7 @@ git clone https://github.com/semernyakov/polychat.git
 # Установить зависимости
 npm install
 
-# Запуск в режиме разработки 
+# Запуск в режиме разработки
 npm run dev
 
 # Собрать плагин

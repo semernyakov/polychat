@@ -46,7 +46,7 @@ export default class GroqChatPlugin extends Plugin implements GroqPluginInterfac
       this.addSettingTab(this.settingsTab);
 
       new Notice('PolyChat: готов к работе');
-      
+
       // Автоматически открываем интерфейс после полной инициализации workspace
       this.app.workspace.onLayoutReady(() => {
         this.activateView();

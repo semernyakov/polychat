@@ -90,7 +90,7 @@ git clone https://github.com/semernyakov/polychat.git
 # Install dependencies
 npm install
 
-# Development mode 
+# Development mode
 npm run dev
 
 # Build the plugin
