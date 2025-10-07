@@ -43,6 +43,7 @@ export const MessageList = React.memo(
       const scrollLockRef = useRef<boolean>(false);
       const scrollTimeoutRef = useRef<number | null>(null);
       const hasPendingNewMessagesRef = useRef<boolean>(false);
+      const ioFreezeRef = useRef<boolean>(false);
 
       const DEFAULT_TAIL_LIMIT = Math.max(1, tailLimit ?? 10);
       const [limit, setLimit] = useState<number>(DEFAULT_TAIL_LIMIT);
@@ -103,27 +104,55 @@ export const MessageList = React.memo(
             return;
           }
 
+          // Блокируем реакцию обработчиков и IO во время форс-скролла
           scrollLockRef.current = true;
+          ioFreezeRef.current = true;
 
           if (scrollTimeoutRef.current !== null) {
             window.clearTimeout(scrollTimeoutRef.current);
             scrollTimeoutRef.current = null;
           }
 
+          const sentinel = bottomSentinelRef.current;
+
           if (!smooth) {
             el.classList.add(SCROLL_LOCK_CLASS);
 
-            ensureStrictBottom(el, () => {
-              el.classList.remove(SCROLL_LOCK_CLASS);
-              scrollLockRef.current = false;
+            // Пробуем прокрутить к нижнему sentinel
+            if (sentinel && typeof sentinel.scrollIntoView === 'function') {
+              try {
+                sentinel.scrollIntoView({ block: 'end', inline: 'nearest', behavior: 'auto' });
+              } catch {
+                // fallback ниже
+              }
+            }
+
+            // Довершаем позиционирование на несколько кадров
+            requestAnimationFrame(() => {
+              ensureStrictBottom(el, () => {
+                el.classList.remove(SCROLL_LOCK_CLASS);
+                scrollLockRef.current = false;
+                ioFreezeRef.current = false;
+              });
             });
           } else {
-            const target = Math.max(0, el.scrollHeight - el.clientHeight);
-            el.scrollTo({ top: target, behavior: 'smooth' });
+            if (sentinel && typeof sentinel.scrollIntoView === 'function') {
+              try {
+                sentinel.scrollIntoView({ block: 'end', inline: 'nearest', behavior: 'smooth' });
+              } catch {
+                const target = Math.max(0, el.scrollHeight - el.clientHeight);
+                el.scrollTo({ top: target, behavior: 'smooth' });
+              }
+            } else {
+              const target = Math.max(0, el.scrollHeight - el.clientHeight);
+              el.scrollTo({ top: target, behavior: 'smooth' });
+            }
 
+            // После завершения плавного скролла жёстко фиксируем нижнее положение
             scrollTimeoutRef.current = window.setTimeout(() => {
               ensureStrictBottom(el, () => {
                 scrollLockRef.current = false;
+                ioFreezeRef.current = false;
               });
               scrollTimeoutRef.current = null;
             }, 320);
@@ -149,30 +178,20 @@ export const MessageList = React.memo(
         }
       }, [messages.length, scrollToBottom]);
 
-      // Обработка новых сообщений - выполняем до первого кадра, чтобы исключить визуальный скачок вверх
+      // Обработка новых сообщений — синхронно до первого кадра: сразу вниз, чтобы показать «модель думает»
       useLayoutEffect(() => {
         const prevLength = prevMessagesLengthRef.current;
         const currentLength = messages.length;
         const hasNewMessages = currentLength > prevLength;
 
         if (hasNewMessages && !isInitialRenderRef.current) {
-          if (isAtBottomRef.current) {
-            // Пользователь находился у нижней границы — жестко прокручиваем вниз синхронно
-            scrollToBottom({ smooth: false, force: true });
-            updatePendingNewMessages(false);
-          } else if (!isLastMessageVisible) {
-            updatePendingNewMessages(true);
-          }
+          // Немедленно форсируем позицию в самый низ без плавности
+          scrollToBottom({ smooth: false, force: true });
+          updatePendingNewMessages(false);
         }
 
         prevMessagesLengthRef.current = currentLength;
-      }, [
-        isLastMessageVisible,
-        messages.length,
-        scrollToBottom,
-        updatePendingNewMessages,
-        visibleMessages.length,
-      ]);
+      }, [messages.length, scrollToBottom, updatePendingNewMessages]);
 
       useEffect(() => {
         return () => {
@@ -229,6 +248,11 @@ export const MessageList = React.memo(
 
         const observer = new IntersectionObserver(
           entries => {
+            // Во время принудительного скролла и фиксации — игнорируем сигналы наблюдателя
+            if (scrollLockRef.current || ioFreezeRef.current) {
+              return;
+            }
+
             const entry = entries[0];
             const visible = Boolean(entry?.isIntersecting || entry?.intersectionRatio);
             setIsLastMessageVisible(visible);

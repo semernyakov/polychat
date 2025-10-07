@@ -12,7 +12,6 @@
     "lint": "eslint . --ext .ts,.tsx --fix",
     "format": "npx prettier --write .",
     "format-check": "npx prettier --check .",
-    "check-models": "NODE_OPTIONS='--no-warnings' tsx scripts/check_obsolete_models.ts",
     "version": "node version-bump.js && git add manifest.json version.json community-plugins.json && git commit -m \"chore: bump version\" && git push",
     "version-patch": "npm version patch",
     "version-minor": "npm version minor"

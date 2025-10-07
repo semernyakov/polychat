@@ -141,7 +141,7 @@ export class GroqChatSettingsTab extends PluginSettingTab {
     // Support note for Russian users
     if (t('supportNote', locale)) {
       const supportNoteDiv = thanksBlock.createEl('div', { cls: 'groq-settings-support-note' });
-      supportNoteDiv.innerHTML = t('supportNote', locale);
+      supportNoteDiv.textContent = t('supportNote', locale);
     }
 
     // Ссылки в компактном формате

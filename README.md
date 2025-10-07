@@ -14,6 +14,7 @@
 A plugin for Obsidian that integrates Groq AI capabilities directly into your notes.
 
 PolyChat is a powerful chat extension with support for AI models via the Groq API. Designed for flexibility and ease of use, it enables seamless communication with multiple models directly from your vault.
+
 ## Screenshots
 
 **Main Interface**
@@ -89,77 +90,18 @@ git clone https://github.com/semernyakov/polychat.git
 # Install dependencies
 npm install
 
+# Development mode 
+npm run dev
+
 # Build the plugin
 npm run build
+
+# Formatting
+npm run format
 
 # Lint the code
 npm run lint
 ```
-
-<!-- ## Model Checking
-
-The `check_obsolete_models.ts` script verifies if the plugin is using any obsolete Groq models and helps maintain compatibility with the latest available models.
-
-### Quick Start (Recommended)
-
-```bash
-# Show help and available options
-npm run check-models -- --help
-
-# Check with custom plugin data path (Linux/macOS)
-npm run check-models -- --plugin-data-dir=~/.config/obsidian/plugins/groq-chat-plugin/data
-
-# Check with custom plugin data path (Windows)
-npm run check-models -- --plugin-data-dir=%APPDATA%\\obsidian\\plugins\\groq-chat-plugin\\data
-
-# List all available models (including deprecated ones)
-npm run check-models -- --list-all
-
-# Run with English output
-npm run check-models -- --lang=en
-```
-
-### Additional Options
-
-1. **Specify Obsidian config directory** (if you know the path to `.obsidian`):
-
-   ```bash
-   # Relative path (recommended)
-   npm run check-models -- --config-dir=~/.obsidian
-
-   # Absolute path
-   npm run check-models -- --config-dir=/full/path/to/vault/.obsidian
-   ```
-
-2. **Use environment variables** (useful for scripts):
-
-   ```bash
-   OBSIDIAN_VAULT_PATH=~/.config/obsidian \
-   npm run check-models
-   ```
-
-3. **Development mode** (uses default paths):
-   ```bash
-   NODE_ENV=development npm run check-models
-   ```
-
-### Plugin Settings Location
-
-Plugin settings are usually found in one of these locations:
-
-- **Linux**: `~/.config/obsidian/plugins/groq-chat-plugin/data/settings.json`
-- **Windows**: `%APPDATA%\\obsidian\\plugins\\groq-chat-plugin\\data\\settings.json`
-- **macOS**: `~/Library/Application Support/obsidian/plugins/groq-chat-plugin/data/settings.json`
-
-### What Does the Script Do?
-
-1. Finds the plugin's settings file
-2. Checks which models are specified in the settings
-3. Compares them with the current list of available Groq models
-4. Identifies deprecated models that should be replaced
-5. Detects unknown models that aren't in the official list
-6. Provides recommendations for model replacements when available
--->
 
 ## Contributing
 
@@ -191,5 +133,3 @@ If you find PolyChat helpful, you can support development via:
 See [CHANGELOG.md](CHANGELOG.md) for all changes.
 
 ---
-
-Copyright (c) 2025 Ivan Semernyakov.

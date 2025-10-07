@@ -93,9 +93,9 @@
   box-sizing: border-box;
   overflow-y: auto;
   overflow-x: hidden;
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
   -webkit-overflow-scrolling: touch;
-  /* Убрали overflow-anchor: none - может конфликтовать с программным скроллом */
+  overflow-anchor: none;
 
   /* Переменные для скролла */
   --near-bottom-threshold: 50px;
@@ -103,11 +103,11 @@
   --load-reveal-offset: 80px;
 
   /* Улучшения для стабильного скроллинга */
-  scroll-padding: 10px; /* Минимальный отступ при программном скролле */
-  /* Убрали scroll-margin - может вызывать проблемы */
+  scroll-padding: 0;
 
   /* Предотвращаем возможные конфликты */
-  transform: translateZ(0); /* Аппаратное ускорение для плавного скролла */
+  transform: translateZ(0);
+  will-change: scroll-position;
 }
 
 /* --- Поле ввода --- */
@@ -463,6 +463,7 @@
 
 .groq-markdown-content a {
   color: var(--interactive-accent);
+  background-image: none !important;
 }
 
 .groq-markdown-content img {
@@ -1129,6 +1130,19 @@
 /* --- Специальные классы для скролла --- */
 .groq-chat__messages--scroll-locked {
   scroll-behavior: auto !important;
+  overflow-anchor: none !important;
+}
+
+.groq-chat__bottom-sentinel {
+  height: 1px;
+  width: 100%;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.groq-load-more-container {
+  margin-bottom: 12px;
+  text-align: center;
 }
 
 /* ===== АДАПТИВНОСТЬ ===== */
