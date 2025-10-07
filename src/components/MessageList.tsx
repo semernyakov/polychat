@@ -61,19 +61,9 @@ export const MessageList = React.memo(
       }, []);
 
       const ensureStrictBottom = useCallback((el: HTMLDivElement, onSettled?: () => void) => {
-        const clampToBottom = () => {
-          const target = Math.max(0, el.scrollHeight - el.clientHeight);
-          el.scrollTop = target;
-        };
-
-        clampToBottom();
-        requestAnimationFrame(() => {
-          clampToBottom();
-          requestAnimationFrame(() => {
-            clampToBottom();
-            onSettled?.();
-          });
-        });
+        const target = Math.max(0, el.scrollHeight - el.clientHeight);
+        el.scrollTop = target;
+        onSettled?.();
       }, []);
 
       // Вычисляем видимую "хвостовую" часть
@@ -91,79 +81,48 @@ export const MessageList = React.memo(
         return el.scrollTop + el.clientHeight >= el.scrollHeight - threshold;
       }, []);
 
-      // Прокрутка вниз с гарантированным позиционированием (без «скачков»)
+      // Immediate, smooth, unidirectional scroll to bottom without bouncing
       const scrollToBottom = useCallback(
         (opts?: { smooth?: boolean; force?: boolean }) => {
           const el = containerRef.current;
           if (!el) return;
 
-          const smooth = opts?.smooth ?? true;
           const force = opts?.force ?? false;
 
           if (!(force || isAtBottomRef.current)) {
             return;
           }
 
-          // Блокируем реакцию обработчиков и IO во время форс-скролла
-          scrollLockRef.current = true;
-          ioFreezeRef.current = true;
-
+          // Clear any pending scroll operations
           if (scrollTimeoutRef.current !== null) {
             window.clearTimeout(scrollTimeoutRef.current);
             scrollTimeoutRef.current = null;
           }
 
-          const sentinel = bottomSentinelRef.current;
+          // Block scroll event handlers during forced scroll
+          scrollLockRef.current = true;
+          ioFreezeRef.current = true;
 
-          if (!smooth) {
-            el.classList.add(SCROLL_LOCK_CLASS);
+          // Add scroll lock class to prevent CSS transitions
+          el.classList.add(SCROLL_LOCK_CLASS);
 
-            // Пробуем прокрутить к нижнему sentinel
-            if (sentinel && typeof sentinel.scrollIntoView === 'function') {
-              try {
-                sentinel.scrollIntoView({ block: 'end', inline: 'nearest', behavior: 'auto' });
-              } catch {
-                // fallback ниже
-              }
-            }
+          // Immediate scroll to bottom - single direct motion
+          const target = Math.max(0, el.scrollHeight - el.clientHeight);
+          el.scrollTop = target;
 
-            // Довершаем позиционирование на несколько кадров
-            requestAnimationFrame(() => {
-              ensureStrictBottom(el, () => {
-                el.classList.remove(SCROLL_LOCK_CLASS);
-                scrollLockRef.current = false;
-                ioFreezeRef.current = false;
-              });
-            });
-          } else {
-            if (sentinel && typeof sentinel.scrollIntoView === 'function') {
-              try {
-                sentinel.scrollIntoView({ block: 'end', inline: 'nearest', behavior: 'smooth' });
-              } catch {
-                const target = Math.max(0, el.scrollHeight - el.clientHeight);
-                el.scrollTo({ top: target, behavior: 'smooth' });
-              }
-            } else {
-              const target = Math.max(0, el.scrollHeight - el.clientHeight);
-              el.scrollTo({ top: target, behavior: 'smooth' });
-            }
-
-            // После завершения плавного скролла жёстко фиксируем нижнее положение
-            scrollTimeoutRef.current = window.setTimeout(() => {
-              ensureStrictBottom(el, () => {
-                scrollLockRef.current = false;
-                ioFreezeRef.current = false;
-              });
-              scrollTimeoutRef.current = null;
-            }, 320);
-          }
+          // Release locks after scroll completes
+          requestAnimationFrame(() => {
+            el.classList.remove(SCROLL_LOCK_CLASS);
+            scrollLockRef.current = false;
+            ioFreezeRef.current = false;
+          });
 
           isAtBottomRef.current = true;
           updatePendingNewMessages(false);
           setShowNewMessageNotice(false);
           setIsNoticeExiting(false);
         },
-        [ensureStrictBottom, updatePendingNewMessages],
+        [updatePendingNewMessages],
       );
 
       // Initial scroll - только при первом рендере с сообщениями
@@ -178,15 +137,15 @@ export const MessageList = React.memo(
         }
       }, [messages.length, scrollToBottom]);
 
-      // Обработка новых сообщений — синхронно до первого кадра: сразу вниз, чтобы показать «модель думает»
+      // Handle new messages - immediate scroll to show "model is thinking" indicator
       useLayoutEffect(() => {
         const prevLength = prevMessagesLengthRef.current;
         const currentLength = messages.length;
         const hasNewMessages = currentLength > prevLength;
 
         if (hasNewMessages && !isInitialRenderRef.current) {
-          // Немедленно форсируем позицию в самый низ без плавности
-          scrollToBottom({ smooth: false, force: true });
+          // Immediate forced scroll to bottom to show new message/indicator
+          scrollToBottom({ force: true });
           updatePendingNewMessages(false);
         }
 
@@ -341,10 +300,9 @@ export const MessageList = React.memo(
       }, [scrollToBottom, updatePendingNewMessages]);
 
       const handleLastMessageRender = useCallback(() => {
-        // После рендеринга markdown всегда докручиваем до низа (без задержек)
-        // Но только если пользователь находится у нижней границы
+        // After markdown renders, immediately scroll to bottom if user is at bottom
         if (!isInitialRenderRef.current && !scrollLockRef.current && isAtBottomRef.current) {
-          scrollToBottom({ smooth: false, force: true });
+          scrollToBottom({ force: true });
         }
       }, [scrollToBottom]);
 

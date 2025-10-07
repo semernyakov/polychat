@@ -94,7 +94,7 @@
   overflow-y: auto;
   overflow-x: hidden;
   scroll-behavior: auto;
-  -webkit-overflow-scrolling: touch;
+  -webkit-overflow-scrolling: auto;
   overflow-anchor: none;
 
   /* Переменные для скролла */
@@ -104,10 +104,12 @@
 
   /* Улучшения для стабильного скроллинга */
   scroll-padding: 0;
+  scroll-snap-type: none;
 
-  /* Предотвращаем возможные конфликты */
+  /* Предотвращаем возможные конфликты и эластичные эффекты */
   transform: translateZ(0);
-  will-change: scroll-position;
+  will-change: auto;
+  overscroll-behavior: contain;
 }
 
 /* --- Поле ввода --- */
@@ -1131,6 +1133,8 @@
 .groq-chat__messages--scroll-locked {
   scroll-behavior: auto !important;
   overflow-anchor: none !important;
+  -webkit-overflow-scrolling: auto !important;
+  overscroll-behavior: contain !important;
 }
 
 .groq-chat__bottom-sentinel {

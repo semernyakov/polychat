@@ -260,7 +260,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
         // Устанавливаем флаг блокировки скролла во время стриминга
         // Скролл будет выполнен автоматически через onRenderComplete после рендеринга markdown
 
-        // Обработчик для потоковых чанков
+        // Handler for streaming chunks - immediate scroll to keep content visible
         let streamContent = '';
         const handleChunk = (chunk: string) => {
           streamContent += chunk;
@@ -269,7 +269,8 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
               msg.id === tempAssistantMessage.id ? { ...msg, content: streamContent } : msg,
             ),
           );
-          requestAnimationFrame(() => messageListRef.current?.scrollToBottom());
+          // Immediate scroll to bottom during streaming without smooth animation
+          messageListRef.current?.scrollToBottom({ smooth: false });
         };
 
         const assistantMessage = await plugin.groqService.sendMessage(
@@ -278,12 +279,13 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
           handleChunk,
         );
 
-        // Заменяем временное сообщение на финальное
+        // Replace temporary message with final message
         setMessages(prev =>
           prev.map(msg => (msg.id === tempAssistantMessage.id ? assistantMessage : msg)),
         );
         setIsStreaming(false);
-        requestAnimationFrame(() => messageListRef.current?.scrollToBottom());
+        // Final immediate scroll to ensure complete message is visible
+        messageListRef.current?.scrollToBottom({ smooth: false });
 
         await plugin.historyService.addMessage(assistantMessage);
       } catch (error: any) {
