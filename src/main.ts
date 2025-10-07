@@ -19,28 +19,42 @@ export default class GroqChatPlugin extends Plugin implements GroqPluginInterfac
   private settingsTab: GroqChatSettingsTab | null = null;
 
   async onload() {
-    await this.loadSettings();
-    this.initializeServices();
+    try {
+      new Notice('PolyChat: загрузка…');
 
-    // Check API key on plugin load
-    if (this.settings.apiKey) {
-      const isValid = await this.groqService.validateApiKey(this.settings.apiKey);
-      if (!isValid) {
-        new Notice('⚠️ Invalid API key. Please update your API key in settings.');
+      await this.loadSettings();
+      this.initializeServices();
+
+      // Check API key on plugin load
+      if (this.settings.apiKey) {
+        const isValid = await this.groqService.validateApiKey(this.settings.apiKey);
+        if (!isValid) {
+          new Notice('⚠️ Invalid API key. Please update your API key in settings.');
+        }
+      } else {
+        new Notice('⚠️ Please set your Groq API key in settings.');
       }
-    } else {
-      new Notice('⚠️ Please set your Groq API key in settings.');
+
+      this.registerView(VIEW_TYPE_GROQ_CHAT, leaf => {
+        this.currentLeaf = leaf;
+        return new GroqChatView(leaf, this);
+      });
+
+      this.addCommands();
+      this.addRibbonIcon('message-square', 'PolyChat', () => this.activateView());
+      this.settingsTab = new GroqChatSettingsTab(this.app, this);
+      this.addSettingTab(this.settingsTab);
+
+      new Notice('PolyChat: готов к работе');
+      
+      // Автоматически открываем интерфейс после полной инициализации workspace
+      this.app.workspace.onLayoutReady(() => {
+        this.activateView();
+      });
+    } catch (e: any) {
+      new Notice(`PolyChat: ошибка загрузки — ${e?.message ?? String(e)}`);
+      throw e;
     }
-
-    this.registerView(VIEW_TYPE_GROQ_CHAT, leaf => {
-      this.currentLeaf = leaf;
-      return new GroqChatView(leaf, this);
-    });
-
-    this.addCommands();
-    this.addRibbonIcon('message-square', 'PolyChat', () => this.activateView());
-    this.settingsTab = new GroqChatSettingsTab(this.app, this);
-    this.addSettingTab(this.settingsTab);
   }
 
   private initializeServices(): void {
