@@ -92,8 +92,12 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
             </option>,
           );
 
-          // Добавляем сгруппированные модели
-          Object.entries(groupedModels).forEach(([owner, models]) => {
+          // Сортируем группы по алфавиту и добавляем сгруппированные модели
+          const sortedGroups = Object.entries(groupedModels).sort(([ownerA], [ownerB]) =>
+            ownerA.localeCompare(ownerB, locale === 'ru' ? 'ru' : 'en')
+          );
+
+          sortedGroups.forEach(([owner, models]) => {
             // Создаем optgroup для каждого владельца
             const optgroup = (
               <optgroup key={owner} label={owner}>

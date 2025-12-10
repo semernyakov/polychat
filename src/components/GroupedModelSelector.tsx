@@ -4,6 +4,7 @@ import { GroqPluginInterface } from '../types/plugin';
 import { GroqModelInfo } from '../settings/GroqChatSettings';
 import { toast } from 'react-toastify';
 import { t, Locale } from '../localization';
+import { groupModelsByOwner, isPreviewModel } from '../utils/modelUtils';
 
 interface GroupedModelSelectorProps {
   plugin: GroqPluginInterface;
@@ -65,6 +66,12 @@ export const GroupedModelSelector: React.FC<GroupedModelSelectorProps> = ({
     onSelectModel(selectedValue);
   };
 
+  // Группируем модели и сортируем по алфавиту
+  const groupedModels = groupModelsByOwner(availableModels);
+  const sortedGroups = Object.entries(groupedModels).sort(([ownerA], [ownerB]) =>
+    ownerA.localeCompare(ownerB, locale === 'ru' ? 'ru' : 'en')
+  );
+
   return (
     <div className="groq-model-selector">
       <select
@@ -74,10 +81,18 @@ export const GroupedModelSelector: React.FC<GroupedModelSelectorProps> = ({
         className="groq-select"
         aria-label={t('chooseModel', locale)}
       >
-        {availableModels.map(modelInfo => (
-          <option key={modelInfo.id} value={modelInfo.id}>
-            {modelInfo.name}
-          </option>
+        {sortedGroups.map(([owner, models]) => (
+          <optgroup key={owner} label={owner}>
+            {models.map(modelInfo => {
+              const displayName =
+                modelInfo.name + (isPreviewModel(modelInfo) ? ` (${t('preview', locale)})` : '');
+              return (
+                <option key={modelInfo.id} value={modelInfo.id}>
+                  {displayName}
+                </option>
+              );
+            })}
+          </optgroup>
         ))}
       </select>
     </div>
