@@ -1,25 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import '../styles.css'; // Используем единый style.css
 import { GroqPluginInterface } from '../types/plugin';
+import { GroqModelInfo } from '../settings/GroqChatSettings';
 import { toast } from 'react-toastify'; // Импортируем toast
 import { t, Locale } from '../localization';
 import { fixModelNameCasing, groupModelsByOwner, isPreviewModel } from '../utils/modelUtils';
-
-// Используем DynamicModelInfo для моделей
-interface DynamicModelInfo {
-  id: string;
-  name: string;
-  description?: string;
-  owned_by?: string;
-  isPreview?: boolean;
-}
 
 export interface ModelSelectorProps {
   plugin: GroqPluginInterface;
   selectedModel: string;
   onSelectModel: (modelId: string) => void;
-  getAvailableModels: () => Promise<{ id: string; name: string; description?: string }[]>;
-  availableModels?: any[];
+  getAvailableModels: () => Promise<GroqModelInfo[]>;
+  availableModels?: GroqModelInfo[];
   locale?: Locale;
 }
 
@@ -32,7 +24,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
   locale = 'en',
 }) => {
   // Если availableModels передан как проп, используем его, иначе локальный state
-  const [availableModels, setAvailableModels] = useState<DynamicModelInfo[]>([]);
+  const [availableModels, setAvailableModels] = useState<GroqModelInfo[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -53,7 +45,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
               ),
             )
           : models;
-        setAvailableModels(activeModels.map((m: any) => ({ ...m })));
+        setAvailableModels(activeModels.map((m: GroqModelInfo) => ({ ...m })));
       } catch (error) {
         console.error('Failed to fetch available models:', error);
         setAvailableModels([]);
@@ -63,7 +55,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
       }
     };
 
-    fetchAvailableModels();
+    void fetchAvailableModels();
   }, [getAvailableModels, _plugin.settings.groqAvailableModels, availableModelsProp]); // Добавляем зависимость
 
   if (isLoading) {
@@ -71,7 +63,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
   }
 
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedValue = event.target.value as string;
+    const selectedValue = event.target.value;
     onSelectModel(selectedValue);
   };
 

@@ -108,7 +108,7 @@ export class HistoryService {
     } catch (error) {
       console.error('Error saving to localStorage', error);
       if (error instanceof Error && error.name === 'QuotaExceededError') {
-        new Notice('Failed to save history: LocalStorage quota exceeded.');
+        new Notice('Failed to save history: localStorage quota exceeded.');
       }
     }
   }
@@ -127,7 +127,7 @@ export class HistoryService {
 
         request.onerror = event => {
           console.error('IndexedDB getAll error:', (event.target as IDBRequest).error);
-          reject((event.target as IDBRequest).error);
+          reject(new Error(`IndexedDB getAll error: ${(event.target as IDBRequest).error}`));
         };
       });
     } catch (error) {
@@ -150,29 +150,29 @@ export class HistoryService {
             return new Promise<void>((res, rej) => {
               const req = store.put(msg);
               req.onsuccess = () => res();
-              req.onerror = event => rej((event.target as IDBRequest).error);
+              req.onerror = event => rej(new Error(`IndexedDB put error: ${(event.target as IDBRequest).error}`));
             });
           });
 
           Promise.all(putPromises)
             .then(() => {
-              console.log('IndexedDB save successful');
+              console.warn('IndexedDB save successful');
               resolve();
             })
             .catch(err => {
               console.error('IndexedDB put error:', err);
-              reject(err);
+              reject(err instanceof Error ? err : new Error(String(err)));
             });
         };
 
         clearRequest.onerror = event => {
           console.error('IndexedDB clear error:', (event.target as IDBRequest).error);
-          reject((event.target as IDBRequest).error);
+          reject(new Error(`IndexedDB clear error: ${(event.target as IDBRequest).error}`));
         };
 
         transaction.onerror = event => {
           console.error('IndexedDB transaction error:', (event.target as IDBTransaction).error);
-          reject((event.target as IDBTransaction).error);
+          reject(new Error(`IndexedDB transaction error: ${(event.target as IDBTransaction).error}`));
         };
 
         transaction.oncomplete = () => {};
@@ -192,12 +192,12 @@ export class HistoryService {
         const request = store.clear();
 
         request.onsuccess = () => {
-          console.log('IndexedDB cleared successfully');
+          console.warn('IndexedDB cleared successfully');
           resolve();
         };
         request.onerror = event => {
           console.error('IndexedDB clear error:', (event.target as IDBRequest).error);
-          reject((event.target as IDBRequest).error);
+          reject(new Error(`IndexedDB clear error: ${(event.target as IDBRequest).error}`));
         };
       });
     } catch (error) {
@@ -301,7 +301,7 @@ export class HistoryService {
       };
 
       request.onerror = event => {
-        reject((event.target as IDBOpenDBRequest).error);
+        reject(new Error(`IndexedDB open error: ${(event.target as IDBOpenDBRequest).error}`));
       };
 
       request.onblocked = () => {

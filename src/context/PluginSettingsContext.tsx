@@ -27,15 +27,20 @@ export function PluginSettingsProvider({
     setSettingsState(prev => ({ ...prev, ...newSettings }));
   };
 
+  // Get current locale from Obsidian app
+  const getLanguage = (): Locale => {
+    const app = (window as any)?.app;
+    const appLang = app?.getLanguage?.();
+    return (appLang && appLang.toLowerCase().startsWith('ru') ? 'ru' : 'en') as Locale;
+  };
+
   return (
     <PluginSettingsContext.Provider
       value={{
         ...settings,
         setSettings,
         // Язык интерфейса берём из настроек Obsidian, а не из настроек плагина
-        language: ((window as any)?.app?.getLanguage?.() || 'en').toLowerCase().startsWith('ru')
-          ? ('ru' as Locale)
-          : ('en' as Locale),
+        language: getLanguage(),
       }}
     >
       {children}

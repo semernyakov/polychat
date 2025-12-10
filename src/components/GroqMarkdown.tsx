@@ -1,9 +1,20 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { MarkdownRenderer, Component } from 'obsidian';
 import type { App } from 'obsidian';
-import { FiClipboard, FiCode, FiAlignLeft } from 'react-icons/fi';
+import { FiClipboard } from 'react-icons/fi';
 import { t, Locale } from '../localization';
 import '../styles.css';
+
+// Type for Obsidian container elements
+interface ObsidianContainerElement extends HTMLElement {
+  empty(): void;
+  setText(text: string): void;
+}
+
+// Type assertion helper for window.app
+const getWindowApp = (): App | undefined => {
+  return window.app;
+};
 
 interface GroqMarkdownProps {
   content: string;
@@ -12,53 +23,13 @@ interface GroqMarkdownProps {
   locale?: Locale;
 }
 
-interface CodeBlockProps {
-  language: string;
-  value: string;
-  className?: string;
-}
-
-const CodeBlock: React.FC<CodeBlockProps> = ({ language, value, className = '' }) => {
-  const [isCopied, setIsCopied] = useState(false);
-
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(value);
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy:', err);
-    }
-  };
-
-  return (
-    <div className="groq-code-container">
-      <div className="groq-code-header">
-        <span className="groq-code-language">{language}</span>
-        <div className="groq-code-actions">
-          <button
-            onClick={handleCopy}
-            className={`groq-code-button ${isCopied ? 'is-copied' : ''}`}
-            title="Copy"
-          >
-            <FiClipboard />
-          </button>
-        </div>
-      </div>
-      <pre className={className}>
-        <code>{value}</code>
-      </pre>
-    </div>
-  );
-};
-
 export const GroqMarkdown: React.FC<GroqMarkdownProps> = ({ content, app, onRenderComplete, locale = 'en' }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const mdComponentRef = useRef<Component | null>(null);
   const lastRenderedRef = useRef<string>('');
   const debounceTimerRef = useRef<number | null>(null);
   const mountedRef = useRef<boolean>(false);
-  const effectiveApp: App | undefined = app ?? ((window as any)?.app as App | undefined);
+  const effectiveApp: App | undefined = app ?? getWindowApp();
 
   // Очистка think-тегов из контента для рендеринга
   const cleanedContent = React.useMemo(() => {
@@ -110,7 +81,7 @@ export const GroqMarkdown: React.FC<GroqMarkdownProps> = ({ content, app, onRend
         mdComponentRef.current = null;
       }
       if (containerRef.current) {
-        (containerRef.current as any).empty?.();
+        (containerRef.current as ObsidianContainerElement).empty?.();
       }
       if (debounceTimerRef.current) {
         window.clearTimeout(debounceTimerRef.current);
@@ -124,12 +95,12 @@ export const GroqMarkdown: React.FC<GroqMarkdownProps> = ({ content, app, onRend
     if (!effectiveApp) {
       const container = containerRef.current;
       if (container) {
-        (container as any).empty?.();
-        (container as any).setText?.(cleanedContent);
+        (container as ObsidianContainerElement).empty?.();
+        (container as ObsidianContainerElement).setText?.(cleanedContent);
       }
       lastRenderedRef.current = cleanedContent;
       if (onRenderComplete) {
-        onRenderComplete();
+        void onRenderComplete();
       }
       return;
     }
@@ -148,7 +119,7 @@ export const GroqMarkdown: React.FC<GroqMarkdownProps> = ({ content, app, onRend
         return;
       }
 
-      (container as any).empty?.();
+      (container as ObsidianContainerElement).empty?.();
 
       try {
         const sourcePath =
@@ -174,13 +145,13 @@ export const GroqMarkdown: React.FC<GroqMarkdownProps> = ({ content, app, onRend
         lastRenderedRef.current = cleanedContent;
 
         if (onRenderComplete) {
-          onRenderComplete();
+          void onRenderComplete();
         }
       } catch (err) {
         console.error('Error rendering markdown:', err);
-        (container as any).setText?.(cleanedContent);
+        (container as ObsidianContainerElement).setText?.(cleanedContent);
         if (onRenderComplete) {
-          onRenderComplete();
+          void onRenderComplete();
         }
       }
     }, 50);
@@ -188,7 +159,7 @@ export const GroqMarkdown: React.FC<GroqMarkdownProps> = ({ content, app, onRend
 
   // Функция enhanceCodeBlocks с локализацией
   const enhanceCodeBlocks = (root: HTMLElement, currentLocale: Locale) => {
-    const codeBlocks = Array.from(root.querySelectorAll('pre > code')) as HTMLElement[];
+    const codeBlocks = Array.from(root.querySelectorAll('pre > code'));
     codeBlocks.forEach(codeEl => {
       const preEl = codeEl.parentElement as HTMLPreElement | null;
       if (!preEl) return;
@@ -219,17 +190,29 @@ export const GroqMarkdown: React.FC<GroqMarkdownProps> = ({ content, app, onRend
       copyBtn.className = 'groq-icon-button groq-code-copy';
       copyBtn.type = 'button';
       copyBtn.setAttribute('aria-label', t('copyCode', currentLocale));
-      copyBtn.innerHTML =
-        '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v12h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>';
+      
+      // Create SVG element instead of using innerHTML
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('viewBox', '0 0 24 24');
+      svg.setAttribute('aria-hidden', 'true');
+      
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('fill', 'currentColor');
+      path.setAttribute('d', 'M16 1H4c-1.1 0-2 .9-2 2v12h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z');
+      
+      svg.appendChild(path);
+      copyBtn.appendChild(svg);
 
-      copyBtn.addEventListener('click', async () => {
-        try {
-          await navigator.clipboard.writeText(codeEl.innerText);
-          copyBtn.classList.add('is-copied');
-          setTimeout(() => copyBtn.classList.remove('is-copied'), 1200);
-        } catch (e) {
-          console.error('Copy failed', e);
-        }
+      copyBtn.addEventListener('click', () => {
+        void (async () => {
+          try {
+            await navigator.clipboard.writeText((codeEl as HTMLElement).innerText);
+            copyBtn.classList.add('is-copied');
+            setTimeout(() => copyBtn.classList.remove('is-copied'), 1200);
+          } catch (e) {
+            console.error('Copy failed', e);
+          }
+        })();
       });
 
       actions.appendChild(copyBtn);

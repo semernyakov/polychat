@@ -11,7 +11,8 @@ function getCurrentLocale(): Locale {
   if (typeof window === 'undefined') {
     return defaultLocale;
   }
-  const appLang = (window as any)?.app?.getLanguage?.();
+  const app = (window as any)?.app;
+  const appLang = app?.getLanguage?.();
   if (typeof appLang === 'string') {
     const normalized = appLang.toLowerCase();
     return (normalized.startsWith('ru') ? 'ru' : 'en') as Locale;

@@ -12,7 +12,8 @@ export const SupportButton: React.FC<SupportButtonProps> = ({
   onClick,
   supportLink = 'https://yoomoney.ru/fundraise/194GT5A5R07.250321',
 }) => {
-  const appLang = (window as any)?.app?.getLanguage?.();
+  const app = (window as any)?.app;
+  const appLang = app?.getLanguage?.();
   const language = (appLang && appLang.toLowerCase().startsWith('ru') ? 'ru' : 'en') as Locale;
   const handleClick = () => {
     onClick?.();

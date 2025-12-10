@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { FiExternalLink, FiStar, FiMessageCircle, FiDollarSign } from 'react-icons/fi';
 import '../styles.css'; // Используем единый style.css
-import { t, tHtml } from '../localization';
+import { t } from '../localization';
 
 interface SupportDialogProps {
   isOpen: boolean;

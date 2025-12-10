@@ -1,6 +1,7 @@
 /**
  * Utility functions for handling model names and their proper casing
  */
+import { GroqModelInfo } from '../settings/GroqChatSettings';
 
 // Mapping of model name prefixes to their proper casing
 const MODEL_NAME_PREFIX_MAP: Record<string, string> = {
@@ -139,8 +140,8 @@ export function fixModelNameCasing(modelName: string): string {
  * @param models Array of model objects
  * @returns Object with owners as keys and arrays of models as values
  */
-export function groupModelsByOwner(models: any[]): Record<string, any[]> {
-  const grouped: Record<string, any[]> = {};
+export function groupModelsByOwner(models: GroqModelInfo[]): Record<string, GroqModelInfo[]> {
+  const grouped: Record<string, GroqModelInfo[]> = {};
 
   models.forEach(model => {
     // Use the owned_by field or default to 'Unknown'
@@ -161,9 +162,9 @@ export function groupModelsByOwner(models: any[]): Record<string, any[]> {
  * @param model The model object to check
  * @returns True if the model is in preview status
  */
-export function isPreviewModel(model: any): boolean {
+export function isPreviewModel(model: GroqModelInfo): boolean {
   // Check if the model has a release_status field with value 'preview'
-  if (model.release_status === 'preview' || model.releaseStatus === 'preview') {
+  if (model.releaseStatus === 'preview') {
     return true;
   }
 

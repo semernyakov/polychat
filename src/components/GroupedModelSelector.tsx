@@ -1,26 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import '../styles.css';
 import { GroqPluginInterface } from '../types/plugin';
+import { GroqModelInfo } from '../settings/GroqChatSettings';
 import { toast } from 'react-toastify';
 import { t, Locale } from '../localization';
-import { groupModelsByOwner, isPreviewModel } from '../utils/modelUtils';
-
-interface DynamicModelInfo {
-  id: string;
-  name: string;
-  description?: string;
-  owned_by?: string;
-  isPreview?: boolean;
-}
+import { groupModelsByOwner } from '../utils/modelUtils';
 
 interface GroupedModelSelectorProps {
   plugin: GroqPluginInterface;
   selectedModel: string;
   onSelectModel: (modelId: string) => void;
-  getAvailableModels: () => Promise<
-    { id: string; name: string; description?: string; owned_by?: string; isPreview?: boolean }[]
-  >;
-  availableModels?: any[];
+  getAvailableModels: () => Promise<GroqModelInfo[]>;
+  availableModels?: GroqModelInfo[];
   locale?: Locale;
 }
 
@@ -32,15 +23,10 @@ export const GroupedModelSelector: React.FC<GroupedModelSelectorProps> = ({
   availableModels: availableModelsProp,
   locale = 'en',
 }) => {
-  const [availableModels, setAvailableModels] = useState<DynamicModelInfo[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [groupedModels, setGroupedModels] = useState<Record<string, DynamicModelInfo[]>>({});
-
   useEffect(() => {
     if (availableModelsProp) {
       setIsLoading(false);
       setAvailableModels(availableModelsProp);
-      setGroupedModels(groupModelsByOwner(availableModelsProp));
       return;
     }
     const fetchAvailableModels = async () => {
@@ -55,19 +41,17 @@ export const GroupedModelSelector: React.FC<GroupedModelSelectorProps> = ({
               ),
             )
           : models;
-        setAvailableModels(activeModels.map((m: any) => ({ ...m })));
-        setGroupedModels(groupModelsByOwner(activeModels));
+        setAvailableModels(activeModels.map((m: GroqModelInfo) => ({ ...m })));
       } catch (error) {
         console.error('Failed to fetch available models:', error);
         setAvailableModels([]);
-        setGroupedModels({});
         toast.error(t('modelsUpdateError', locale));
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchAvailableModels();
+    void fetchAvailableModels();
   }, [getAvailableModels, _plugin.settings.groqAvailableModels, availableModelsProp]);
 
   if (isLoading) {
@@ -75,7 +59,7 @@ export const GroupedModelSelector: React.FC<GroupedModelSelectorProps> = ({
   }
 
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedValue = event.target.value as string;
+    const selectedValue = event.target.value;
     onSelectModel(selectedValue);
   };
 
@@ -88,18 +72,10 @@ export const GroupedModelSelector: React.FC<GroupedModelSelectorProps> = ({
         className="groq-select"
         aria-label={t('chooseModel', locale)}
       >
-        {Object.entries(groupedModels).map(([owner, models]) => (
-          <optgroup key={owner} label={owner}>
-            {models.map(modelInfo => {
-              const displayName =
-                modelInfo.name + (modelInfo.isPreview ? ` (${t('preview', locale)})` : '');
-              return (
-                <option key={modelInfo.id} value={modelInfo.id}>
-                  {displayName}
-                </option>
-              );
-            })}
-          </optgroup>
+        {availableModels.map(modelInfo => (
+          <option key={modelInfo.id} value={modelInfo.id}>
+            {modelInfo.name}
+          </option>
         ))}
       </select>
     </div>

@@ -60,12 +60,6 @@ export const MessageList = React.memo(
         setHasPendingNewMessages(value);
       }, []);
 
-      const ensureStrictBottom = useCallback((el: HTMLDivElement, onSettled?: () => void) => {
-        const target = Math.max(0, el.scrollHeight - el.clientHeight);
-        el.scrollTop = target;
-        onSettled?.();
-      }, []);
-
       // Вычисляем видимую "хвостовую" часть
       const visibleMessages = React.useMemo(() => {
         if (!messages || messages.length === 0) return [];

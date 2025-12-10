@@ -16,6 +16,26 @@ export type RateLimitsType = {
   resetTokens?: string;
 };
 
+// Interface for API response model
+interface GroqApiModel {
+  id: string;
+  object?: string;
+  owned_by?: string;
+  name?: string;
+  description?: string;
+  max_completion_tokens?: number;
+  active?: boolean;
+  release_status?: string;
+  releaseStatus?: string;
+  created?: number;
+}
+
+// Interface for API response
+interface GroqApiResponse {
+  data: GroqApiModel[];
+  object?: string;
+}
+
 interface GroqServiceMethods {
   updateApiKey: (apiKey: string) => void;
   validateApiKey: (apiKey: string) => Promise<boolean>;
@@ -190,35 +210,36 @@ export class GroqService implements GroqServiceMethods {
       };
 
       this.rateLimits = rl;
-      const filtered = ((response.json && response.json.data) || []).filter((m: any) => {
+      const filtered = ((response.json && response.json.data) || []).filter((m: GroqApiModel) => {
         const name = (m.name || m.id || '').toLowerCase();
         return !/speech\s*to\s*text|text\s*to\s*speech|audio|image|vision|multimodal/.test(name);
       });
-      const sorted = filtered.sort((a: any, b: any) => {
+      const sorted = filtered.sort((a: GroqApiModel, b: GroqApiModel) => {
         const idA = (a.id || '').toLowerCase();
         const idB = (b.id || '').toLowerCase();
         return idA.localeCompare(idB);
       });
-      const models = sorted.map((m: any) => ({
+      const models = sorted.map((m: GroqApiModel): GroqModelInfo => ({
         id: m.id,
         name: fixModelNameCasing(m.name || m.id),
         description: m.description || '',
         developer: { name: m.owned_by || '—' },
         maxTokens:
           typeof m.max_completion_tokens === 'number' ? m.max_completion_tokens : undefined,
-        active: typeof m.active === 'boolean' ? m.active : undefined,
+        isActive: typeof m.active === 'boolean' ? m.active : undefined,
         releaseStatus: m.release_status || m.releaseStatus || undefined,
         owned_by: m.owned_by || undefined, // Добавляем информацию о владельце
-        isPreview:
+        isPreview: Boolean(
           (m.release_status || m.releaseStatus) === 'preview' ||
           (m.name && m.name.toLowerCase().includes('preview')) ||
-          (m.id && m.id.toLowerCase().includes('preview')), // Определяем, является ли модель preview
+          (m.id && m.id.toLowerCase().includes('preview'))
+        ), // Определяем, является ли модель preview
       }));
 
       // ВРЕМЕННО: логируем все поля моделей для отладки
       if (response.json && Array.isArray(response.json.data)) {
         // console.log('[GroqService] Получено моделей:', response.json.data.length);
-        response.json.data.forEach((model: any, idx: number) => {
+        response.json.data.forEach((model: GroqApiModel, idx: number) => {
           // console.log(`[GroqService] Модель #${idx + 1}:`, model);
         });
       }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { GroqPluginInterface } from '../types/plugin';
-import { Message } from '../types/types';
+import { Message, DynamicModelInfo } from '../types/types';
 import { MessageUtils } from '../utils/messageUtils';
 import { MessageList, MessageListHandles } from './MessageList';
 import { ModelSelector } from './ModelSelector';
@@ -24,6 +24,10 @@ import { t, Locale } from '../localization';
 // import { DEFAULT_MODEL } from '../types/models'; // Удалено, если не используется
 import { GroqModel, ModelCategory, ModelReleaseStatus } from '../types/types';
 import { fixModelNameCasing } from '../utils/modelUtils';
+import { HistoryService } from '../services/historyService';
+import { RateLimitsType } from '../services/groqService';
+import type { App } from 'obsidian';
+import { GroqModelInfo } from '../settings/GroqChatSettings';
 
 interface ChatPanelProps {
   plugin: GroqPluginInterface;
@@ -60,7 +64,7 @@ interface ModelInfo {
 }
 
 // Хук для управления сообщениями
-const useMessages = (initialMessages: Message[], historyService: any, locale: Locale) => {
+const useMessages = (initialMessages: Message[], historyService: HistoryService, locale: Locale) => {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [isHistoryLoading, setIsHistoryLoading] = useState(false);
   const [hasLoadedHistory, setHasLoadedHistory] = useState(false);
@@ -85,7 +89,7 @@ const useMessages = (initialMessages: Message[], historyService: any, locale: Lo
           setIsHistoryLoading(false);
         }
       };
-      loadHistory();
+      void loadHistory();
     }
   }, [historyService, hasLoadedHistory, initialMessages]);
 
@@ -112,8 +116,8 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
     const [isStreaming, setIsStreaming] = useState(false);
     // Только активные модели
     const initialModels: LocalDynamicModelInfo[] = (plugin.settings.groqAvailableModels || [])
-      .filter((m: any) => m.isActive !== false)
-      .map((m: any) => ({ ...m }));
+      .filter((m: GroqModelInfo) => m.isActive !== false)
+      .map((m: GroqModelInfo) => ({ ...m }));
     const [availableModels, setAvailableModels] = useState<LocalDynamicModelInfo[]>(initialModels);
 
     // Выбираем модель из настроек, если она валидна, иначе первую активную
@@ -139,7 +143,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
     }, [availableModels]);
     const [isSupportOpen, setIsSupportOpen] = useState(false);
     const [isModelInfoOpen, setIsModelInfoOpen] = useState(false);
-    const [rateLimits, setRateLimits] = useState<any>(null);
+    const [rateLimits, setRateLimits] = useState<RateLimitsType | null>(null);
     const messageListRef = useRef<MessageListHandles>(null);
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -200,13 +204,13 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
       if (!plugin.groqService.getAvailableModelsWithLimits) return [];
       const { models, rateLimits } = await plugin.groqService.getAvailableModelsWithLimits();
       setRateLimits(rateLimits || {});
-      const filtered = models.filter((m: any) => m.isActive !== false);
-      setAvailableModels(filtered.map((m: any) => ({ ...m })));
+      const filtered = models.filter((m: GroqModelInfo) => m.isActive !== false);
+      setAvailableModels(filtered.map((m: GroqModelInfo) => ({ ...m })));
       return filtered;
     }, [plugin.groqService]);
 
     useEffect(() => {
-      fetchAvailableModels();
+      void fetchAvailableModels();
     }, [fetchAvailableModels]);
 
     // ResizeObserver
@@ -288,7 +292,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
         messageListRef.current?.scrollToBottom({ smooth: false });
 
         await plugin.historyService.addMessage(assistantMessage);
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error('Error:', error);
         const errorMsg = error instanceof Error ? error.message : String(error);
         toast.error(`${t('error', locale)}: ${errorMsg}`);
@@ -303,7 +307,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
     const handleModelChange = (modelId: string) => {
       setSelectedModel(modelId);
       plugin.settings.model = modelId;
-      plugin.saveSettings();
+      void plugin.saveSettings();
     };
 
     const toggleDisplayMode = () => {
@@ -400,7 +404,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
               <FiChevronDown size={16} />
             </button>
             <button
-              onClick={clearHistory}
+              onClick={() => void clearHistory()}
               className="groq-icon-button groq-clear-button"
               aria-label={t('clearHistory', locale)}
               disabled={messages.length === 0 || isLoading}

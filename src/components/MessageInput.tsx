@@ -34,29 +34,9 @@ export const MessageInput: React.FC<MessageInputProps> = ({
     }
   }, [value]);
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (isComposing) return;
-
-    if (event.key === 'Enter' && event.shiftKey) {
-      return;
-    }
-
-    if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
-      event.preventDefault();
-      const trimmedValue = value.trim();
-      if (!disabled && trimmedValue) {
-        onSend();
-      }
-    }
-
-    if (onKeyDown) {
-      onKeyDown(event);
-    }
-  };
-
   const handleSendClick = () => {
     if (!disabled && value.trim()) {
-      onSend();
+      void onSend();
     }
   };
 
@@ -74,7 +54,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
           onKeyDown={e => {
             if (e.key === 'Enter' && !e.shiftKey) {
               e.preventDefault();
-              onSend();
+              void onSend();
             }
           }}
           onCompositionStart={() => setIsComposing(true)}

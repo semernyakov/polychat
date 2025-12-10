@@ -20,7 +20,7 @@ export default class GroqChatPlugin extends Plugin implements GroqPluginInterfac
 
   async onload() {
     try {
-      new Notice('PolyChat: загрузка…');
+      new Notice('PolyChat: Загрузка…');
 
       await this.loadSettings();
       this.initializeServices();
@@ -45,14 +45,15 @@ export default class GroqChatPlugin extends Plugin implements GroqPluginInterfac
       this.settingsTab = new GroqChatSettingsTab(this.app, this);
       this.addSettingTab(this.settingsTab);
 
-      new Notice('PolyChat: готов к работе');
+      new Notice('PolyChat: Готов к работе');
 
       // Автоматически открываем интерфейс после полной инициализации workspace
       this.app.workspace.onLayoutReady(() => {
-        this.activateView();
+        void this.activateView();
       });
-    } catch (e: any) {
-      new Notice(`PolyChat: ошибка загрузки — ${e?.message ?? String(e)}`);
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : String(e);
+      new Notice(`PolyChat: Ошибка загрузки — ${errorMessage}`);
       throw e;
     }
   }
@@ -66,13 +67,13 @@ export default class GroqChatPlugin extends Plugin implements GroqPluginInterfac
   private addCommands(): void {
     this.addCommand({
       id: 'open-groq-chat-tab',
-      name: 'Open in Tab',
+      name: 'Open in tab',
       callback: () => this.changeDisplayMode('tab'),
     });
 
     this.addCommand({
       id: 'open-groq-chat-sidepanel',
-      name: 'Open in Sidepanel',
+      name: 'Open in sidepanel',
       callback: () => this.changeDisplayMode('sidepanel'),
     });
   }
@@ -107,7 +108,7 @@ export default class GroqChatPlugin extends Plugin implements GroqPluginInterfac
     });
 
     this.currentLeaf = leaf;
-    this.app.workspace.revealLeaf(leaf);
+    await this.app.workspace.revealLeaf(leaf);
   }
 
   async loadSettings() {

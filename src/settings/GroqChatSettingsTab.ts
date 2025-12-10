@@ -2,9 +2,8 @@ import { App, PluginSettingTab, Setting, Notice, requestUrl } from 'obsidian';
 import { GroqPluginInterface } from '../types/plugin';
 import { HistoryStorageMethod } from '../types/settings';
 import { isValidFileName } from '../utils/validation';
-import { createLink, createTextNode, clearElement } from '../utils/domUtils';
+import { createLink, createTextNode } from '../utils/domUtils';
 import { t, Locale } from '../localization';
-import type { RateLimitsType } from '../services/groqService';
 import type { GroqChatSettings as GroqChatSettingsType } from '../settings/GroqChatSettings';
 import { fixModelNameCasing, groupModelsByOwner, isPreviewModel } from '../utils/modelUtils';
 
@@ -64,7 +63,7 @@ export class GroqChatSettingsTab extends PluginSettingTab {
     }, 1000);
     this.containerEl.empty();
     // --- Приветствие (без верхнего заголовка) ---
-    const subtitle = this.containerEl.createEl('div', {
+    this.containerEl.createEl('div', {
       text: t('settings.subtitle', locale),
       cls: 'groq-settings-subtitle',
     });
@@ -193,10 +192,12 @@ export class GroqChatSettingsTab extends PluginSettingTab {
           .setLimits(0, 2, 0.1)
           .setValue(this.plugin.settings.temperature)
           .setDynamicTooltip()
-          .onChange(async value => {
-            this.plugin.settings.temperature = value;
-            await this.plugin.saveSettings();
-            this.showSavedIcon(slider.sliderEl);
+          .onChange(value => {
+            void (async () => {
+              this.plugin.settings.temperature = value;
+              await this.plugin.saveSettings();
+              this.showSavedIcon(slider.sliderEl);
+            })();
           }),
       );
     return wrapper;
@@ -216,11 +217,13 @@ export class GroqChatSettingsTab extends PluginSettingTab {
         text
           .setPlaceholder(locale === 'ru' ? 'Например: 2048' : 'e.g. 2048')
           .setValue(this.plugin.settings.maxTokens.toString())
-          .onChange(async value => {
-            const num = Math.max(1, Math.min(32768, parseInt(value) || 4096));
-            this.plugin.settings.maxTokens = num;
-            await this.plugin.saveSettings();
-            this.showSavedIcon(text.inputEl);
+          .onChange(value => {
+            void (async () => {
+              const num = Math.max(1, Math.min(32768, parseInt(value) || 4096));
+              this.plugin.settings.maxTokens = num;
+              await this.plugin.saveSettings();
+              this.showSavedIcon(text.inputEl);
+            })();
           }),
       );
     return wrapper;
@@ -245,21 +248,25 @@ export class GroqChatSettingsTab extends PluginSettingTab {
         text
           .setPlaceholder(t('apiKeyPlaceholder', locale))
           .setValue(this.plugin.settings.apiKey)
-          .onChange(async value => {
-            this.plugin.settings.apiKey = value.trim();
-            await this.plugin.saveSettings();
-            this.showSavedIcon(text.inputEl);
+          .onChange(value => {
+            void (async () => {
+              this.plugin.settings.apiKey = value.trim();
+              await this.plugin.saveSettings();
+              this.showSavedIcon(text.inputEl);
+            })();
           }),
       )
       .addButton(btn =>
         btn
           .setButtonText(t('checkApiKey', locale))
           .setCta()
-          .onClick(async () => {
-            const isValid = await this.plugin.authService.validateApiKey(
-              this.plugin.settings.apiKey,
-            );
-            new Notice(isValid ? t('validApiKey', locale) : t('invalidApiKey', locale));
+          .onClick(() => {
+            void (async () => {
+              const isValid = await this.plugin.authService.validateApiKey(
+                this.plugin.settings.apiKey,
+              );
+              new Notice(isValid ? t('validApiKey', locale) : t('invalidApiKey', locale));
+            })();
           }),
       );
   }
@@ -294,7 +301,7 @@ export class GroqChatSettingsTab extends PluginSettingTab {
 
     // Create the dropdown
     let selectEl: HTMLSelectElement;
-    const dropdown = modelSetting.addDropdown(dd => {
+    modelSetting.addDropdown(dd => {
       selectEl = dd.selectEl;
 
       // Add available models with grouping
@@ -330,9 +337,11 @@ export class GroqChatSettingsTab extends PluginSettingTab {
       dd.setValue(this.plugin.settings.model || '');
 
       // Handle model change
-      dd.onChange(async (value: string) => {
-        this.plugin.settings.model = value;
-        await this.plugin.saveSettings();
+      dd.onChange((value: string) => {
+        void (async () => {
+          this.plugin.settings.model = value;
+          await this.plugin.saveSettings();
+        })();
       });
     });
 
@@ -345,75 +354,77 @@ export class GroqChatSettingsTab extends PluginSettingTab {
       btn
         .setIcon('refresh-cw')
         .setTooltip(t('refreshModels', locale))
-        .onClick(async () => {
-          try {
-            btn.setDisabled(true);
-            spinner.classList.add('groq-spinner--visible');
+        .onClick(() => {
+          void (async () => {
+            try {
+              btn.setDisabled(true);
+              spinner.classList.add('groq-spinner--visible');
 
-            const apiModels = await this.fetchGroqModels(this.plugin.settings.apiKey);
-            if (apiModels?.length) {
-              // Update available models
-              const settings = this.plugin.settings as any;
-              settings.groqAvailableModels = apiModels.map((m: any) => ({
-                id: m.id,
-                name: fixModelNameCasing(m.name || m.id),
-                description: m.description || '',
-                owned_by: m.owned_by || undefined,
-                isPreview: isPreviewModel(m),
-                isActive: true,
-              }));
+              const apiModels = await this.fetchGroqModels(this.plugin.settings.apiKey);
+              if (apiModels?.length) {
+                // Update available models
+                const settings = this.plugin.settings as any;
+                settings.groqAvailableModels = apiModels.map((m: any) => ({
+                  id: m.id,
+                  name: fixModelNameCasing(m.name || m.id),
+                  description: m.description || '',
+                  owned_by: m.owned_by || undefined,
+                  isPreview: isPreviewModel(m),
+                  isActive: true,
+                }));
 
-              await this.plugin.saveSettings();
-              new Notice(t('modelsUpdated', locale));
+                await this.plugin.saveSettings();
+                new Notice(t('modelsUpdated', locale));
 
-              // Update the dropdown
-              if (selectEl) {
-                selectEl.empty();
-                selectEl.createEl('option', {
-                  text: locale === 'ru' ? 'Выберите модель' : 'Select a model',
-                  value: '',
-                });
-
-                if (this.plugin.settings.groqAvailableModels) {
-                  // Группируем модели по владельцам
-                  const groupedModels = groupModelsByOwner(
-                    this.plugin.settings.groqAvailableModels.filter(model => model.isActive),
-                  );
-
-                  // Добавляем сгруппированные модели
-                  Object.entries(groupedModels).forEach(([owner, models]) => {
-                    models.forEach(model => {
-                      // Формируем отображаемое имя с учетом preview статуса
-                      const displayName =
-                        fixModelNameCasing(model.name) +
-                        (isPreviewModel(model) ? ` (${t('preview', locale)})` : '');
-
-                      const optionEl = selectEl.createEl('option', {
-                        text: displayName,
-                        value: model.id,
-                      });
-
-                      // Устанавливаем атрибут data-owner для группировки
-                      optionEl.setAttribute('data-owner', owner);
-                    });
+                // Update the dropdown
+                if (selectEl) {
+                  selectEl.empty();
+                  selectEl.createEl('option', {
+                    text: locale === 'ru' ? 'Выберите модель' : 'Select a model',
+                    value: '',
                   });
-                }
 
-                // Restore selected value if any
-                if (this.plugin.settings.model) {
-                  selectEl.value = this.plugin.settings.model;
+                  if (this.plugin.settings.groqAvailableModels) {
+                    // Группируем модели по владельцам
+                    const groupedModels = groupModelsByOwner(
+                      this.plugin.settings.groqAvailableModels.filter(model => model.isActive),
+                    );
+
+                    // Добавляем сгруппированные модели
+                    Object.entries(groupedModels).forEach(([owner, models]) => {
+                      models.forEach(model => {
+                        // Формируем отображаемое имя с учетом preview статуса
+                        const displayName =
+                          fixModelNameCasing(model.name) +
+                          (isPreviewModel(model) ? ` (${t('preview', locale)})` : '');
+
+                        const optionEl = selectEl.createEl('option', {
+                          text: displayName,
+                          value: model.id,
+                        });
+
+                        // Устанавливаем атрибут data-owner для группировки
+                        optionEl.setAttribute('data-owner', owner);
+                      });
+                    });
+                  }
+
+                  // Restore selected value if any
+                  if (this.plugin.settings.model) {
+                    selectEl.value = this.plugin.settings.model;
+                  }
                 }
+              } else {
+                new Notice(t('modelsUpdateError', locale));
               }
-            } else {
+            } catch (error) {
+              console.error('Error refreshing models:', error);
               new Notice(t('modelsUpdateError', locale));
+            } finally {
+              btn.setDisabled(false);
+              spinner.classList.remove('groq-spinner--visible');
             }
-          } catch (error) {
-            console.error('Error refreshing models:', error);
-            new Notice(t('modelsUpdateError', locale));
-          } finally {
-            btn.setDisabled(false);
-            spinner.classList.remove('groq-spinner--visible');
-          }
+          })();
         });
     });
   }
@@ -421,7 +432,7 @@ export class GroqChatSettingsTab extends PluginSettingTab {
   // --- Model List (table, separate row) ---
   private addModelListBlock(locale: Locale): void {
     // Create or find container for models table
-    let modelsBlock = this.containerEl.querySelector('.groq-models-block') as HTMLDivElement | null;
+    let modelsBlock = this.containerEl.querySelector('.groq-models-block');
     if (!modelsBlock) {
       modelsBlock = document.createElement('div');
       modelsBlock.className = 'groq-models-block';
@@ -431,7 +442,7 @@ export class GroqChatSettingsTab extends PluginSettingTab {
       modelsBlock.removeChild(modelsBlock.firstChild);
     }
 
-    const settings = this.plugin.settings as GroqChatSettingsType;
+    const settings = this.plugin.settings;
     const models = (settings.groqAvailableModels || []).map(model => ({
       ...model,
       isActive: model.isActive !== false, // Default to true if undefined
@@ -473,7 +484,6 @@ export class GroqChatSettingsTab extends PluginSettingTab {
     const checkboxes: HTMLInputElement[] = [];
 
     // Create table rows with grouping
-    let rowIndex = 0;
     Object.entries(groupedModels).forEach(([owner, ownerModels]) => {
       // Добавляем заголовок группы
       const groupHeaderRow = tbody.insertRow();
@@ -505,27 +515,28 @@ export class GroqChatSettingsTab extends PluginSettingTab {
 
         const toggle = document.createElement('input');
         toggle.type = 'checkbox';
-        toggle.checked = model.isActive;
+        toggle.checked = model.isActive !== false;
         toggle.classList.add('groq-model-toggle');
         toggle.title =
           locale === 'ru' ? 'Включить/выключить модель для чата' : 'Enable/disable model for chat';
 
-        toggle.addEventListener('change', async () => {
-          // Находим модель в массиве и обновляем ее статус
-          const modelIndex = models.findIndex(m => m.id === model.id);
-          if (modelIndex !== -1) {
-            models[modelIndex].isActive = toggle.checked;
-            if (settings.groqAvailableModels) {
-              settings.groqAvailableModels = [...models];
-              await this.plugin.saveSettings();
-              this.showSavedIcon(toggle);
+        toggle.addEventListener('change', () => {
+          void (async () => {
+            // Находим модель в массиве и обновляем ее статус
+            const modelIndex = models.findIndex(m => m.id === model.id);
+            if (modelIndex !== -1) {
+              models[modelIndex].isActive = toggle.checked;
+              if (settings.groqAvailableModels) {
+                settings.groqAvailableModels = [...models];
+                await this.plugin.saveSettings();
+                this.showSavedIcon(toggle);
+              }
             }
-          }
+          })();
         });
 
         toggleCell.appendChild(toggle);
         checkboxes.push(toggle);
-        rowIndex++;
       });
     });
 
@@ -607,20 +618,24 @@ export class GroqChatSettingsTab extends PluginSettingTab {
           .addOption('indexedDB', locale === 'ru' ? 'IndexedDB' : 'IndexedDB')
           .addOption('file', locale === 'ru' ? 'В файле' : 'In file')
           .setValue(this.plugin.settings.historyStorageMethod)
-          .onChange(async value => {
-            this.plugin.settings.historyStorageMethod = value as HistoryStorageMethod;
-            await this.plugin.saveSettings();
-            this.display();
+          .onChange(value => {
+            void (async () => {
+              this.plugin.settings.historyStorageMethod = value as HistoryStorageMethod;
+              await this.plugin.saveSettings();
+              this.display();
+            })();
           });
       })
       .addText(text => {
         text
           .setPlaceholder(t('historyLengthPlaceholder', locale))
           .setValue(this.plugin.settings.maxHistoryLength.toString())
-          .onChange(async value => {
-            const num = parseInt(value);
-            this.plugin.settings.maxHistoryLength = !isNaN(num) && num >= 0 ? num : 0;
-            await this.plugin.saveSettings();
+          .onChange(value => {
+            void (async () => {
+              const num = parseInt(value);
+              this.plugin.settings.maxHistoryLength = !isNaN(num) && num >= 0 ? num : 0;
+              await this.plugin.saveSettings();
+            })();
           });
         const hintSpan = document.createElement('span');
         hintSpan.className = 'groq-small-text groq-margin-left';
@@ -642,17 +657,19 @@ export class GroqChatSettingsTab extends PluginSettingTab {
           text
             .setPlaceholder(t('historyFilePlaceholder', locale))
             .setValue(this.plugin.settings.notePath)
-            .onChange(async value => {
-              const trimmedValue = value.trim();
-              if (isValidFileName(trimmedValue)) {
-                this.plugin.settings.notePath = trimmedValue;
-                await this.plugin.saveSettings();
-                this.showSavedIcon(text.inputEl);
-              } else {
-                new Notice(
-                  locale === 'ru' ? 'Некорректное имя/путь файла' : 'Invalid file name/path',
-                );
-              }
+            .onChange(value => {
+              void (async () => {
+                const trimmedValue = value.trim();
+                if (isValidFileName(trimmedValue)) {
+                  this.plugin.settings.notePath = trimmedValue;
+                  await this.plugin.saveSettings();
+                  this.showSavedIcon(text.inputEl);
+                } else {
+                  new Notice(
+                    locale === 'ru' ? 'Некорректное имя/путь файла' : 'Invalid file name/path',
+                  );
+                }
+              })();
             }),
         );
 
@@ -677,17 +694,19 @@ export class GroqChatSettingsTab extends PluginSettingTab {
         text
           .setPlaceholder(t('settings.example10', locale))
           .setValue(String(plugin.settings.messageTailLimit ?? 10))
-          .onChange(async (value: string) => {
-            const num = Math.max(1, Math.min(1000, parseInt(value) || 10));
-            plugin.settings.messageTailLimit = num;
-            await this.plugin.saveSettings();
-            // Визуальная отметка сохранения
-            const input = text.inputEl as HTMLElement;
-            const icon = input.createEl('span', { text: '✓', cls: 'groq-saved-icon' });
-            setTimeout(() => {
-              icon.classList.add('groq-saved-icon--fade-out');
-              setTimeout(() => icon.remove(), 500);
-            }, 1200);
+          .onChange((value: string) => {
+            void (async () => {
+              const num = Math.max(1, Math.min(1000, parseInt(value) || 10));
+              plugin.settings.messageTailLimit = num;
+              await this.plugin.saveSettings();
+              // Визуальная отметка сохранения
+              const input = text.inputEl as HTMLElement;
+              const icon = input.createEl('span', { text: '✓', cls: 'groq-saved-icon' });
+              setTimeout(() => {
+                icon.classList.add('groq-saved-icon--fade-out');
+                setTimeout(() => icon.remove(), 500);
+              }, 1200);
+            })();
           }),
       );
 
@@ -700,10 +719,12 @@ export class GroqChatSettingsTab extends PluginSettingTab {
         stepOptions.forEach(n => dd.addOption(String(n), String(n)));
         const current = String(plugin.settings.messageLoadStep ?? 20);
         dd.setValue(current);
-        dd.onChange(async (value: string) => {
-          const num = Math.max(1, Math.min(1000, parseInt(value) || 20));
-          plugin.settings.messageLoadStep = num;
-          await this.plugin.saveSettings();
+        dd.onChange((value: string) => {
+          void (async () => {
+            const num = Math.max(1, Math.min(1000, parseInt(value) || 20));
+            plugin.settings.messageLoadStep = num;
+            await this.plugin.saveSettings();
+          })();
         });
       });
   }

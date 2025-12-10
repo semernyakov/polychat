@@ -18,6 +18,7 @@ export interface GroqModelInfo {
   maxTokens?: number;
   tokensPerMinute?: number;
   releaseStatus?: string;
+  isPreview?: boolean;
 }
 
 export interface GroqChatSettings {

@@ -1,4 +1,5 @@
 import { Notice } from 'obsidian';
+import type { App } from 'obsidian';
 
 export class AuthService {
   private apiKeyIsSet: boolean = false;
@@ -11,9 +12,9 @@ export class AuthService {
       updateApiKey?: (apiKey: string) => void;
     },
     private readonly plugin: {
-      saveData: (data: any) => Promise<void>;
-      loadData: () => Promise<any>;
-      app?: {
+      saveData: (data: Record<string, unknown>) => Promise<void>;
+      loadData: () => Promise<Record<string, unknown> | null>;
+      app?: App & {
         plugins?: {
           disablePlugin?: (id: string) => Promise<void>;
           enablePlugin?: (id: string) => Promise<void>;
@@ -38,7 +39,7 @@ export class AuthService {
    */
   async loadApiKey(): Promise<void> {
     const data = await this.plugin.loadData();
-    if (data?.apiKey) {
+    if (data?.apiKey && typeof data.apiKey === 'string') {
       this.apiKey = data.apiKey;
       this.apiKeyIsSet = true;
     } else {
@@ -127,7 +128,7 @@ export class AuthService {
       !this.plugin.app?.plugins?.disablePlugin ||
       !this.plugin.app.plugins.enablePlugin
     ) {
-      console.log('Cannot refresh plugin: missing required methods');
+      console.warn('Cannot refresh plugin: missing required methods');
       return;
     }
 
@@ -136,14 +137,16 @@ export class AuthService {
       // Disable the plugin
       await this.plugin.app.plugins.disablePlugin(pluginId);
       // Re-enable the plugin after a short delay
-      setTimeout(async () => {
-        try {
-          await this.plugin.app?.plugins?.enablePlugin?.(pluginId);
-          new Notice('✅ Plugin refreshed successfully');
-        } catch (error) {
-          console.error('Error re-enabling plugin:', error);
-          new Notice('⚠️ Error refreshing plugin. Please restart Obsidian.');
-        }
+      setTimeout(() => {
+        void (async () => {
+          try {
+            await this.plugin.app?.plugins?.enablePlugin?.(pluginId);
+            new Notice('✅ Plugin refreshed successfully');
+          } catch (error) {
+            console.error('Error re-enabling plugin:', error);
+            new Notice('⚠️ Error refreshing plugin. Please restart Obsidian.');
+          }
+        })();
       }, 1000);
     } catch (error) {
       console.error('Error disabling plugin:', error);

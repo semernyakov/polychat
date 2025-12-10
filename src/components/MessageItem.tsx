@@ -5,6 +5,7 @@ import '../styles.css';
 import { toast } from 'react-toastify';
 import { t, Locale } from '../localization';
 import { Message } from '../types/types';
+import type { App } from 'obsidian';
 
 interface MessageItemProps {
   message: Message;
@@ -83,7 +84,7 @@ export const MessageItem: React.FC<MessageItemProps> = React.memo(
 
     const handleCreateNote = useCallback(async () => {
       try {
-        const app = (window as any)?.app;
+        const app: App | undefined = window.app;
         if (!app?.vault) {
           throw new Error('App API is not available');
         }
@@ -157,7 +158,7 @@ export const MessageItem: React.FC<MessageItemProps> = React.memo(
           {message.role === 'assistant' && (
             <div className="groq-message__actions">
               <button
-                onClick={handleCreateNote}
+                onClick={() => void handleCreateNote()}
                 className="groq-icon-button"
                 aria-label={t('createNote', locale)}
                 title={t('createNote', locale)}
@@ -184,7 +185,7 @@ export const MessageItem: React.FC<MessageItemProps> = React.memo(
               </button>
               {/* Кнопка копирования */}
               <button
-                onClick={handleCopy}
+                onClick={() => void handleCopy()}
                 className="groq-icon-button"
                 aria-label={t('copyMessage', locale)}
               >

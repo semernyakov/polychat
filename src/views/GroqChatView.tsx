@@ -2,6 +2,7 @@ import { ItemView, WorkspaceLeaf } from 'obsidian';
 import { createRoot } from 'react-dom/client';
 import { ChatPanel } from '../components/ChatPanel';
 import type { GroqPluginInterface } from '../types/plugin';
+import { GroqChatSettings } from '../settings/GroqChatSettings';
 import { Message } from '../types/types';
 
 export const VIEW_TYPE_GROQ_CHAT = 'groq-chat-view';
@@ -26,7 +27,7 @@ export class GroqChatView extends ItemView {
   }
 
   getDisplayText() {
-    return 'PolyChat';
+    return 'Polychat';
   }
 
   getIcon() {
@@ -38,11 +39,11 @@ export class GroqChatView extends ItemView {
   }
 
   async onOpen() {
-    this.renderView();
+    void this.renderView();
   }
 
   async onClose() {
-    this.root?.unmount();
+    void this.root?.unmount();
   }
 
   private renderView() {
@@ -56,15 +57,16 @@ export class GroqChatView extends ItemView {
         plugin={this.plugin}
         displayMode={this.plugin.settings.displayMode}
         initialMessages={this.messages}
-        onDisplayModeChange={mode => this.plugin.changeDisplayMode(mode)}
+        onDisplayModeChange={mode => void this.plugin.changeDisplayMode(mode)}
       />,
     );
   }
 
   // Метод для синхронизации настроек с основного окна
-  public onSettingsChanged(newSettings: any) {
+  public onSettingsChanged(newSettings: GroqChatSettings) {
     // Обновить ссылку на актуальные настройки
-    (this.plugin as any).settings = newSettings;
+    const plugin = this.plugin as GroqPluginInterface & { settings: GroqChatSettings };
+    plugin.settings = { ...plugin.settings, ...newSettings };
     this.renderView();
   }
 }
