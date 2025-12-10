@@ -23,6 +23,9 @@ export const GroupedModelSelector: React.FC<GroupedModelSelectorProps> = ({
   availableModels: availableModelsProp,
   locale = 'en',
 }) => {
+  const [availableModels, setAvailableModels] = useState<GroqModelInfo[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
   useEffect(() => {
     if (availableModelsProp) {
       setIsLoading(false);
