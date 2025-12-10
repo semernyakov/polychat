@@ -46,15 +46,15 @@ PolyChat — это мощное расширение чата с поддерж
 
 | Разработчик         | Модели                                                                                                                                                                                               |
 | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **SDAIA**           | Allam 2 7B                                                                                                                                                                                           |
-| **DeepSeek / Meta** | DeepSeek-R1-Distill-Llama-70B                                                                                                                                                                        |
-| **Google**          | Gemma 2 9B Instruct                                                                                                                                                                                  |
-| **Groq**            | Groq Compound<br>Groq Compound Mini                                                                                                                                                                  |
-| **Meta**            | Llama 3.1 8B Instant<br>Llama 3.3 70B Versatile<br>Llama 4 Maverick 17B 128E Instruct<br>Llama 4 Scout 17B 16E Instruct<br>Llama Guard 4 12B<br>Llama Prompt Guard 2 22M<br>Llama Prompt Guard 2 86M |
+| **Meta**            | Llama 4 Scout 17B 16E Instruct<br>Llama Prompt Guard 2 22M<br>Llama Prompt Guard 2 86M<br>Llama 3.3 70B Versatile<br>Llama Guard 4 12B<br>Llama 4 Maverick 17B 128E Instruct<br>Llama 3.1 8B Instant |
+| **OpenAI**          | Whisper Large v3 Turbo<br>Community OSS Model (20B)<br>Whisper Large v3<br>Community OSS Model (120B)                                                                                               |
+| **PlayAI**          | PlayAI TTS (Arabic)<br>PlayAI TTS                                                                                                                                                                    |
 | **Moonshot AI**     | Kimi K2 Instruct<br>Kimi K2 Instruct (0905)                                                                                                                                                          |
-| **PlayAI**          | PlayAI TTS<br>PlayAI TTS (Arabic)                                                                                                                                                                    |
 | **Alibaba Cloud**   | Qwen3 32B                                                                                                                                                                                            |
-| **OpenAI**          | Поддержка моделей Whisper (от OpenAI):<br>• Whisper Large v3<br>• Whisper Large v3 Turbo                                                                                                             |
+| **Google**          | Gemma 2 9B Instruct                                                                                                                                                                                  |
+| **SDAIA**           | Allam 2 7B                                                                                                                                                                                           |
+| **Groq**            | Groq Compound<br>Groq Compound Mini                                                                                                                                                                  |
+| **DeepSeek / Meta** | DeepSeek R1 Distill Llama 70B                                                                                                                                                                        |
 
 > Полный и актуальный список всегда отображается в настройках плагина. Описания будут добавлены по мере появления.
 
