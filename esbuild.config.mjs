@@ -58,6 +58,16 @@ const copyFilesPlugin = {
       const rootDir = process.cwd();
 
       try {
+        // Удаляем дублирующий main.css если он существует
+        try {
+          await fs.unlink(path.join(distDir, 'main.css'));
+          console.log('✅  Удален дублирующий main.css из dist/');
+        } catch (err) {
+          if (err.code !== 'ENOENT') {
+            console.warn('⚠️  Не удалось удалить main.css:', err.message);
+          }
+        }
+
         const mainJsSource = path.join(distDir, 'main.js');
         const mainJsDest = path.join(rootDir, 'main.js');
         await fs.copyFile(mainJsSource, mainJsDest);
