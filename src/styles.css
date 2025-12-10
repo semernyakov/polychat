@@ -1086,10 +1086,17 @@
 /* ===== УТИЛИТЫ И ВСПОМОГАТЕЛЬНЫЕ СТИЛИ ===== */
 /* --- Стили для select: выбор модели --- */
 .groq-select {
-  color: var(--text-on-accent);
+  color: var(--text-normal);
+  background-color: var(--background-primary);
+  border: var(--border-width) solid var(--background-modifier-border);
   padding: 3px 7px;
   border-radius: 3px;
   font-weight: 500;
+}
+
+.groq-select:focus {
+  outline: none;
+  border-color: var(--interactive-accent);
 }
 
 /* --- Auto-height textarea --- */
