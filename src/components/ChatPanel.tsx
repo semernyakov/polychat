@@ -62,7 +62,11 @@ interface ModelInfo {
 }
 
 // Хук для управления сообщениями
-const useMessages = (initialMessages: Message[], historyService: HistoryService, locale: Locale) => {
+const useMessages = (
+  initialMessages: Message[],
+  historyService: HistoryService,
+  locale: Locale,
+) => {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [isHistoryLoading, setIsHistoryLoading] = useState(false);
   const [hasLoadedHistory, setHasLoadedHistory] = useState(false);

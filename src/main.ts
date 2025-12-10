@@ -123,11 +123,13 @@ export default class GroqChatPlugin extends Plugin implements GroqPluginInterfac
         leaf = this.app.workspace.getLeaf(true);
       } catch (error) {
         // Fallback: создаем в основной области
-        leaf = this.app.workspace.getLeaf('split', 'horizontal') || this.app.workspace.getLeaf(false);
+        leaf =
+          this.app.workspace.getLeaf('split', 'horizontal') || this.app.workspace.getLeaf(false);
       }
     } else {
       // Sidepanel mode
-      leaf = this.app.workspace.getRightLeaf(false) || this.app.workspace.getLeaf('split', 'vertical');
+      leaf =
+        this.app.workspace.getRightLeaf(false) || this.app.workspace.getLeaf('split', 'vertical');
     }
 
     await leaf.setViewState({

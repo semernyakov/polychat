@@ -94,7 +94,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
 
           // Сортируем группы по алфавиту и добавляем сгруппированные модели
           const sortedGroups = Object.entries(groupedModels).sort(([ownerA], [ownerB]) =>
-            ownerA.localeCompare(ownerB, locale === 'ru' ? 'ru' : 'en')
+            ownerA.localeCompare(ownerB, locale === 'ru' ? 'ru' : 'en'),
           );
 
           sortedGroups.forEach(([owner, models]) => {

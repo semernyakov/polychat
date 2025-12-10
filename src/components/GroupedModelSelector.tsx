@@ -69,7 +69,7 @@ export const GroupedModelSelector: React.FC<GroupedModelSelectorProps> = ({
   // Группируем модели и сортируем по алфавиту
   const groupedModels = groupModelsByOwner(availableModels);
   const sortedGroups = Object.entries(groupedModels).sort(([ownerA], [ownerB]) =>
-    ownerA.localeCompare(ownerB, locale === 'ru' ? 'ru' : 'en')
+    ownerA.localeCompare(ownerB, locale === 'ru' ? 'ru' : 'en'),
   );
 
   return (

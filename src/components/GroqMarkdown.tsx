@@ -23,7 +23,12 @@ interface GroqMarkdownProps {
   locale?: Locale;
 }
 
-export const GroqMarkdown: React.FC<GroqMarkdownProps> = ({ content, app, onRenderComplete, locale = 'en' }) => {
+export const GroqMarkdown: React.FC<GroqMarkdownProps> = ({
+  content,
+  app,
+  onRenderComplete,
+  locale = 'en',
+}) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const mdComponentRef = useRef<Component | null>(null);
   const lastRenderedRef = useRef<string>('');
@@ -190,16 +195,19 @@ export const GroqMarkdown: React.FC<GroqMarkdownProps> = ({ content, app, onRend
       copyBtn.className = 'groq-icon-button groq-code-copy';
       copyBtn.type = 'button';
       copyBtn.setAttribute('aria-label', t('copyCode', currentLocale));
-      
+
       // Create SVG element instead of using innerHTML
       const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
       svg.setAttribute('viewBox', '0 0 24 24');
       svg.setAttribute('aria-hidden', 'true');
-      
+
       const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
       path.setAttribute('fill', 'currentColor');
-      path.setAttribute('d', 'M16 1H4c-1.1 0-2 .9-2 2v12h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z');
-      
+      path.setAttribute(
+        'd',
+        'M16 1H4c-1.1 0-2 .9-2 2v12h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z',
+      );
+
       svg.appendChild(path);
       copyBtn.appendChild(svg);
 

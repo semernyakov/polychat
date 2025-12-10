@@ -150,7 +150,8 @@ export class HistoryService {
             return new Promise<void>((res, rej) => {
               const req = store.put(msg);
               req.onsuccess = () => res();
-              req.onerror = event => rej(new Error(`IndexedDB put error: ${(event.target as IDBRequest).error}`));
+              req.onerror = event =>
+                rej(new Error(`IndexedDB put error: ${(event.target as IDBRequest).error}`));
             });
           });
 
@@ -172,7 +173,9 @@ export class HistoryService {
 
         transaction.onerror = event => {
           console.error('IndexedDB transaction error:', (event.target as IDBTransaction).error);
-          reject(new Error(`IndexedDB transaction error: ${(event.target as IDBTransaction).error}`));
+          reject(
+            new Error(`IndexedDB transaction error: ${(event.target as IDBTransaction).error}`),
+          );
         };
 
         transaction.oncomplete = () => {};

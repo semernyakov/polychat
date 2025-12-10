@@ -219,22 +219,24 @@ export class GroqService implements GroqServiceMethods {
         const idB = (b.id || '').toLowerCase();
         return idA.localeCompare(idB);
       });
-      const models = sorted.map((m: GroqApiModel): GroqModelInfo => ({
-        id: m.id,
-        name: fixModelNameCasing(m.name || m.id),
-        description: m.description || '',
-        developer: { name: m.owned_by || '—' },
-        maxTokens:
-          typeof m.max_completion_tokens === 'number' ? m.max_completion_tokens : undefined,
-        isActive: typeof m.active === 'boolean' ? m.active : undefined,
-        releaseStatus: m.release_status || m.releaseStatus || undefined,
-        owned_by: m.owned_by || undefined, // Добавляем информацию о владельце
-        isPreview: Boolean(
-          (m.release_status || m.releaseStatus) === 'preview' ||
-          (m.name && m.name.toLowerCase().includes('preview')) ||
-          (m.id && m.id.toLowerCase().includes('preview'))
-        ), // Определяем, является ли модель preview
-      }));
+      const models = sorted.map(
+        (m: GroqApiModel): GroqModelInfo => ({
+          id: m.id,
+          name: fixModelNameCasing(m.name || m.id),
+          description: m.description || '',
+          developer: { name: m.owned_by || '—' },
+          maxTokens:
+            typeof m.max_completion_tokens === 'number' ? m.max_completion_tokens : undefined,
+          isActive: typeof m.active === 'boolean' ? m.active : undefined,
+          releaseStatus: m.release_status || m.releaseStatus || undefined,
+          owned_by: m.owned_by || undefined, // Добавляем информацию о владельце
+          isPreview: Boolean(
+            (m.release_status || m.releaseStatus) === 'preview' ||
+              (m.name && m.name.toLowerCase().includes('preview')) ||
+              (m.id && m.id.toLowerCase().includes('preview')),
+          ), // Определяем, является ли модель preview
+        }),
+      );
 
       // ВРЕМЕННО: логируем все поля моделей для отладки
       if (response.json && Array.isArray(response.json.data)) {
