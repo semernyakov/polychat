@@ -1,9 +1,9 @@
-import js from '@eslint/js';
-import ts from '@typescript-eslint/eslint-plugin';
-import tsParser from '@typescript-eslint/parser';
-import globals from 'globals';
+const js = require('@eslint/js');
+const ts = require('@typescript-eslint/eslint-plugin');
+const tsParser = require('@typescript-eslint/parser');
+const globals = require('globals');
 
-export default [
+module.exports = [
   {
     ignores: [
       '**/node_modules/**',
@@ -13,7 +13,20 @@ export default [
       'version-bump.js',
       'src/hot-reload.js',
       'main.js',
+      'eslint.config.js', // Ignore the config file itself
     ],
+  },
+  {
+    files: ['eslint.config.js'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+        require: 'readonly',
+        module: 'readonly',
+        console: 'readonly',
+        process: 'readonly',
+      },
+    },
   },
   js.configs.recommended,
   {
