@@ -49,12 +49,15 @@ export default class GroqChatPlugin extends Plugin implements GroqPluginInterfac
 
       // Автоматически открываем интерфейс после полной инициализации workspace
       this.app.workspace.onLayoutReady(() => {
-        void this.activateView();
+        void this.activateView().catch(error => {
+          console.error('Failed to activate PolyChat view:', error);
+          new Notice('PolyChat: Не удалось открыть интерфейс');
+        });
       });
     } catch (e: unknown) {
       const errorMessage = e instanceof Error ? e.message : String(e);
       new Notice(`PolyChat: Ошибка загрузки — ${errorMessage}`);
-      throw e;
+      console.error('PolyChat plugin loading error:', e);
     }
   }
 
@@ -79,7 +82,23 @@ export default class GroqChatPlugin extends Plugin implements GroqPluginInterfac
   }
 
   async activateView() {
-    await this.changeDisplayMode(this.settings.displayMode);
+    try {
+      await this.changeDisplayMode(this.settings.displayMode);
+    } catch (error) {
+      console.error('Failed to activate PolyChat view:', error);
+      new Notice('PolyChat: Не удалось открыть интерфейс');
+      // Try fallback to tab mode if sidepanel fails
+      if (this.settings.displayMode === 'sidepanel') {
+        try {
+          await this.changeDisplayMode('tab');
+        } catch (fallbackError) {
+          console.error('Failed to activate fallback tab mode:', fallbackError);
+          throw fallbackError;
+        }
+      } else {
+        throw error;
+      }
+    }
   }
 
   async changeDisplayMode(mode: 'tab' | 'sidepanel') {
@@ -95,11 +114,21 @@ export default class GroqChatPlugin extends Plugin implements GroqPluginInterfac
       this.app.workspace.detachLeavesOfType(VIEW_TYPE_GROQ_CHAT);
     }
 
-    // Открываем в новом режиме
-    const leaf =
-      mode === 'tab'
-        ? this.app.workspace.getLeaf(true)
-        : this.app.workspace.getRightLeaf(false) || this.app.workspace.getLeaf('split', 'vertical');
+    let leaf: WorkspaceLeaf;
+
+    // Открываем в новом режиме с fallback
+    if (mode === 'tab') {
+      try {
+        // Пытаемся создать лист в tab group
+        leaf = this.app.workspace.getLeaf(true);
+      } catch (error) {
+        // Fallback: создаем в основной области
+        leaf = this.app.workspace.getLeaf('split', 'horizontal') || this.app.workspace.getLeaf(false);
+      }
+    } else {
+      // Sidepanel mode
+      leaf = this.app.workspace.getRightLeaf(false) || this.app.workspace.getLeaf('split', 'vertical');
+    }
 
     await leaf.setViewState({
       type: VIEW_TYPE_GROQ_CHAT,
