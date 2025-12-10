@@ -4,7 +4,6 @@ import { GroqPluginInterface } from '../types/plugin';
 import { GroqModelInfo } from '../settings/GroqChatSettings';
 import { toast } from 'react-toastify';
 import { t, Locale } from '../localization';
-import { groupModelsByOwner } from '../utils/modelUtils';
 
 interface GroupedModelSelectorProps {
   plugin: GroqPluginInterface;

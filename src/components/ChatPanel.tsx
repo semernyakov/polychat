@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { GroqPluginInterface } from '../types/plugin';
-import { Message, DynamicModelInfo } from '../types/types';
+import { Message } from '../types/types';
 import { MessageUtils } from '../utils/messageUtils';
 import { MessageList, MessageListHandles } from './MessageList';
 import { ModelSelector } from './ModelSelector';
@@ -21,12 +21,10 @@ import '../styles.css';
 import { ModelInfoDialog } from './ModelInfoDialog';
 import { PluginSettingsProvider } from '../context/PluginSettingsContext';
 import { t, Locale } from '../localization';
-// import { DEFAULT_MODEL } from '../types/models'; // Удалено, если не используется
 import { GroqModel, ModelCategory, ModelReleaseStatus } from '../types/types';
 import { fixModelNameCasing } from '../utils/modelUtils';
 import { HistoryService } from '../services/historyService';
 import { RateLimitsType } from '../services/groqService';
-import type { App } from 'obsidian';
 import { GroqModelInfo } from '../settings/GroqChatSettings';
 
 interface ChatPanelProps {
