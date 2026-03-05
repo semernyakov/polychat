@@ -81,6 +81,21 @@ This project is actively maintained and developed. New features are added regula
 4. Start chatting with AI (text, code)
 5. View model info any time via the Model Info Dialog
 
+## Test the Plugin with BRAT
+
+You can install and test the latest development version of the plugin using the [BRAT](https://github.com/TfTHacker/obsidian42-brat) (Beta Reviewers Auto-update Tool) plugin for Obsidian.
+
+**Steps**
+
+1. Install BRAT from the Obsidian Community Plugins.
+2. Open BRAT settings.
+3. Click Add Beta Plugin.
+4. Paste the repository URL: https://github.com/semernyakov/polychat
+5. Confirm installation.
+
+BRAT will automatically install the plugin and allow you to receive updates directly from the repository.
+
+
 ## Development
 
 ```bash
