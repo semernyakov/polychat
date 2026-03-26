@@ -6,6 +6,7 @@ import { MessageList, MessageListHandles } from './MessageList';
 import { ModelSelector } from './ModelSelector';
 import { MessageInput } from './MessageInput';
 import { SupportDialog } from './SupportDialog';
+import type { App } from 'obsidian';
 import {
   FiTrash2,
   FiChevronUp,
@@ -151,7 +152,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
 
     // Мониторинг изменения языка Obsidian
     const getObsidianLocale = useCallback((): Locale => {
-      const appLang = (plugin.app as any)?.getLanguage?.();
+      const appLang = (plugin.app as unknown as { getLanguage?: () => string })?.getLanguage?.();
       if (typeof appLang === 'string') {
         const val = appLang.toLowerCase();
         return (val.startsWith('ru') ? 'ru' : 'en') as Locale;
