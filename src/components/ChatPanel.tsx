@@ -470,7 +470,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
           <div className="groq-chat__input-container">
             <MessageInput
               value={inputValue}
-              onChange={setInputValue}
+              onChange={value => void setInputValue(value)}
               onSend={handleSendMessage}
               disabled={isLoading || isHistoryLoading}
               maxTokens={selectedModelInfo.maxTokens}
