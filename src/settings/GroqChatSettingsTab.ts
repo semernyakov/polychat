@@ -364,14 +364,14 @@ export class GroqChatSettingsTab extends PluginSettingTab {
               if (apiModels?.length) {
                 // Update available models
                 const settings = this.plugin.settings as any;
-                settings.groqAvailableModels = apiModels.map((m: any) => ({
+                settings.groqAvailableModels = apiModels.map((m: GroqApiModel) => ({
                   id: m.id,
                   name: fixModelNameCasing(m.name || m.id),
                   description: m.description || '',
                   owned_by: m.owned_by || undefined,
-                  isPreview: isPreviewModel(m),
+                  isPreview: m.release_status === 'preview' || m.releaseStatus === 'preview',
                   isActive: true,
-                }));
+                } as GroqModelInfo));
 
                 await this.plugin.saveSettings();
                 new Notice(t('modelsUpdated', locale));
