@@ -4,10 +4,24 @@ import { HistoryStorageMethod } from '../types/settings';
 import { isValidFileName } from '../utils/validation';
 import { createLink, createTextNode } from '../utils/domUtils';
 import { t, Locale } from '../localization';
-import type { GroqChatSettings as GroqChatSettingsType } from '../settings/GroqChatSettings';
+import type { GroqChatSettings as GroqChatSettingsType, GroqModelInfo } from '../settings/GroqChatSettings';
 import { fixModelNameCasing, groupModelsByOwner, isPreviewModel } from '../utils/modelUtils';
 
 // NOTE: Use canonical settings type imported from '../settings/GroqChatSettings'
+
+// Interface for Groq API model response
+interface GroqApiModel {
+  id: string;
+  object?: string;
+  owned_by?: string;
+  name?: string;
+  description?: string;
+  max_completion_tokens?: number;
+  active?: boolean;
+  release_status?: string;
+  releaseStatus?: string;
+  created?: number;
+}
 
 export class GroqChatSettingsTab extends PluginSettingTab {
   constructor(
@@ -271,7 +285,7 @@ export class GroqChatSettingsTab extends PluginSettingTab {
       );
   }
 
-  private async fetchGroqModels(apiKey: string): Promise<any[]> {
+  private async fetchGroqModels(apiKey: string): Promise<GroqApiModel[]> {
     try {
       const response = await requestUrl({
         url: 'https://api.groq.com/openai/v1/models',
