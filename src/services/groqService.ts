@@ -30,12 +30,6 @@ interface GroqApiModel {
   created?: number;
 }
 
-// Interface for API response
-interface GroqApiResponse {
-  data: GroqApiModel[];
-  object?: string;
-}
-
 interface GroqServiceMethods {
   updateApiKey: (apiKey: string) => void;
   validateApiKey: (apiKey: string) => Promise<boolean>;

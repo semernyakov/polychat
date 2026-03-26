@@ -1,7 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { MarkdownRenderer, Component } from 'obsidian';
 import type { App } from 'obsidian';
-import { FiClipboard } from 'react-icons/fi';
 import { t, Locale } from '../localization';
 import '../styles.css';
 

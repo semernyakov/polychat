@@ -121,7 +121,7 @@ export default class GroqChatPlugin extends Plugin implements GroqPluginInterfac
       try {
         // Пытаемся создать лист в tab group
         leaf = this.app.workspace.getLeaf(true);
-      } catch (error) {
+      } catch {
         // Fallback: создаем в основной области
         leaf =
           this.app.workspace.getLeaf('split', 'horizontal') || this.app.workspace.getLeaf(false);

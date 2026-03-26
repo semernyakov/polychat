@@ -39,11 +39,11 @@ export class GroqChatView extends ItemView {
   }
 
   async onOpen() {
-    void this.renderView();
+    await this.renderView();
   }
 
   async onClose() {
-    void this.root?.unmount();
+    await this.root?.unmount();
   }
 
   private renderView() {

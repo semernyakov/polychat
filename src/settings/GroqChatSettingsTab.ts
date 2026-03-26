@@ -4,7 +4,7 @@ import { HistoryStorageMethod } from '../types/settings';
 import { isValidFileName } from '../utils/validation';
 import { createLink, createTextNode } from '../utils/domUtils';
 import { t, Locale } from '../localization';
-import type { GroqChatSettings as GroqChatSettingsType, GroqModelInfo } from '../settings/GroqChatSettings';
+import type { GroqModelInfo } from '../settings/GroqChatSettings';
 import { fixModelNameCasing, groupModelsByOwner, isPreviewModel } from '../utils/modelUtils';
 
 // NOTE: Use canonical settings type imported from '../settings/GroqChatSettings'
