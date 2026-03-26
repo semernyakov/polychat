@@ -53,13 +53,13 @@ export class AuthService {
    */
   async validateApiKey(apiKey: string): Promise<boolean> {
     if (!this.validateApiKeyFormat(apiKey)) {
-      new Notice('❌ Invalid API key format');
+      new Notice('Invalid API key format');
       return false;
     }
     try {
       const isValid = await this.groqService.validateApiKey(apiKey);
       if (isValid) {
-        new Notice('✅ Valid API key');
+        new Notice('Valid API key');
         return true;
       } else {
         new Notice('❌ Invalid API key');
@@ -67,7 +67,7 @@ export class AuthService {
       }
     } catch (error) {
       console.error('API key validation error:', error);
-      new Notice('⚠️ API key validation failed. Please check your connection and try again.');
+      new Notice('API key validation failed. Please check your connection and try again.');
       return false;
     }
   }
@@ -96,7 +96,7 @@ export class AuthService {
     } else {
       this.apiKeyIsSet = false;
       this.apiKey = null;
-      new Notice('❌ Invalid API key. Please check and try again.');
+      new Notice('Invalid API key. Please check and try again.');
       return false;
     }
   }
@@ -141,16 +141,16 @@ export class AuthService {
         void (async () => {
           try {
             await this.plugin.app?.plugins?.enablePlugin?.(pluginId);
-            new Notice('✅ Plugin refreshed successfully');
+            new Notice('Plugin refreshed successfully');
           } catch (error) {
             console.error('Error re-enabling plugin:', error);
-            new Notice('⚠️ Error refreshing plugin. Please restart Obsidian.');
+            new Notice('Error refreshing plugin. Please restart Obsidian.');
           }
         })();
       }, 1000);
     } catch (error) {
       console.error('Error disabling plugin:', error);
-      new Notice('⚠️ Error refreshing plugin. Please restart Obsidian.');
+      new Notice('Error disabling plugin:');
     }
   }
 }

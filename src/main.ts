@@ -20,7 +20,7 @@ export default class GroqChatPlugin extends Plugin implements GroqPluginInterfac
 
   async onload() {
     try {
-      new Notice('PolyChat: Загрузка…');
+      new Notice('PolyChat: Loading…');
 
       await this.loadSettings();
       this.initializeServices();
@@ -45,18 +45,18 @@ export default class GroqChatPlugin extends Plugin implements GroqPluginInterfac
       this.settingsTab = new GroqChatSettingsTab(this.app, this);
       this.addSettingTab(this.settingsTab);
 
-      new Notice('PolyChat: Готов к работе');
+      new Notice('PolyChat: Ready to work');
 
       // Автоматически открываем интерфейс после полной инициализации workspace
       this.app.workspace.onLayoutReady(() => {
         void this.activateView().catch(error => {
           console.error('Failed to activate PolyChat view:', error);
-          new Notice('PolyChat: Не удалось открыть интерфейс');
+          new Notice('PolyChat: Failed to open interface');
         });
       });
     } catch (e: unknown) {
       const errorMessage = e instanceof Error ? e.message : String(e);
-      new Notice(`PolyChat: Ошибка загрузки — ${errorMessage}`);
+      new Notice(`PolyChat: Loading error — ${errorMessage}`);
       console.error('PolyChat plugin loading error:', e);
     }
   }
