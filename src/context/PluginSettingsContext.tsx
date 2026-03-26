@@ -1,6 +1,7 @@
 import React, { createContext, useState } from 'react';
 import { GroqChatSettings, DEFAULT_SETTINGS } from '../settings/GroqChatSettings';
 import type { Locale } from '../localization';
+import type { App } from 'obsidian';
 
 interface PluginSettingsContextType extends GroqChatSettings {
   setSettings: (settings: Partial<GroqChatSettings>) => void;
@@ -29,7 +30,7 @@ export function PluginSettingsProvider({
 
   // Get current locale from Obsidian app
   const getLanguage = (): Locale => {
-    const app = (window as any)?.app;
+    const app = (window as any).app;
     const appLang = app?.getLanguage?.();
     return (appLang && appLang.toLowerCase().startsWith('ru') ? 'ru' : 'en') as Locale;
   };
