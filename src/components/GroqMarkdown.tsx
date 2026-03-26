@@ -50,7 +50,7 @@ export const GroqMarkdown: React.FC<GroqMarkdownProps> = ({
     const onClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement | null;
       if (!target) return;
-      const anchor = target.closest('a') as HTMLAnchorElement | null;
+      const anchor = target.closest('a');
       if (!anchor) return;
 
       const isInternal = anchor.classList.contains('internal-link');
