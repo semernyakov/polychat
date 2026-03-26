@@ -44,7 +44,7 @@ export class GroqChatSettingsTab extends PluginSettingTab {
   private _lastLocale: Locale | null = null;
 
   private getObsidianLocale(): Locale {
-    const appLang = (this.app as any)?.getLanguage?.();
+    const appLang = (this.app as unknown as { getLanguage?: () => string })?.getLanguage?.();
     if (typeof appLang === 'string') {
       const val = appLang.toLowerCase();
       return (val.startsWith('ru') ? 'ru' : 'en') as Locale;
