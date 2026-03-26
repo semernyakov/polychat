@@ -46,7 +46,7 @@ This project is actively maintained and developed. New features are added regula
 
 | Developer           | Models | Purpose |
 | ------------------- | ------ | ------- |
-| **Meta**            | Llama 4 Scout 17B 16E Instruct<br>Llama Prompt Guard 2 22M<br>Llama Prompt Guard 2 86M<br>Llama 3.3 70B Versatile<br>Llama 3.1 8B Instant | Text Generation<br>Content Filtering<br>Content Filtering<br>General Purpose<br>General Purpose |
+| **Meta**            | Llama 4 Scout 17B 16E Instruct<br>Llama Prompt Guard 2 22M<br>Llama Prompt Guard 2 86M<br>Llama 3.3 70B Versatile<br>Llama 3.1 8B Instant | Text Generation<br>Content Filtering<br>General Purpose<br>General Purpose |
 | **OpenAI**          | Whisper Large v3 Turbo<br>Community OSS Model (20B)<br>Whisper Large v3<br>Community OSS Model (120B) | Speech-to-Text<br>General Purpose<br>Speech-to-Text<br>General Purpose |
 | **Moonshot AI**     | Kimi K2 Instruct<br>Kimi K2 Instruct (0905) | General Purpose |
 | **Alibaba Cloud**   | Qwen3 32B | General Purpose |

@@ -46,7 +46,7 @@ PolyChat — это мощное расширение чата с поддерж
 
 | Разработчик         | Модели | Назначение |
 | ------------------- | ------ | ---------- |
-| **Meta**            | Llama 4 Scout 17B 16E Instruct<br>Llama Prompt Guard 2 22M<br>Llama Prompt Guard 2 86M<br>Llama 3.3 70B Versatile<br>Llama 3.1 8B Instant | Генерация текста<br>Фильтрация контента<br>Фильтрация контента<br>Общего назначения<br>Общего назначения |
+| **Meta**            | Llama 4 Scout 17B 16E Instruct<br>Llama Prompt Guard 2 22M<br>Llama Prompt Guard 2 86M<br>Llama 3.3 70B Versatile<br>Llama 3.1 8B Instant | Генерация текста<br>Фильтрация контента<br>Общего назначения<br>Общего назначения |
 | **OpenAI**          | Whisper Large v3 Turbo<br>Community OSS Model (20B)<br>Whisper Large v3<br>Community OSS Model (120B) | Речь в текст<br>Общего назначения<br>Речь в текст<br>Общего назначения |
 | **Moonshot AI**     | Kimi K2 Instruct<br>Kimi K2 Instruct (0905) | Общего назначения |
 | **Alibaba Cloud**   | Qwen3 32B | Общего назначения |
