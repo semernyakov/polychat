@@ -58,7 +58,7 @@ export const GroqMarkdown: React.FC<GroqMarkdownProps> = ({
 
       if (isInternal && href) {
         e.preventDefault();
-        effectiveApp.workspace.openLinkText(href, '/', false);
+        void effectiveApp.workspace.openLinkText(href, '/', false);
         return;
       }
 
@@ -130,7 +130,7 @@ export const GroqMarkdown: React.FC<GroqMarkdownProps> = ({
         const sourcePath =
           effectiveApp.workspace.getActiveFile()?.path ?? effectiveApp.vault.getName() ?? '';
 
-        await MarkdownRenderer.render(
+        await await MarkdownRenderer.render(
           effectiveApp,
           cleanedContent,
           container,
