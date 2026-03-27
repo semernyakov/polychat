@@ -44,18 +44,18 @@ This project is actively maintained and developed. New features are added regula
 
 ### Supported Models (Grouped by Developer)
 
-| Developer           | Models | Purpose |
-| ------------------- | ------ | ------- |
+| Developer           | Models                                                                                                                                    | Purpose                                                                                         |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
 | **Meta**            | Llama 4 Scout 17B 16E Instruct<br>Llama Prompt Guard 2 22M<br>Llama Prompt Guard 2 86M<br>Llama 3.3 70B Versatile<br>Llama 3.1 8B Instant | Text Generation<br>Content Filtering<br>Content Filtering<br>General Purpose<br>General Purpose |
-| **OpenAI**          | Whisper Large v3 Turbo<br>Community OSS Model (20B)<br>Whisper Large v3<br>Community OSS Model (120B) | Speech-to-Text<br>General Purpose<br>Speech-to-Text<br>General Purpose |
-| **Moonshot AI**     | Kimi K2 Instruct<br>Kimi K2 Instruct (0905) | General Purpose |
-| **Alibaba Cloud**   | Qwen3 32B | General Purpose |
-| **SDAIA**           | Allam 2 7B | Text Generation (Arabic) |
-| **Groq**            | Groq Compound<br>Groq Compound Mini | General Purpose |
-| **Canopy Labs**     | canopylabs/orpheus Arabic saudi<br>canopylabs/orpheus v1 english | Text-to-Speech (Arabic)<br>Text-to-Speech (English) |
-| **OpenAI (Safety)** | OpenAI/gpt oss safeguard 20b<br>OpenAI/gpt oss 120b | Content Safety<br>General Purpose |
+| **OpenAI**          | Whisper Large v3 Turbo<br>Community OSS Model (20B)<br>Whisper Large v3<br>Community OSS Model (120B)                                     | Speech-to-Text<br>General Purpose<br>Speech-to-Text<br>General Purpose                          |
+| **Moonshot AI**     | Kimi K2 Instruct<br>Kimi K2 Instruct (0905)                                                                                               | General Purpose                                                                                 |
+| **Alibaba Cloud**   | Qwen3 32B                                                                                                                                 | General Purpose                                                                                 |
+| **SDAIA**           | Allam 2 7B                                                                                                                                | Text Generation (Arabic)                                                                        |
+| **Groq**            | Groq Compound<br>Groq Compound Mini                                                                                                       | General Purpose                                                                                 |
+| **Canopy Labs**     | canopylabs/orpheus Arabic saudi<br>canopylabs/orpheus v1 english                                                                          | Text-to-Speech (Arabic)<br>Text-to-Speech (English)                                             |
+| **OpenAI (Safety)** | OpenAI/gpt oss safeguard 20b<br>OpenAI/gpt oss 120b                                                                                       | Content Safety<br>General Purpose                                                               |
 
-> *Last updated: March 26, 2026* <br>
+> _Last updated: March 26, 2026_ <br>
 > See plugin settings for the full up-to-date list. Descriptions will be updated as soon as they become available.
 
 ## Installation
@@ -94,7 +94,6 @@ You can install and test the latest development version of the plugin using the 
 5. Confirm installation.
 
 BRAT will automatically install the plugin and allow you to receive updates directly from the repository.
-
 
 ## Development
 

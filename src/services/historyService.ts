@@ -127,7 +127,11 @@ export class HistoryService {
 
         request.onerror = event => {
           console.error('IndexedDB getAll error:', (event.target as IDBRequest).error);
-          reject(new Error(`IndexedDB getAll error: ${(event.target as IDBRequest).error?.message || 'Unknown error'}`));
+          reject(
+            new Error(
+              `IndexedDB getAll error: ${(event.target as IDBRequest).error?.message || 'Unknown error'}`,
+            ),
+          );
         };
       });
     } catch (error) {
@@ -151,7 +155,11 @@ export class HistoryService {
               const req = store.put(msg);
               req.onsuccess = () => res();
               req.onerror = event =>
-                rej(new Error(`IndexedDB put error: ${(event.target as IDBRequest).error?.message || 'Unknown error'}`));
+                rej(
+                  new Error(
+                    `IndexedDB put error: ${(event.target as IDBRequest).error?.message || 'Unknown error'}`,
+                  ),
+                );
             });
           });
 
@@ -168,13 +176,19 @@ export class HistoryService {
 
         clearRequest.onerror = event => {
           console.error('IndexedDB clear error:', (event.target as IDBRequest).error);
-          reject(new Error(`IndexedDB clear error: ${(event.target as IDBRequest).error?.message || 'Unknown error'}`));
+          reject(
+            new Error(
+              `IndexedDB clear error: ${(event.target as IDBRequest).error?.message || 'Unknown error'}`,
+            ),
+          );
         };
 
         transaction.onerror = event => {
           console.error('IndexedDB transaction error:', (event.target as IDBTransaction).error);
           reject(
-            new Error(`IndexedDB transaction error: ${(event.target as IDBTransaction).error?.message || 'Unknown error'}`),
+            new Error(
+              `IndexedDB transaction error: ${(event.target as IDBTransaction).error?.message || 'Unknown error'}`,
+            ),
           );
         };
 
@@ -200,7 +214,11 @@ export class HistoryService {
         };
         request.onerror = event => {
           console.error('IndexedDB clear error:', (event.target as IDBRequest).error);
-          reject(new Error(`IndexedDB clear error: ${(event.target as IDBRequest).error?.message || 'Unknown error'}`));
+          reject(
+            new Error(
+              `IndexedDB clear error: ${(event.target as IDBRequest).error?.message || 'Unknown error'}`,
+            ),
+          );
         };
       });
     } catch (error) {
@@ -304,7 +322,11 @@ export class HistoryService {
       };
 
       request.onerror = event => {
-        reject(new Error(`IndexedDB open error: ${(event.target as IDBOpenDBRequest).error?.message || 'Unknown error'}`));
+        reject(
+          new Error(
+            `IndexedDB open error: ${(event.target as IDBOpenDBRequest).error?.message || 'Unknown error'}`,
+          ),
+        );
       };
 
       request.onblocked = () => {

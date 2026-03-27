@@ -44,18 +44,18 @@ PolyChat — это мощное расширение чата с поддерж
 
 ## 🤖 Поддержка моделей (Группировка по разработчикам)
 
-| Разработчик         | Модели | Назначение |
-| ------------------- | ------ | ---------- |
+| Разработчик         | Модели                                                                                                                                    | Назначение                                                                                               |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
 | **Meta**            | Llama 4 Scout 17B 16E Instruct<br>Llama Prompt Guard 2 22M<br>Llama Prompt Guard 2 86M<br>Llama 3.3 70B Versatile<br>Llama 3.1 8B Instant | Генерация текста<br>Фильтрация контента<br>Фильтрация контента<br>Общего назначения<br>Общего назначения |
-| **OpenAI**          | Whisper Large v3 Turbo<br>Community OSS Model (20B)<br>Whisper Large v3<br>Community OSS Model (120B) | Речь в текст<br>Общего назначения<br>Речь в текст<br>Общего назначения |
-| **Moonshot AI**     | Kimi K2 Instruct<br>Kimi K2 Instruct (0905) | Общего назначения |
-| **Alibaba Cloud**   | Qwen3 32B | Общего назначения |
-| **SDAIA**           | Allam 2 7B | Генерация текста (арабский) |
-| **Groq**            | Groq Compound<br>Groq Compound Mini | Общего назначения |
-| **Canopy Labs**     | canopylabs/orpheus Arabic saudi<br>canopylabs/orpheus v1 english | Синтез речи (арабский)<br>Синтез речи (английский) |
-| **OpenAI (Safety)** | OpenAI/gpt oss safeguard 20b<br>OpenAI/gpt oss 120b | Безопасность контента<br>Общего назначения |
+| **OpenAI**          | Whisper Large v3 Turbo<br>Community OSS Model (20B)<br>Whisper Large v3<br>Community OSS Model (120B)                                     | Речь в текст<br>Общего назначения<br>Речь в текст<br>Общего назначения                                   |
+| **Moonshot AI**     | Kimi K2 Instruct<br>Kimi K2 Instruct (0905)                                                                                               | Общего назначения                                                                                        |
+| **Alibaba Cloud**   | Qwen3 32B                                                                                                                                 | Общего назначения                                                                                        |
+| **SDAIA**           | Allam 2 7B                                                                                                                                | Генерация текста (арабский)                                                                              |
+| **Groq**            | Groq Compound<br>Groq Compound Mini                                                                                                       | Общего назначения                                                                                        |
+| **Canopy Labs**     | canopylabs/orpheus Arabic saudi<br>canopylabs/orpheus v1 english                                                                          | Синтез речи (арабский)<br>Синтез речи (английский)                                                       |
+| **OpenAI (Safety)** | OpenAI/gpt oss safeguard 20b<br>OpenAI/gpt oss 120b                                                                                       | Безопасность контента<br>Общего назначения                                                               |
 
-> *Последнее обновление: 26 марта 2026 г.* <br>
+> _Последнее обновление: 26 марта 2026 г._ <br>
 > Полный и актуальный список всегда отображается в настройках плагина. Описания будут добавлены по мере появления.
 
 ## Установка

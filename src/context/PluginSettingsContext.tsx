@@ -68,4 +68,4 @@ export const PluginSettingsProvider: React.FC<PluginSettingsProviderProps> = ({
       {children}
     </PluginSettingsContext.Provider>
   );
-}
+};

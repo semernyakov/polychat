@@ -138,27 +138,27 @@ export const GroqMarkdown: React.FC<GroqMarkdownProps> = ({
             mdComponent,
           );
 
-        // Гарантируем безопасность внешних ссылок
-        container.querySelectorAll('a:not(.internal-link)').forEach(link => {
-          link.setAttribute('target', '_blank');
-          link.setAttribute('rel', 'noopener noreferrer');
-        });
+          // Гарантируем безопасность внешних ссылок
+          container.querySelectorAll('a:not(.internal-link)').forEach(link => {
+            link.setAttribute('target', '_blank');
+            link.setAttribute('rel', 'noopener noreferrer');
+          });
 
-        // Обогащаем блоки кода
-        enhanceCodeBlocks(container, locale);
+          // Обогащаем блоки кода
+          enhanceCodeBlocks(container, locale);
 
-        lastRenderedRef.current = cleanedContent;
+          lastRenderedRef.current = cleanedContent;
 
-        if (onRenderComplete) {
-          void onRenderComplete();
+          if (onRenderComplete) {
+            void onRenderComplete();
+          }
+        } catch (err) {
+          console.error('Error rendering markdown:', err);
+          (container as ObsidianContainerElement).setText?.(cleanedContent);
+          if (onRenderComplete) {
+            void onRenderComplete();
+          }
         }
-      } catch (err) {
-        console.error('Error rendering markdown:', err);
-        (container as ObsidianContainerElement).setText?.(cleanedContent);
-        if (onRenderComplete) {
-          void onRenderComplete();
-        }
-      }
       })();
     }, 50);
   }, [cleanedContent, effectiveApp, onRenderComplete]);
