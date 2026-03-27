@@ -499,7 +499,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
   };
 
   return (
-    <PluginSettingsProvider initialSettings={props.plugin.settings}>
+    <PluginSettingsProvider plugin={props.plugin} initialSettings={props.plugin.settings}>
       <ChatPanelInner />
     </PluginSettingsProvider>
   );

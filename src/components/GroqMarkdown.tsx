@@ -115,27 +115,28 @@ export const GroqMarkdown: React.FC<GroqMarkdownProps> = ({
       debounceTimerRef.current = null;
     }
 
-    debounceTimerRef.current = window.setTimeout(async () => {
-      if (!mountedRef.current) return;
-      const container = containerRef.current;
-      const mdComponent = mdComponentRef.current;
-      if (!container || !mdComponent) {
-        return;
-      }
+    debounceTimerRef.current = window.setTimeout(() => {
+      void (async () => {
+        if (!mountedRef.current) return;
+        const container = containerRef.current;
+        const mdComponent = mdComponentRef.current;
+        if (!container || !mdComponent) {
+          return;
+        }
 
-      (container as ObsidianContainerElement).empty?.();
+        (container as ObsidianContainerElement).empty?.();
 
-      try {
-        const sourcePath =
-          effectiveApp.workspace.getActiveFile()?.path ?? effectiveApp.vault.getName() ?? '';
+        try {
+          const sourcePath =
+            effectiveApp.workspace.getActiveFile()?.path ?? effectiveApp.vault.getName() ?? '';
 
-        await await MarkdownRenderer.render(
-          effectiveApp,
-          cleanedContent,
-          container,
-          sourcePath,
-          mdComponent,
-        );
+          await MarkdownRenderer.render(
+            effectiveApp,
+            cleanedContent,
+            container,
+            sourcePath,
+            mdComponent,
+          );
 
         // Гарантируем безопасность внешних ссылок
         container.querySelectorAll('a:not(.internal-link)').forEach(link => {
@@ -158,6 +159,7 @@ export const GroqMarkdown: React.FC<GroqMarkdownProps> = ({
           void onRenderComplete();
         }
       }
+      })();
     }, 50);
   }, [cleanedContent, effectiveApp, onRenderComplete]);
 
