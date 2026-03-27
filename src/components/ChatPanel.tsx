@@ -471,7 +471,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
             <MessageInput
               value={inputValue}
               onChange={value => void setInputValue(value)}
-              onSend={handleSendMessage}
+              onSend={() => void handleSendMessage()}
               disabled={isLoading || isHistoryLoading}
               maxTokens={selectedModelInfo.maxTokens}
               locale={locale}
