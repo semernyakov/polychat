@@ -235,7 +235,7 @@ export class GroqService implements GroqServiceMethods {
       // ВРЕМЕННО: логируем все поля моделей для отладки
       if (response.json && Array.isArray(response.json.data)) {
         // console.log('[GroqService] Получено моделей:', response.json.data.length);
-        response.json.data.forEach((model: GroqApiModel, idx: number) => {
+        response.json.data.forEach((_model: GroqApiModel, _idx: number) => {
           // console.log(`[GroqService] Модель #${idx + 1}:`, model);
         });
       }

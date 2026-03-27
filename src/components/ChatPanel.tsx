@@ -6,7 +6,6 @@ import { MessageList, MessageListHandles } from './MessageList';
 import { ModelSelector } from './ModelSelector';
 import { MessageInput } from './MessageInput';
 import { SupportDialog } from './SupportDialog';
-import type { App } from 'obsidian';
 import {
   FiTrash2,
   FiChevronUp,
@@ -499,7 +498,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = props => {
   };
 
   return (
-    <PluginSettingsProvider plugin={props.plugin} initialSettings={props.plugin.settings}>
+    <PluginSettingsProvider _plugin={props.plugin} initialSettings={props.plugin.settings}>
       <ChatPanelInner />
     </PluginSettingsProvider>
   );

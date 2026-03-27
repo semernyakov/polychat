@@ -8,16 +8,16 @@ export class AuthService {
   // Теперь принимаем plugin с методами saveData/loadData
   constructor(
     private readonly groqService: {
-      validateApiKey: (apiKey: string) => Promise<boolean>;
-      updateApiKey?: (apiKey: string) => void;
+      validateApiKey: (_apiKey: string) => Promise<boolean>;
+      updateApiKey?: (_apiKey: string) => void;
     },
     private readonly plugin: {
       saveData: (data: Record<string, unknown>) => Promise<void>;
       loadData: () => Promise<Record<string, unknown> | null>;
       app?: App & {
         plugins?: {
-          disablePlugin?: (id: string) => Promise<void>;
-          enablePlugin?: (id: string) => Promise<void>;
+          disablePlugin?: (_id: string) => Promise<void>;
+          enablePlugin?: (_id: string) => Promise<void>;
         };
       };
     } & { id?: string },

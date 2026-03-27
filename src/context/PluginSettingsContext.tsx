@@ -27,13 +27,13 @@ export const usePluginSettings = () => {
 
 interface PluginSettingsProviderProps {
   children: React.ReactNode;
-  plugin: Plugin;
+  _plugin: Plugin;
   initialSettings: GroqChatSettings;
 }
 
 export const PluginSettingsProvider: React.FC<PluginSettingsProviderProps> = ({
   children,
-  plugin,
+  _plugin,
   initialSettings,
 }) => {
   const [settings, setSettings] = useState<GroqChatSettings>({
@@ -49,8 +49,8 @@ export const PluginSettingsProvider: React.FC<PluginSettingsProviderProps> = ({
     return (appLang && appLang.toLowerCase().startsWith('ru') ? 'ru' : 'en') as Locale;
   };
 
-  const updateSettings = (newSettings: Partial<GroqChatSettings>) => {
-    setSettings(prev => ({ ...prev, ...newSettings }));
+  const updateSettings = (_newSettings: Partial<GroqChatSettings>) => {
+    setSettings(prev => ({ ...prev, ..._newSettings }));
   };
 
   useEffect(() => {
