@@ -377,7 +377,7 @@ export class GroqChatSettingsTab extends PluginSettingTab {
               const apiModels = await this.fetchGroqModels(this.plugin.settings.apiKey);
               if (apiModels?.length) {
                 // Update available models
-                const settings = this.plugin.settings as any;
+                const settings = this.plugin.settings;
                 settings.groqAvailableModels = apiModels.map((m: GroqApiModel) => ({
                   id: m.id,
                   name: fixModelNameCasing(m.name || m.id),
@@ -699,7 +699,7 @@ export class GroqChatSettingsTab extends PluginSettingTab {
 
   // --- Дополнительные настройки интерфейса (хвост истории) ---
   private addTailSettings(locale: Locale): void {
-    const plugin = this.plugin as any;
+    const plugin = this.plugin;
     // Сколько последних сообщений показывать при открытии
     new Setting(this.containerEl)
       .setName(t('settings.tailLimitName', locale))
@@ -734,11 +734,9 @@ export class GroqChatSettingsTab extends PluginSettingTab {
         const current = String(plugin.settings.messageLoadStep ?? 20);
         dd.setValue(current);
         dd.onChange((value: string) => {
-          void (async () => {
-            const num = Math.max(1, Math.min(1000, parseInt(value) || 20));
-            plugin.settings.messageLoadStep = num;
-            await this.plugin.saveSettings();
-          })();
+          const num = Math.max(1, Math.min(1000, parseInt(value) || 20));
+          plugin.settings.messageLoadStep = num;
+          void this.plugin.saveSettings();
         });
       });
   }

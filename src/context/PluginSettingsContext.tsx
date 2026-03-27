@@ -1,47 +1,68 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { GroqChatSettings, DEFAULT_SETTINGS } from '../settings/GroqChatSettings';
+import type { App, Plugin } from 'obsidian';
 import type { Locale } from '../localization';
-import type { App } from 'obsidian';
 
-interface PluginSettingsContextType extends GroqChatSettings {
-  setSettings: (settings: Partial<GroqChatSettings>) => void;
-  language: Locale;
+interface WindowWithLanguage {
+  app?: {
+    getLanguage?(): string;
+  };
 }
 
-export const PluginSettingsContext = createContext<PluginSettingsContextType | undefined>(
-  undefined,
-);
+interface PluginSettingsContextType {
+  settings: GroqChatSettings;
+  updateSettings: (newSettings: Partial<GroqChatSettings>) => void;
+  locale: Locale;
+}
 
-export function PluginSettingsProvider({
-  children,
-  initialSettings,
-}: {
+export const PluginSettingsContext = createContext<PluginSettingsContextType | null>(null);
+
+export const usePluginSettings = () => {
+  const context = useContext(PluginSettingsContext);
+  if (!context) {
+    throw new Error('usePluginSettings must be used within a PluginSettingsProvider');
+  }
+  return context;
+};
+
+interface PluginSettingsProviderProps {
   children: React.ReactNode;
-  initialSettings?: Partial<GroqChatSettings>;
-}) {
-  const [settings, setSettingsState] = useState<GroqChatSettings>({
+  plugin: Plugin;
+  initialSettings: GroqChatSettings;
+}
+
+export const PluginSettingsProvider: React.FC<PluginSettingsProviderProps> = ({
+  children,
+  plugin,
+  initialSettings,
+}) => {
+  const [settings, setSettings] = useState<GroqChatSettings>({
     ...DEFAULT_SETTINGS,
     ...initialSettings,
   });
-
-  const setSettings = (newSettings: Partial<GroqChatSettings>) => {
-    setSettingsState(prev => ({ ...prev, ...newSettings }));
-  };
+  const [locale, setLocale] = useState<Locale>('en');
 
   // Get current locale from Obsidian app
   const getLanguage = (): Locale => {
-    const app = (window as any).app;
+    const app = (window as WindowWithLanguage).app;
     const appLang = app?.getLanguage?.();
     return (appLang && appLang.toLowerCase().startsWith('ru') ? 'ru' : 'en') as Locale;
   };
 
+  const updateSettings = (newSettings: Partial<GroqChatSettings>) => {
+    setSettings(prev => ({ ...prev, ...newSettings }));
+  };
+
+  useEffect(() => {
+    setLocale(getLanguage());
+  }, []);
+
   return (
     <PluginSettingsContext.Provider
       value={{
-        ...settings,
-        setSettings,
-        // Язык интерфейса берём из настроек Obsidian, а не из настроек плагина
-        language: getLanguage(),
+        settings,
+        updateSettings,
+        locale,
       }}
     >
       {children}
