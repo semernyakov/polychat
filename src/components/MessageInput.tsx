@@ -52,7 +52,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
           value={value}
           onChange={e => onChange(e.target.value)}
           onKeyDown={e => {
-            if (e.key === 'Enter' && !e.shiftKey) {
+            if (e.key === 'Enter' && !e.shiftKey && !isComposing) {
               e.preventDefault();
               void onSend();
             }

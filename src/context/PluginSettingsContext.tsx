@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { GroqChatSettings, DEFAULT_SETTINGS } from '../settings/GroqChatSettings';
-import type { App, Plugin } from 'obsidian';
+import type { Plugin } from 'obsidian';
 import type { Locale } from '../localization';
 
 interface WindowWithLanguage {
