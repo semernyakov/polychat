@@ -1,6 +1,6 @@
 {
-  "id": "groq-poly-chat",
-  "name": "PolyChat",
+  "id": "semernyakov-groq-poly-chat",
+  "name": "Semernyakov PolyChat",
   "version": "1.3.5",
   "minAppVersion": "1.8.0",
   "description": "PolyChat: multimodal AI chat with Groq API — one-click model switching, history, and cross-device sync for seamless productivity.",
