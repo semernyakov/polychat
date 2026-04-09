@@ -27,7 +27,7 @@ export class GroqChatView extends ItemView {
   }
 
   getDisplayText() {
-    return 'Polychat';
+    return 'PolyMind';
   }
 
   getIcon() {

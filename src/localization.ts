@@ -30,7 +30,7 @@ const translations: Record<Locale, Record<string, string>> = {
   ru: {
     // Settings
     'settings.interface': '👀 Интерфейс и язык',
-    'settings.subtitle': 'Настройте PolyChat, чтобы общение с ИИ было максимально удобным! 😊',
+    'settings.subtitle': 'Настройте PolyMind, чтобы общение с ИИ было максимально удобным! 😊',
     'settings.apiHeading': '🔑 Доступ к API',
     'settings.tailLimitName': 'Последние сообщения при открытии',
     'settings.tailLimitDesc': 'Сколько последних сообщений показывать без прокрутки',
@@ -57,7 +57,7 @@ const translations: Record<Locale, Record<string, string>> = {
       'Этот плагин разрабатывается энтузиастом в свободное время. Ваша поддержка поможет ускорить разработку, добавить новые функции и поддерживать проект в актуальном состоянии.',
     supportDialogYooMoneyInfo:
       'Вы можете поддержать проект через YooMoney. Сервис принимает переводы как из России, так и из других стран (через банковские карты).',
-    supportDialogThanksTitle: 'Спасибо за использование PolyChat!',
+    supportDialogThanksTitle: 'Спасибо за использование PolyMind!',
     supportDialogThanksSupport: 'Поддержать проект',
     supportDialogThanksReview: 'Оставить отзыв',
     supportDialogThanksContact: 'Написать разработчику в Telegram',
@@ -65,7 +65,7 @@ const translations: Record<Locale, Record<string, string>> = {
     language: 'Язык',
     save: 'Сохранить',
     cancel: 'Сбросить',
-    chatTitle: 'PolyChat',
+    chatTitle: 'PolyMind',
     authToken: 'Токен авторизации',
     // Thanks block
     'thanks.title': 'Спасибо за использование плагина!',
@@ -196,7 +196,7 @@ const translations: Record<Locale, Record<string, string>> = {
       'This plugin is developed by an enthusiast in their free time. Your support will help accelerate development, add new features, and maintain the project in an up-to-date state.',
     supportDialogYooMoneyInfo:
       'You can support the project via YooMoney. The service accepts transfers from both Russia and other Countries (via bank cards).',
-    supportDialogThanksTitle: 'Thank you for using PolyChat!',
+    supportDialogThanksTitle: 'Thank you for using PolyMind!',
     supportDialogThanksSupport: 'Support project',
     supportDialogThanksReview: 'Leave review',
     supportDialogThanksContact: 'Contact with developer by Telegram',
@@ -204,7 +204,7 @@ const translations: Record<Locale, Record<string, string>> = {
     language: 'Language',
     save: 'Save',
     cancel: 'Reset',
-    chatTitle: 'PolyChat',
+    chatTitle: 'PolyMind',
     authToken: 'Auth Token',
     // Thanks block
     'thanks.title': 'Thank you for using the plugin!',

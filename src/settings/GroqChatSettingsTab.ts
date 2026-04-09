@@ -164,7 +164,7 @@ export class GroqChatSettingsTab extends PluginSettingTab {
     const githubLink = createLink(
       linksDiv,
       '⭐ GitHub',
-      'https://github.com/semernyakov/polychat',
+      'https://github.com/semernyakov/polymind',
       {
         target: '_blank',
         rel: 'noopener noreferrer',

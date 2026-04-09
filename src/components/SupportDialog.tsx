@@ -28,7 +28,7 @@ const SupportThanksBlock: React.FC<{ locale: import('../localization').Locale }>
           {t('supportDialogThanksSupport', locale)}
         </button>
         <button
-          onClick={() => openLink('https://github.com/semernyakov/polychat')}
+          onClick={() => openLink('https://github.com/semernyakov/polymind')}
           className="groq-support-thanks__button"
         >
           <FiStar size={16} />

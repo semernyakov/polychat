@@ -2,7 +2,7 @@ import { HistoryStorageMethod } from '../types/settings';
 import type { RateLimitsType } from '../services/groqService';
 
 /**
- * Настройки плагина PolyChat
+ * Настройки плагина PolyMind
  */
 export interface GroqModelInfo {
   id: string;
@@ -48,7 +48,7 @@ export const DEFAULT_SETTINGS: Readonly<GroqChatSettings> = Object.freeze({
   maxTokens: 4096,
   historyStorageMethod: 'memory',
   maxHistoryLength: 20,
-  notePath: 'polychat-history.md',
+  notePath: 'polymind-history.md',
   displayMode: 'tab', // Значение по умолчанию
   messageTailLimit: 10,
   messageLoadStep: 20,
