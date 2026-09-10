@@ -48,7 +48,9 @@ export default class GroqChatPlugin extends Plugin implements GroqPluginInterfac
       new Notice('PolyChat: Ready to work');
 
       // Автоматически открываем интерфейс после полной инициализации workspace
+      // (отключается настройкой openOnStartup)
       this.app.workspace.onLayoutReady(() => {
+        if (!this.settings.openOnStartup) return;
         void this.activateView().catch(error => {
           console.error('Failed to activate PolyChat view:', error);
           new Notice('PolyChat: Failed to open interface');
