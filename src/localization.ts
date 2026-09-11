@@ -37,6 +37,17 @@ const translations: Record<Locale, Record<string, string>> = {
     'settings.loadStepName': 'Шаг подгрузки истории',
     'settings.loadStepDesc':
       'Сколько сообщений добавлять при нажатии на кнопку или прокрутке вверх',
+    'settings.noteContextHeading': '📄 Контекст заметок',
+    'settings.openOnStartup': 'Открывать чат при запуске',
+    'settings.openOnStartupDesc': 'Автоматически открывать панель чата при запуске Obsidian.',
+    'settings.expandWikilinks': 'Раскрывать [[ссылки]] в сообщении',
+    'settings.expandWikilinksDesc':
+      'Заменять [[Заметка]] на реальное содержимое заметки перед отправкой.',
+    'settings.includeOpenNotes': 'Включать все открытые заметки как контекст',
+    'settings.includeOpenNotesDesc':
+      'Автоматически добавлять содержимое всех открытых вкладок к каждому сообщению.',
+    'settings.maxContextChars': 'Макс. символов на заметку',
+    'settings.maxContextCharsDesc': '0 = включать заметку целиком.',
     'settings.historyHeading': '🕓 История чата',
     'settings.default10': 'По умолчанию: 10',
     'settings.default20': 'По умолчанию: 20',
@@ -176,6 +187,17 @@ const translations: Record<Locale, Record<string, string>> = {
     'settings.tailLimitDesc': 'How many last messages to show without initial scrolling',
     'settings.loadStepName': 'History load step',
     'settings.loadStepDesc': 'How many messages to load when clicking the button or scrolling up',
+    'settings.noteContextHeading': '📄 Note context',
+    'settings.openOnStartup': 'Open chat on startup',
+    'settings.openOnStartupDesc': 'Automatically open the chat panel when Obsidian starts.',
+    'settings.expandWikilinks': 'Expand [[links]] in your message',
+    'settings.expandWikilinksDesc':
+      "Replace [[Note]] references with the note's actual content before sending.",
+    'settings.includeOpenNotes': 'Include all open notes as context',
+    'settings.includeOpenNotesDesc':
+      'Automatically append the content of every open markdown tab to each message.',
+    'settings.maxContextChars': 'Max characters per note',
+    'settings.maxContextCharsDesc': '0 = include the whole note.',
     'settings.historyHeading': '🕓 Chat History',
     'settings.default10': 'Default: 10',
     'settings.default20': 'Default: 20',
